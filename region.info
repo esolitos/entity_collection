@@ -1,7 +1,6 @@
 name = Region
-description = Let's you create region entities that can be used for dealing with
-ordering of things.
-dependencies[] = entity
+description = Let's you create region entities that can be used for dealing with ordering of things.
 dependencies[] = ctools
+dependencies[] = entity
 core = 7.x
 package = Region

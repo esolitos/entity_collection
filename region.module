@@ -85,6 +85,10 @@ function region_entity_info() {
   );
 }
 
+/**
+ * Fetch all bundles for a region.
+ * @return type
+ */
 function region_bundles() {
   ctools_include('export');
   return ctools_export_load_object('region_bundles');

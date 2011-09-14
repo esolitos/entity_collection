@@ -8,14 +8,14 @@
 /**
  * Form callback for the region add form.
  */
-function region_add_form($form, &$form_state, $type) {
+function region_add_form($form, &$form_state, $bundle) {
   $form = array();
-  $form_state['type'] = $type;
+  $form_state['bundle'] = $bundle;
   $form = region_form($form, $form_state);
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save block'),
+    '#value' => t('Save region'),
     '#weight' => 40,
   );
   return $form;
@@ -66,7 +66,7 @@ function region_form($form = array(), &$form_state = array()) {
     '#type' => 'textfield',
     '#required' => TRUE,
     '#default_value' => $region->title,
-    '#title' => 'title',
+    '#title' => t('Title'),
   );
   // Machine-readable name.
   $form['name'] = array(
@@ -80,7 +80,7 @@ function region_form($form = array(), &$form_state = array()) {
     ),
     '#description' => t('A unique machine-readable name for this block. It must only contain lowercase letters, numbers, and underscores.'),
   );
-  field_attach_form('region', $region, $form, $form_state);
+  //field_attach_form('region', $region, $form, $form_state);
   $form['#validate'][] = 'region_form_validate';
   $form['#submit'][] = 'region_form_submit';
   return $form;
