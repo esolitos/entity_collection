@@ -19,16 +19,16 @@ function region_menu() {
     'page arguments' => array('region_edit_form', 4),
     'access arguments' => array('edit', 4),
     'access callback' => 'entityblock_access',
-    'file' => 'entityblock.admin.inc',
+    'file' => 'region.admin.inc',
     'type' => MENU_CALLBACK,
   );
   $items['admin/structure/region/delete/%region'] = array(
     'title' => 'Delete region',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('region_delete_form', 4),
-    'access callback' => 'entityblock_access',
+    'access callback' => 'region_access',
     'access arguments' => array('delete', 4),
-    'file' => 'entityblock.admin.inc',
+    'file' => 'region.admin.inc',
     'type' => MENU_CALLBACK,
   );
   $region_bundles = region_bundles();
@@ -39,7 +39,7 @@ function region_menu() {
       'page callback' => 'drupal_get_form',
       'page arguments' => array('region_add_form', 4),
       'access arguments' => array("create {$info->name} entity blocks"),
-      'file' => 'entityblock.admin.inc',
+      'file' => 'region.admin.inc',
       'type' => MENU_LOCAL_ACTION,
     );
   }
@@ -87,7 +87,7 @@ function region_entity_info() {
 
 function region_bundles() {
   ctools_include('export');
-  return ctools_export_load_object('region_bundle');
+  return ctools_export_load_object('region_bundles');
 }
 
 /**
