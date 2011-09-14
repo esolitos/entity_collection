@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Table definition for the region module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function region_schema() {
+  // The region bundles table is used for store bundles. It's using the
+  // CTools export API to make it exportable.
+  $schema['region_bundles'] = array(
+    'description' => 'Table holding region bundles.',
+    'export' => array(
+      'api' => array(
+        'owner' => 'region',
+        'api' => 'region_bundles_default',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+      'key' => 'name',
+      'key name' => 'Name',
+      'primary key' => 'rbid',
+      'identifier' => 'preset',
+      'default hook' => 'region_bundles_default',
+      'load callback' => 'region_bundle_load',
+    ),
+    'fields' => array(
+      'rbid' => array(
+        'description' => 'Serial id for this region. Only used for internal lookups.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'Machine-readable name for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Administrative title for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'description' => 'Administrative description for this region.',
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('rbid', 'name'),
+  );
+  // Table for regions. Regions are exportable through the Entity API.
+  $schema['region_regions'] = array(
+    'description' => 'Table holding regions.',
+    'fields' => array(
+      'rid' => array(
+        'description' => 'Serial id for this region. Only used for internal lookups.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'Machine-readable name for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'bundle' => array(
+        'description' => 'Machine-readable name for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'max_items' => array(
+        'description' => t('Maximum number of items'),
+        'type' => 'int',
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('rid', 'name'),
+  );
+
+
+
+  return $schema;
+}

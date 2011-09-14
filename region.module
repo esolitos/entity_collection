@@ -1,0 +1,210 @@
+<?php
+
+/**
+ * Imeplements hook_menu().
+ */
+function region_menu() {
+  $items = array();
+  $items['admin/structure/region'] = array(
+    'title' => 'Regions',
+    'page callback' => 'region_admin',
+    'description' => t('Administer regions'),
+    'access arguments' => array('administer regions'),
+    'file' => 'region.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/structure/region/edit/%region'] = array(
+    'title' => 'Edit region',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('region_edit_form', 4),
+    'access arguments' => array('edit', 4),
+    'access callback' => 'entityblock_access',
+    'file' => 'entityblock.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/structure/region/delete/%region'] = array(
+    'title' => 'Delete region',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('region_delete_form', 4),
+    'access callback' => 'entityblock_access',
+    'access arguments' => array('delete', 4),
+    'file' => 'entityblock.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $region_bundles = region_bundles();
+  // If we are using the block module, then we add links from there.
+  foreach ($region_bundles as $key => $info) {
+    $item = array(
+      'title' => 'Add ' . drupal_strtolower($info->title),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('region_add_form', 4),
+      'access arguments' => array("create {$info->name} entity blocks"),
+      'file' => 'entityblock.admin.inc',
+      'type' => MENU_LOCAL_ACTION,
+    );
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function region_entity_info() {
+  return array(
+    'region' => array(
+      'label' => t('Region'),
+      'entity class' => 'Region',
+      'controller class' => 'EntityAPIController',
+      'fieldable' => TRUE,
+      'exportable' => TRUE,
+      'view modes' => array(
+        'block' => array(
+          'label' => t('Region'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'access callback' => 'region_access',
+      'base table' => 'region_regions',
+      'module' => 'region',
+      'bundles' => region_bundles(),
+      'bundle keys' => array('bundle' => 'type'),
+      'entity keys' => array(
+        'id' => 'rcid',
+        'name' => 'name',
+        'bundle' => 'bundle',
+        'label' => 'title',
+      ),
+    ),
+  );
+}
+
+function region_bundles() {
+  ctools_include('export');
+  return ctools_export_load_object('region_bundle');
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function region_ctools_plugin_directory($module, $type) {
+  if ($type == 'export_ui') {
+    return 'plugins/' . $type;
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function region_permission() {
+  $permissions = array(
+    'administer region types' =>  array(
+      'title' => t('Administer region types'),
+      'description' => t('Create and delete fields on regions, and set their permissions.'),
+    ),
+  );
+  /*
+  // Generate per profile type permissions.
+  foreach (entityblock_get_types() as $type) {
+    $type_name = check_plain($type->type);
+    $permissions += array(
+      "create $type_name entity blocks" => array(
+        'title' => t('%type_name: Create entity block', array('%type_name' => $type->label)),
+      ),
+      "edit $type_name entity blocks" => array(
+        'title' => t('%type_name: Edit entity block', array('%type_name' => $type->label)),
+      ),
+      "view $type_name entity blocks" => array(
+        'title' => t('%type_name: View entity block', array('%type_name' => $type->label)),
+      ),
+      "delete $type_name entity blocks" => array(
+        'title' => t('%type_name: Delete entity block', array('%type_name' => $type->label)),
+      ),
+    );
+  }
+   */
+  return $permissions;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function region_block_info() {
+  $regions = array();
+  // Load all blocks
+  $regions = entity_load('region');
+  foreach ($regions as $region) {
+    $blocks[$region->name] = array(
+      'info' => $region->title,
+      'cache' => $region->cache,
+    );
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function region_block_configure($delta) {
+  $block = entity_load('region', array($delta));
+  if (user_access("edit {$block->type} entity blocks")) {
+    $form_state = array('type' => $block->type, 'entityblock' => $block);
+    // We attach our entity block form here.
+    return entityblock_form(array(), $form_state);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function region_block_view($delta) {
+  $block = array();
+  // The delta is always the same as the machine name of the
+  // entity block, so it's fairly easy to load.
+  $region = entity_load('region', array($delta));
+  if ($entityblock && user_access("view {$entityblock->type} entity blocks")) {
+    $block['subject'] = check_plain($entityblock->title);
+    $block['content'] = $entityblock->buildContent();
+    return $block;
+  }
+}
+
+/**
+ * This class is used to represent Regions.
+ */
+class Region extends Entity {
+  // We provide the values here for reference.
+  public $type;
+  public $name;
+  public $bid;
+  public $title;
+  public $cache;
+
+  public function __construct($values = array()) {
+    parent::__construct($values, 'region');
+  }
+
+  /**
+   * Gets the type entity.
+   *
+   * @return Entity
+   *  The type associated with this entity.
+   */
+  public function getTypeEntity() {
+    if (isset($this->type)) {
+      return entity_get_types($this->type);
+    }
+  }
+
+  /**
+   * Build content.
+   * @param string $view_mode
+   *   The current view mode.
+   * @param type $langcode
+   *   The language code to use.
+   * @return array
+   *  An array that can be used with Drupals rendering system.
+   */
+  public function buildContent($view_mode = 'block', $langcode = NULL) {
+    $content = array();
+    return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
+  }
+}
