@@ -5,3 +5,47 @@
  * Sample region storage database implementation.
  */
 
+module_load_include('inc', 'region', 'plugins/region_storage/region_storage');
+
+function region_storage_database_sample_init() {
+  $storage = new RegionStorageDatabaseSample();
+  $fake_entities = (object) array(
+    0 => (object) array('foo' => 'bar'),
+    1 => (object) array('abc' => 'def'),
+  );
+  $storage->save('lorem', $fake_entities);
+  //$storage->retrieve('loremipsum');
+  //$storage->delete('loremipsum');
+}
+
+class RegionStorageDatabaseSample implements RegionStorage {
+
+  public function save($name, $regions) {
+    foreach ($regions as $entity) {
+      $record = array(
+        'name' => 'loremipsum',
+        'entity' => $entity,
+      );
+      drupal_write_record('region_storage', $record);
+    }  
+  }
+
+  public function retrieve($name) {
+    $query = db_select('region_storage');
+    $query->addField('region_storage', 'name');
+    $query->addField('region_storage', 'entity');
+    $query->condition('name', $name, '=');
+    $result = $query->execute();
+    foreach ($result as $value) {
+      var_dump($value);
+    }
+  }
+
+  public function delete($name) {
+    db_delete('region_storage')
+      ->condition('name', $name)
+      ->execute();
+  }
+
+}
+
