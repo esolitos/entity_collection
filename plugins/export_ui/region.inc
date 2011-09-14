@@ -21,10 +21,10 @@ $plugin = array(
 
 function region_export_ui_form(&$form, &$form_state) {
   $region = $form_state['item'];
-  $form['title'] = array(
+  $form['label'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#default_value' => $region->title,
+    '#default_value' => $region->label,
     '#required' => TRUE,
   );
 
@@ -39,6 +39,6 @@ function region_export_ui_form(&$form, &$form_state) {
 }
 
 function region_export_ui_form_submit(&$form, &$form_state) {
-  $form_state['item']->title = $form_state['values']['title'];
+  $form_state['item']->label = $form_state['values']['label'];
   $form_state['item']->description = $form_state['values']['description'];
 }

@@ -94,16 +94,19 @@ function region_admin() {
   $regions = entity_load('region');
   $region_table = array();
   $region = new Region;
-  foreach ($blocks as $block) {
-    $operations = l(t('Edit'), 'admin/structure/region/edit/' . $block->name);
+  foreach ($regions as $region) {
+    $operations = l(t('Edit'), 'admin/structure/region/edit/' . $region->name);
     if (!$region->hasStatus(ENTITY_IN_CODE)) {
-       $operations .= ' | ' . l(t('Delete'), 'admin/structure/region/delete/' . $block->name);
+       $operations .= ' | ' . l(t('Delete'), 'admin/structure/region/delete/' . $region->name);
     }
     $region_table[] = array(
-      $block->title,
-      $block->type,
+      $region->title,
+      $region->bundle,
       $operations,
     );
   }
-  return theme('table', array('rows' => $block_table, 'header' => array('Title', 'Type', 'Operations')));
+  if (count($region_table)) {
+    return theme('table', array('rows' => $region_table, 'header' => array('Title', 'Type', 'Operations')));
+  }
+  return t('You haven\'t created any regions yet.');
 }

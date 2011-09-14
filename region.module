@@ -34,8 +34,8 @@ function region_menu() {
   $region_bundles = region_bundles();
   // If we are using the block module, then we add links from there.
   foreach ($region_bundles as $key => $info) {
-    $item = array(
-      'title' => 'Add ' . drupal_strtolower($info->title),
+    $items['admin/structure/region/add/' . $info->name] = array(
+      'title' => 'Add ' . drupal_strtolower($info->label),
       'page callback' => 'drupal_get_form',
       'page arguments' => array('region_add_form', 4),
       'access arguments' => array("create {$info->name} entity blocks"),
@@ -43,12 +43,20 @@ function region_menu() {
       'type' => MENU_LOCAL_ACTION,
     );
   }
+  return $items;
 }
 
 /**
  * Implements hook_entity_info().
  */
 function region_entity_info() {
+  $bundles = region_bundles();
+  $bundle_info = array();
+  foreach ($bundles as $key => $bundle) {
+    $bundle_info[$key] = array(
+      'label' => $bundle->label,
+    );
+  }
   return array(
     'region' => array(
       'label' => t('Region'),
@@ -65,7 +73,7 @@ function region_entity_info() {
       'access callback' => 'region_access',
       'base table' => 'region_regions',
       'module' => 'region',
-      'bundles' => region_bundles(),
+      'bundles' => $bundle_info,
       'bundle keys' => array('bundle' => 'type'),
       'entity keys' => array(
         'id' => 'rcid',
@@ -145,8 +153,8 @@ function region_block_info() {
  */
 function region_block_configure($delta) {
   $block = entity_load('region', array($delta));
-  if (user_access("edit {$block->type} entity blocks")) {
-    $form_state = array('type' => $block->type, 'entityblock' => $block);
+  if (user_access("edit {$block->bundle} entity blocks")) {
+    $form_state = array('type' => $block->bundle, 'entityblock' => $block);
     // We attach our entity block form here.
     return entityblock_form(array(), $form_state);
   }

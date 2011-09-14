@@ -41,7 +41,7 @@ function region_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
-      'title' => array(
+      'label' => array(
         'description' => 'Administrative title for this region.',
         'type' => 'varchar',
         'length' => 128,
@@ -87,8 +87,6 @@ function region_schema() {
     ),
     'primary key' => array('rid', 'name'),
   );
-
-
 
   return $schema;
 }
