@@ -1,0 +1,6 @@
+name = Region Storage Database Sample
+description = "Sample region storage database implementation."
+core = 7.x
+version = 7.x-1.0-dev
+package = Region
+dependencies[] = region
