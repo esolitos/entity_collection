@@ -76,7 +76,7 @@ function region_entity_info() {
       'bundles' => $bundle_info,
       'bundle keys' => array('bundle' => 'type'),
       'entity keys' => array(
-        'id' => 'rcid',
+        'id' => 'rid',
         'name' => 'name',
         'bundle' => 'bundle',
         'label' => 'title',
@@ -87,11 +87,28 @@ function region_entity_info() {
 
 /**
  * Fetch all bundles for a region.
- * @return type
+ * @return array
+ *   An array of all available bundles.
  */
 function region_bundles() {
   ctools_include('export');
   return ctools_export_load_object('region_bundles');
+}
+
+/**
+ * Load a region by name
+ * @param string $name the name of the region.
+ */
+function region_load($name) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'region')
+    ->propertyCondition('name', $name)
+    ->execute();
+  if (isset($result['region']) && count($result['region'])) {
+    return current(entity_load('region', current($result['region'])));
+  }
+  return FALSE;
 }
 
 /**

@@ -73,6 +73,12 @@ function region_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
+      'title' => array(
+        'description' => 'Administrative title for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
       'bundle' => array(
         'description' => 'Machine-readable name for this region.',
         'type' => 'varchar',
