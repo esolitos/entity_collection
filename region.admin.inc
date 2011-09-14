@@ -87,6 +87,32 @@ function region_form($form = array(), &$form_state = array()) {
 }
 
 /**
+ * Validate our form.
+ * @param array $form
+ * @param array $form_state
+ */
+function region_form_validate($form, &$form_state) {
+  // Fetch the block and populate it. Since this is very simple to do,
+  // let's just do it ourselves instead of using the entity api function.
+  $region = &$form_state['region'];
+  $region->name = $form_state['values']['name'];
+  $region->title = $form_state['values']['title'];
+  //field_attach_form_validate('region', $region, $form, $form_state);
+}
+
+/**
+ * Finally time to actually save the block.
+ * @param type $form
+ * @param array $form_state
+ */
+function region_form_submit($form, &$form_state) {
+  $region = $form_state['region'];
+  //field_attach_submit('region', $region, $form, $form_state);
+  entity_save('region', $region);
+  $form_state['redirect'] = 'admin/structure/region';
+}
+
+/**
  * An admin overview page.
  */
 function region_admin() {

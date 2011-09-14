@@ -54,7 +54,10 @@ function region_schema() {
         'not null' => TRUE,
       ),
     ),
-    'primary key' => array('rbid', 'name'),
+    'primary key' => array('rbid'),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
   );
   // Table for regions. Regions are exportable through the Entity API.
   $schema['region_regions'] = array(
@@ -73,6 +76,12 @@ function region_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
+      'title' => array(
+        'description' => 'Administrative title for this region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
       'bundle' => array(
         'description' => 'Machine-readable name for this region.',
         'type' => 'varchar',
@@ -85,7 +94,10 @@ function region_schema() {
         'default' => 0,
       ),
     ),
-    'primary key' => array('rid', 'name'),
+    'primary key' => array('rid'),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
   );
 
   return $schema;
