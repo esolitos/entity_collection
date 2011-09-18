@@ -126,7 +126,7 @@ function region_load($name) {
     ->propertyCondition('name', $name)
     ->execute();
   if (isset($result['region']) && count($result['region'])) {
-    return current(entity_load('region', current($result['region'])));
+    return current(entity_load('region', array_keys($result['region'])));
   }
   return FALSE;
 }
@@ -171,6 +171,15 @@ function region_permission() {
   }
    */
   return $permissions;
+}
+
+/**
+ * Access callback for regions.
+ */
+function entityblock_access($op, $region, $account = NULL) {
+  if (isset($region)) {
+    return user_access("$op {$region->bundle} profile", $account);
+  }
 }
 
 /**

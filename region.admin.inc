@@ -80,7 +80,7 @@ function region_form($form = array(), &$form_state = array()) {
     ),
     '#description' => t('A unique machine-readable name for this block. It must only contain lowercase letters, numbers, and underscores.'),
   );
-  //field_attach_form('region', $region, $form, $form_state);
+  field_attach_form('region', $region, $form, $form_state);
   $form['#validate'][] = 'region_form_validate';
   $form['#submit'][] = 'region_form_submit';
   return $form;
@@ -97,7 +97,7 @@ function region_form_validate($form, &$form_state) {
   $region = &$form_state['region'];
   $region->name = $form_state['values']['name'];
   $region->title = $form_state['values']['title'];
-  //field_attach_form_validate('region', $region, $form, $form_state);
+  field_attach_form_validate('region', $region, $form, $form_state);
 }
 
 /**
@@ -107,7 +107,7 @@ function region_form_validate($form, &$form_state) {
  */
 function region_form_submit($form, &$form_state) {
   $region = $form_state['region'];
-  //field_attach_submit('region', $region, $form, $form_state);
+  field_attach_submit('region', $region, $form, $form_state);
   entity_save('region', $region);
   $form_state['redirect'] = 'admin/structure/region';
 }
