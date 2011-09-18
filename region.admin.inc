@@ -136,3 +136,48 @@ function region_admin() {
   }
   return t('You haven\'t created any regions yet.');
 }
+
+/**
+ * Manage the content of a region.
+ * This is a simple and included admin-side form.
+ */
+function region_content_form($form, &$form_state, $region) {
+  $form_state['region'] = $region;
+  $form['content'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Add content'),
+    '#maxlength' => 60,
+    '#description' => t('Type in the name of the content you want to add here.'),
+    '#autocomplete_path' => 'region/autocomplete',
+  );
+  $form['add_content'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add content'),
+    '#submit' => array('region_content_form_add_content'),
+  );
+  return $form;
+}
+
+function region_content_form_autocomplete($string = '') {
+  // Let's limit this to nodes for now.
+  // @todo support all entities.
+  $matches = array();
+  $result = db_select('node')
+    ->fields('node', array('nid', 'title'))
+    ->condition('title', db_like($string) . '%', 'LIKE')->range(0, 10)->execute();
+  foreach ($result as $node) {
+    $matches['node:' . $node->nid] = check_plain($node->title);
+  }
+  drupal_json_output($matches);
+}
+
+function region_content_form_add_content($form, &$form_state) {
+  $region = $form_state['region'];
+  list($type, $value) = explode(':', $form_state['values']['content']);
+  $entities = entity_load($type, array($value));
+  if (isset($entities[$value])) {
+    $entity = $entities[$value];
+    $region->getTree()->addChild($type, $value, $entity);
+  }
+  entity_save($type, $region);
+}

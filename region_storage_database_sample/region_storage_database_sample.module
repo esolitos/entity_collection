@@ -27,7 +27,7 @@ class RegionStorageDatabaseSample implements RegionStorage {
         'entity' => $entity,
       );
       drupal_write_record('region_storage', $record);
-    }  
+    }
   }
 
   public function retrieve($name) {
@@ -48,4 +48,3 @@ class RegionStorageDatabaseSample implements RegionStorage {
   }
 
 }
-

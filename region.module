@@ -18,7 +18,16 @@ function region_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('region_edit_form', 4),
     'access arguments' => array('edit', 4),
-    'access callback' => 'entityblock_access',
+    'access callback' => 'region_access',
+    'file' => 'region.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/structure/region/content/%region'] = array(
+    'title' => 'Region content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('region_content_form', 4),
+    'access arguments' => array('content', 4),
+    'access callback' => 'region_access',
     'file' => 'region.admin.inc',
     'type' => MENU_CALLBACK,
   );
@@ -43,6 +52,15 @@ function region_menu() {
       'type' => MENU_LOCAL_ACTION,
     );
   }
+  $items['region/autocomplete'] = array(
+    'title' => 'region autocomplete',
+    'page callback' => 'region_content_form_autocomplete',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer regions'),
+    'type' => MENU_CALLBACK,
+    'file' => 'region.admin.inc',
+  );
+
   return $items;
 }
 
@@ -176,7 +194,7 @@ function region_permission() {
 /**
  * Access callback for regions.
  */
-function entityblock_access($op, $region, $account = NULL) {
+function region_access($op, $region, $account = NULL) {
   if (isset($region)) {
     return user_access("$op {$region->bundle} profile", $account);
   }
@@ -225,6 +243,7 @@ function region_block_view($delta) {
   }
 }
 
+
 /**
  * This class is used to represent Regions.
  */
@@ -234,10 +253,12 @@ class Region extends Entity {
   public $name;
   public $bid;
   public $title;
+  public $content;
   public $cache;
 
   public function __construct($values = array()) {
     parent::__construct($values, 'region');
+    $this->content = new RegionNode();
   }
 
   /**
@@ -264,5 +285,59 @@ class Region extends Entity {
   public function buildContent($view_mode = 'block', $langcode = NULL) {
     $content = array();
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
+  }
+
+  public function getTree() {
+    return $this->content;
+  }
+}
+
+class RegionNode {
+  public $name;
+  public $type;
+  public $content = NULL;
+  private $children = NULL;
+  /**
+   * Add a child to this node. This is a helper for addChildNode.
+   * @param string $name
+   * @param stdClass $content
+   */
+  public function addChild($type, $name, $content) {
+    $node = new RegionNode;
+    $node->name = $name;
+    $node->type = $type;
+    $node->content = $content;
+    $this->addChildNode($node);
+  }
+
+  /**
+   * Add a node as a child to this one.
+   * @param RegionNode $child
+   */
+  public function addChildNode(RegionNode $child) {
+    if (!isset($this->children)) {
+      $this->children = array();
+    }
+    $this->children[$child->name] = $child;
+  }
+
+  public function removeChild($name) {
+    unset($this->children[$child->name]);
+  }
+
+  public function getChild($name) {
+
+  }
+
+  /**
+   * Return this node as an array.
+   */
+  public function toArray() {
+    $tree = array();
+    foreach ($this->children as $key => $child) {
+      $tree[$key]['content'] = $child->content;
+      $tree[$key]['children'] = $child->toArray();
+    }
+    return $tree;
   }
 }
