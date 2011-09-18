@@ -53,8 +53,15 @@ function region_entity_info() {
   $bundles = region_bundles();
   $bundle_info = array();
   foreach ($bundles as $key => $bundle) {
-    $bundle_info[$key] = array(
+    $i = 0;
+    $bundle_info[$bundle->name] = array(
       'label' => $bundle->label,
+      'admin' => array(
+        'path' => 'admin/structure/region_bundle/list/%region_bundle/edit',
+        'real path' => 'admin/structure/region_bundle/list/' . $bundle->name . '/edit',
+        'bundle argument' => 4,
+        'access arguments' => array('administer region types'),
+      ),
     );
   }
   return array(
@@ -74,7 +81,7 @@ function region_entity_info() {
       'base table' => 'region_regions',
       'module' => 'region',
       'bundles' => $bundle_info,
-      'bundle keys' => array('bundle' => 'type'),
+      'bundle keys' => array('bundle' => 'name'),
       'entity keys' => array(
         'id' => 'rid',
         'name' => 'name',
@@ -93,6 +100,19 @@ function region_entity_info() {
 function region_bundles() {
   ctools_include('export');
   return ctools_export_load_object('region_bundles');
+}
+
+/**
+ * Load a region bundle
+ * @param $name
+ *   The name of the bundle.
+ * @return stdClass
+ *   The actual bundle.
+ */
+function region_bundle_load($name) {
+  ctools_include('export');
+  $result = ctools_export_load_object('region_bundles', 'names', array($name));
+  return isset($result[$name]) ?  $result[$name] : FALSE;
 }
 
 /**

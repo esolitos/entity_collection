@@ -5,7 +5,7 @@ $plugin = array(
   'access' => 'administer region types',
   'create access' => 'create regions',
   'menu' => array(
-    'menu item' => 'regions',
+    'menu item' => 'region_bundle',
     'menu title' => 'Region types',
     'menu description' => 'Administer region types',
   ),
@@ -17,6 +17,10 @@ $plugin = array(
      'settings' => 'region_export_ui_form',
      'submit' => 'region_export_ui_form_submit'
    ),
+  'handler' => array(
+    'class' => 'region_ui',
+    'parent' => 'ctools_export_ui',
+  ),
 );
 
 function region_export_ui_form(&$form, &$form_state) {
