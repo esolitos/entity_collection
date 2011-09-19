@@ -205,6 +205,17 @@ function region_permission() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function region_theme() {
+  return array(
+    'region_content_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
  * Access callback for regions.
  */
 function region_access($op, $region, $account = NULL) {

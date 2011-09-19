@@ -155,7 +155,38 @@ function region_admin() {
 function region_content_form($form, &$form_state, $region) {
   $form_state['region'] = $region;
   $tree = region_load_content($region->bundle, $region->name);
+  $entity_info = entity_get_info();
+  $wrappers = array();
   $form['content'] = array(
+    '#type' => 'tree',
+  );
+  $parent_options = array(0 => 'None');
+  $children = $tree->getChildren();
+  foreach ($children as $key => $child) {
+    $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
+    $parent_options[$child->entity_id] = $wrappers[$key]->label();
+  }
+  foreach ($tree->getChildren() as $key => $child) {
+    $entity = $child->content;
+    $entity_type = $child->type;
+    $info = $entity_info[$entity_type];
+
+    $form['content'][$key]['title'] = array(
+      '#markup' => check_plain($wrappers[$key]->label())
+    );
+    $form['content'][$key]['position'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Weight'),
+      '#size' => 3,
+      '#default_value' => $key,
+    );
+    $form['content'][$key]['parent'] = array(
+      '#type' => 'select',
+      '#title' => t('Parent'),
+      '#options' => $parent_options,
+    );
+  }
+  $form['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Add content'),
     '#maxlength' => 60,
@@ -168,6 +199,31 @@ function region_content_form($form, &$form_state, $region) {
     '#submit' => array('region_content_form_add_content'),
   );
   return $form;
+}
+
+/**
+ * Theme function for the content form.
+ * @param type $variables
+ *   Variables containing the form to render.
+ */
+function theme_region_content_form(&$variables) {
+  $form = &$variables['form'];
+  $rows = array();
+  foreach (element_children($form['content']) as $key) {
+    $form['content'][$key]['parent']['#attributes']['class'] = array('region-parent');
+    $title = drupal_render($form['content'][$key]['title']);
+    $position = drupal_render($form['content'][$key]['position']);
+    $parent = drupal_render($form['content'][$key]['parent']);
+    $rows[] = array('class' => array('draggable'), 'data' => array($title, $position, $parent));
+  }
+  $header = array(t('Title'), t('Position'), t('Weight'));
+  $output = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'region-table'),
+  ));
+  drupal_add_tabledrag('region-table', 'match', 'region-parent', 'position');
+  return $output . drupal_render_children($variables['form']);
 }
 
 function region_content_form_autocomplete($string = '') {
@@ -185,7 +241,7 @@ function region_content_form_autocomplete($string = '') {
 
 function region_content_form_add_content($form, &$form_state) {
   $region = $form_state['region'];
-  list($type, $value) = explode(':', $form_state['values']['content']);
+  list($type, $value) = explode(':', $form_state['values']['content_select']);
   $entities = entity_load($type, array($value));
   if (isset($entities[$value])) {
     $entity = $entities[$value];
