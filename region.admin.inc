@@ -154,6 +154,7 @@ function region_admin() {
  */
 function region_content_form($form, &$form_state, $region) {
   $form_state['region'] = $region;
+  $tree = region_load_content($region->bundle, $region->name);
   $form['content'] = array(
     '#type' => 'textfield',
     '#title' => t('Add content'),
@@ -188,7 +189,7 @@ function region_content_form_add_content($form, &$form_state) {
   $entities = entity_load($type, array($value));
   if (isset($entities[$value])) {
     $entity = $entities[$value];
-    $region->getTree()->addChild($type, $value, $entity);
+    $item = new RegionNode($type, $value, $entity);
+    region_storage_factory($region->bundle)->appendItem($region->name, $item);
   }
-  entity_save($type, $region);
 }

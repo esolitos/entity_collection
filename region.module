@@ -257,12 +257,58 @@ function region_block_view($delta) {
 }
 
 /**
- * Save the content of a region.
- * @param Region $region
- *  A fully loaded region object.
+ * Get all storage backends formatted for #options
+ * @return array
+ *   An array of storage backends.
  */
-function region_save_content($region) {
+function region_get_storage_options() {
+  $storage_plugins = ctools_get_plugins('region', 'plugins');
+  // Get all available storage backends.
+  $storage_options = array();
+  foreach ($storage_plugins as $name => $info) {
+    if (isset($info['title'])) {
+      $storage_options[$name] = $info['title'];
+    }
+  }
+  return $storage_options;
+}
 
+/**
+ * Save the content of a region.
+ * @param string $name
+ *   The region name
+ * @param RegioNode $tree
+ *   The tree to save.
+ */
+function region_save_content($name, $bundle, RegionNode $tree) {
+  return region_storage_factory($bundle)->save($name, $tree);
+}
+
+function region_append_item($name, $bundle, RegionNode $item) {
+  return region_storage_factory($bundle)->appendItem($name, $item);
+}
+
+/**
+ * Load content for a region.
+ * @param string $bundle
+ *   The name of the region bundle
+ * @param string $name
+ *   The name of the region.
+ * @return RegionNode the content for a region.
+ */
+function region_load_content($bundle, $name) {
+  return region_storage_factory($bundle)->retrieve($name);
+}
+
+/**
+ * Factory function for fetching a storage backend for a bundle.
+ * @param string $bundle
+ * @return RegionStorage a region storage class.
+ */
+function region_storage_factory($bundle) {
+  $bundle = region_bundle_load($bundle);
+  $plugin = ctools_get_plugins('region', 'plugins', $bundle->storage);
+  return new $plugin['region_storage']['class']();
 }
 
 /**
@@ -314,20 +360,26 @@ class Region extends Entity {
 }
 
 class RegionNode {
-  public $name;
   public $type;
+  public $entity_id;
+  public $parent = NULL;
   public $content = NULL;
-  private $children = NULL;
+  private $children = array();
+
+  public function __construct($type = NULL, $entity_id = NULL, $content = NULL) {
+    $this->type = $type;
+    $this->entity_id = $entity_id;
+    $this->content = $content;
+  }
+
   /**
    * Add a child to this node. This is a helper for addChildNode.
    * @param string $name
    * @param stdClass $content
    */
-  public function addChild($type, $name, $content) {
-    $node = new RegionNode;
-    $node->name = $name;
-    $node->type = $type;
-    $node->content = $content;
+  public function addChild($type, $entity_id, $content) {
+    $node = new RegionNode($type, $entity_id, $content);
+    $node->parent = $this;
     $this->addChildNode($node);
   }
 
@@ -339,7 +391,7 @@ class RegionNode {
     if (!isset($this->children)) {
       $this->children = array();
     }
-    $this->children[$child->name] = $child;
+    $this->children[] = $child;
   }
 
   public function removeChild($name) {
@@ -347,7 +399,11 @@ class RegionNode {
   }
 
   public function getChild($name) {
+    return $this->children[$name];
+  }
 
+  public function getChildren() {
+    return $this->children;
   }
 
   /**

@@ -36,6 +36,13 @@ function region_storage_database_schema() {
         'not null' => TRUE,
         'size' => 'big',
       ),
+      'position' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Position.',
+      ),
       'parent' => array(
         'type' => 'int',
         'unsigned' => TRUE,

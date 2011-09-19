@@ -31,7 +31,13 @@ function region_export_ui_form(&$form, &$form_state) {
     '#default_value' => $region->label,
     '#required' => TRUE,
   );
-
+  $form['storage'] = array(
+    '#type' => 'select',
+    '#title' => t('Storage'),
+    '#default_value' => isset($region->storage) ? $region->storage : NULL,
+    '#options' => region_get_storage_options(),
+    '#required' => TRUE,
+  );
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
@@ -44,5 +50,6 @@ function region_export_ui_form(&$form, &$form_state) {
 
 function region_export_ui_form_submit(&$form, &$form_state) {
   $form_state['item']->label = $form_state['values']['label'];
+  $form_state['item']->storage = $form_state['values']['storage'];
   $form_state['item']->description = $form_state['values']['description'];
 }

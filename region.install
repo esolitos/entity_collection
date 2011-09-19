@@ -41,6 +41,12 @@ function region_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
+      'storage' => array(
+        'description' => 'Storage plugin for this bundle',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
       'label' => array(
         'description' => 'Administrative title for this region.',
         'type' => 'varchar',
