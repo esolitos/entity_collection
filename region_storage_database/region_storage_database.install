@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implementation of hook_schema().
+ */
+function region_storage_database_schema() {
+  $schema['region_storage'] = array(
+    'fields' => array(
+      'rsid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique term ID.',
+      ),
+      'name' => array(
+        'description' => 'Machine-readable name for a region.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'eid' => array(
+        'description' => 'The entity id',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'description' => 'The entity type.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'entity' => array(
+        'description' => 'An entity object.',
+        'type' => 'blob',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'parent' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The parent, if any.',
+      ),
+    ),
+    'primary key' => array('rsid'),
+    'indexes' => array(
+      'parent' => array('parent'),
+      'eid' => array('eid')
+    ),
+  );
+  return $schema;
+}

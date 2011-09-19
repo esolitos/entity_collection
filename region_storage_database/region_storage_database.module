@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Sample region storage database implementation.
+ */
+class RegionStorageDatabase implements RegionStorage {
+
+  public function save($name, $regions) {
+    foreach ($regions as $entity) {
+      $record = array(
+        'name' => 'loremipsum',
+        'entity' => $entity,
+      );
+      drupal_write_record('region_storage', $record);
+    }
+  }
+
+  public function retrieve($name) {
+    $query = db_select('region_storage');
+    $query->addField('region_storage', 'name');
+    $query->addField('region_storage', 'entity');
+    $query->condition('name', $name, '=');
+    $result = $query->execute();
+    foreach ($result as $value) {
+      var_dump($value);
+    }
+  }
+
+  public function delete($name) {
+    db_delete('region_storage')
+      ->condition('name', $name)
+      ->execute();
+  }
+
+}
