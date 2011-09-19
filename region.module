@@ -159,6 +159,19 @@ function region_ctools_plugin_directory($module, $type) {
 }
 
 /**
+ * Implements hook_ctools_plugin_plugin_type().
+ */
+function region_ctools_plugin_type() {
+  return array(
+    'plugins' => array(
+      'cache' => TRUE,
+      'use hooks' => TRUE,
+      'classes' => array('region_storage'),
+    ),
+  );
+}
+
+/**
  * Implements hook_permission().
  */
 function region_permission() {
@@ -243,6 +256,14 @@ function region_block_view($delta) {
   }
 }
 
+/**
+ * Save the content of a region.
+ * @param Region $region
+ *  A fully loaded region object.
+ */
+function region_save_content($region) {
+
+}
 
 /**
  * This class is used to represent Regions.

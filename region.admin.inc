@@ -80,6 +80,13 @@ function region_form($form = array(), &$form_state = array()) {
     ),
     '#description' => t('A unique machine-readable name for this block. It must only contain lowercase letters, numbers, and underscores.'),
   );
+  $form['max_items'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum number of items'),
+    '#default_value' => !empty($region->max_items) ? $region->max_items : 0,
+    '#description' => t('Enter the maximum number of items here. Enter 0 if you want to amount of items to be unlimited.'),
+    '#required' => TRUE,
+  );
   field_attach_form('region', $region, $form, $form_state);
   $form['#validate'][] = 'region_form_validate';
   $form['#submit'][] = 'region_form_submit';
@@ -92,11 +99,15 @@ function region_form($form = array(), &$form_state = array()) {
  * @param array $form_state
  */
 function region_form_validate($form, &$form_state) {
-  // Fetch the block and populate it. Since this is very simple to do,
+  // Fetch the region and populate it. Since this is very simple to do,
   // let's just do it ourselves instead of using the entity api function.
   $region = &$form_state['region'];
   $region->name = $form_state['values']['name'];
   $region->title = $form_state['values']['title'];
+  $region->max_items = !empty($form_state['values']['max_items']) ? $form_state['values']['max_items'] : 0;
+  if (!is_numeric($region->max_items) && $region->max_items >= 0) {
+    form_set_error('max_items', t('Invalid value for max items'));
+  }
   field_attach_form_validate('region', $region, $form, $form_state);
 }
 
