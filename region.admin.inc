@@ -170,22 +170,34 @@ function region_content_form($form, &$form_state, $region) {
     $entity = $child->content;
     $entity_type = $child->type;
     $info = $entity_info[$entity_type];
-
+    $from['content'][$key]['entity_id'] = array(
+      '#type' => 'hidden',
+      '#value' => $child->entity_id,
+    );
     $form['content'][$key]['title'] = array(
       '#markup' => check_plain($wrappers[$key]->label())
     );
     $form['content'][$key]['position'] = array(
       '#type' => 'textfield',
-      '#title' => t('Weight'),
+      '#title' => t('Position'),
       '#size' => 3,
       '#default_value' => $key,
     );
     $form['content'][$key]['parent'] = array(
-      '#type' => 'select',
+      '#type' => 'hidden',
       '#title' => t('Parent'),
+      '#default_value' => 0,
       '#options' => $parent_options,
     );
+    $form['content'][$key]['depth'] = array(
+      '#type' => 'hidden',
+      '#title' => t('Depth'),
+      '#default_value' => 0,
+    );
   }
+  $form['order_save'] = array(
+
+  );
   $form['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Add content'),
@@ -211,18 +223,24 @@ function theme_region_content_form(&$variables) {
   $rows = array();
   foreach (element_children($form['content']) as $key) {
     $form['content'][$key]['parent']['#attributes']['class'] = array('region-parent');
+    $form['content'][$key]['entity_id']['#attributes']['class'] = array('entity-id');
+    $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
+    $form['content'][$key]['position']['#attributes']['class'] = array('position');
     $title = drupal_render($form['content'][$key]['title']);
     $position = drupal_render($form['content'][$key]['position']);
     $parent = drupal_render($form['content'][$key]['parent']);
-    $rows[] = array('class' => array('draggable'), 'data' => array($title, $position, $parent));
+    $depth = drupal_render($form['content'][$key]['depth']);
+    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth, $position));
   }
-  $header = array(t('Title'), t('Position'), t('Weight'));
+  $header = array(t('Title'), t('Position'));
   $output = theme('table', array(
     'header' => $header,
     'rows' => $rows,
     'attributes' => array('id' => 'region-table'),
   ));
-  drupal_add_tabledrag('region-table', 'match', 'region-parent', 'position');
+  drupal_add_tabledrag('region-table', 'match', 'parent', 'region-parent', 'region-parent', 'entity-id', FALSE);
+  drupal_add_tabledrag('region-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
+  drupal_add_tabledrag('region-table', 'order', 'sibling', 'position');
   return $output . drupal_render_children($variables['form']);
 }
 
