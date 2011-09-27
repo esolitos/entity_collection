@@ -232,7 +232,7 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
     $children = $child->getChildren();
     if (count($children)) {
       foreach($children as $child_node) {
-        region_content_form_content($region, $form, $child_node, $child_node->entity_id, $depth+1);
+        region_content_form_content($region, $form, $child_node, $child_node->key, $depth+1);
       }
     }
   }
@@ -287,7 +287,8 @@ function theme_region_content_form(&$variables) {
     $position = drupal_render($form['content'][$key]['position']);
     $parent = drupal_render($form['content'][$key]['parent']);
     $depth = drupal_render($form['content'][$key]['depth']);
-    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth, $position, $delete));
+    $key = drupal_render($form['content'][$key]['key']);
+    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth . $key, $position, $delete));
   }
   $header = array(t('Title'), t('Position'), t('Operations'));
   $output = theme('table', array(

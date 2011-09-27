@@ -47,7 +47,7 @@ class RegionStorageDatabase implements RegionStorage {
       $record->entity = serialize($item->content);
       $record->entity_type = $item->type;
       $record->eid = $item->entity_id;
-      $record->parent = isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0;
+      $record->parent = isset($item->parent) && isset($item->parent->key) ? $item->parent->key : 0;
       $record->position = $position;
       return $record;
     }
@@ -79,7 +79,7 @@ class RegionStorageDatabase implements RegionStorage {
       if ($value->parent > 0) {
         $node = $tree->getChild($value->parent);
       }
-      else {
+      if (empty($node)) {
         $node = $tree;
       }
       $node->addChild($value->entity_type, $value->eid, unserialize($value->entity), $value->rsid);
