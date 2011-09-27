@@ -136,6 +136,7 @@ function region_admin() {
     if (!$region->hasStatus(ENTITY_IN_CODE)) {
        $operations .= ' | ' . l(t('Delete'), 'admin/structure/region/delete/' . $region->name);
     }
+    $operations .= l(' | ' . t('Manage content'), 'admin/structure/region/content/' . $region->name);
     $region_table[] = array(
       $region->title,
       $region->bundle,
