@@ -373,6 +373,7 @@ class Region extends Entity {
 class RegionNode {
   public $type;
   public $entity_id;
+  public $key;
   public $parent = NULL;
   public $content = NULL;
   private $children = array();
@@ -388,8 +389,11 @@ class RegionNode {
    * @param string $name
    * @param stdClass $content
    */
-  public function addChild($type, $entity_id, $content) {
+  public function addChild($type, $entity_id, $content, $key = NULL) {
     $node = new RegionNode($type, $entity_id, $content);
+    if (isset($key)) {
+      $node->key = $key;
+    }
     $node->parent = $this;
     $this->addChildNode($node);
   }
@@ -402,24 +406,27 @@ class RegionNode {
     if (!isset($this->children)) {
       $this->children = array();
     }
-    $this->children[$child->entity_id] = $child;
+    if (!isset($child->key)) {
+      $child->key = $this->getLastChildKey();
+    }
+    $this->children[$child->key] = $child;
   }
 
   public function removeChild($name) {
     unset($this->children[$child->name]);
   }
 
-  public function getChild($entity_id) {
+  public function getChild($key) {
     // Return the child if it exists.
-    if (isset($this->children[$entity_id])) {
-      return $this->children[$entity_id];
+    if (isset($this->children[$key])) {
+      return $this->children[$key];
     }
     // Return FALSE if this branch has no children.
     if (!count($this->children)) {
       return FALSE;
     }
-    foreach ($this->children as $entity_id => $content) {
-      $result = $this->getChild($entity_id);
+    foreach ($this->children as $node) {
+      $result = $node->getChild($key);
       if (!empty($result)) {
         return $result;
       }
@@ -429,6 +436,14 @@ class RegionNode {
 
   public function getLastChild() {
     return $this->children[count($this->children)-1];
+  }
+
+  public function getLastChildKey() {
+    $keys = array_keys($this->children);
+    if (count($keys)) {
+      return $keys[count($keys)-1];
+    }
+    return -1;
   }
 
   public function truncate() {

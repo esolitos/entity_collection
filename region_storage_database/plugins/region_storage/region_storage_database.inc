@@ -82,7 +82,7 @@ class RegionStorageDatabase implements RegionStorage {
       else {
         $node = $tree;
       }
-      $node->addChild($value->entity_type, $value->eid, unserialize($value->entity));
+      $node->addChild($value->entity_type, $value->eid, unserialize($value->entity), $value->rsid);
     }
     return $tree;
   }

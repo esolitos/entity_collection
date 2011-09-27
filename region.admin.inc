@@ -198,6 +198,10 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
       '#title' => t('Entity ID'),
       '#value' => $child->entity_id,
     );
+    $form['content'][$key]['key'] = array(
+      '#type' => 'hidden',
+      '#value' => $child->key,
+    );
     $form['content'][$key]['type'] = array(
       '#type' => 'hidden',
       '#value' => $child->type,
@@ -254,7 +258,7 @@ function region_content_build_tree($values) {
       $node = $tree;
     }
     $entity = current(entity_load($value['type'], array($value['entity_id'])));
-    $node->addChild($value['type'], $value['entity_id'], $entity);
+    $node->addChild($value['type'], $value['entity_id'], $entity, $value['key']);
     $previous_value = $value;
   }
   return $tree;
@@ -275,6 +279,7 @@ function theme_region_content_form(&$variables) {
   foreach (element_children($form['content']) as $key) {
     $form['content'][$key]['parent']['#attributes']['class'] = array('region-parent');
     $form['content'][$key]['entity_id']['#attributes']['class'] = array('entity-id');
+    $form['content'][$key]['key']['#attributes']['class'] = array('key');
     $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
     $form['content'][$key]['position']['#attributes']['class'] = array('position');
     $title = drupal_render($form['content'][$key]['title']);
@@ -290,7 +295,7 @@ function theme_region_content_form(&$variables) {
     'rows' => $rows,
     'attributes' => array('id' => 'region-table'),
   ));
-  drupal_add_tabledrag('region-table', 'match', 'parent', 'region-parent', 'region-parent', 'position', FALSE);
+  drupal_add_tabledrag('region-table', 'match', 'parent', 'region-parent', 'region-parent', 'key', FALSE);
   drupal_add_tabledrag('region-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
   drupal_add_tabledrag('region-table', 'order', 'sibling', 'position');
   return $output . drupal_render_children($variables['form']);
