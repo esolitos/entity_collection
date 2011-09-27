@@ -8,12 +8,16 @@ class RegionStorageDatabase implements RegionStorage {
 
   public function save($name, RegionNode $tree, $position = 0) {
     $record = $this->getRecord($name, $tree, $position);
+    $primary_keys = array();
     if ($record) {
-      drupal_write_record('region_storage', $record);
+      if ($this->itemExists($record->name, $record->eid)) {
+        $primary_keys = array('eid', 'name');
+      }
+      drupal_write_record('region_storage', $record, $primary_keys);
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
-      $this->save($name, $tree, $i);
+      $this->save($name, $node, $i);
       $i++;
     }
   }
@@ -30,7 +34,7 @@ class RegionStorageDatabase implements RegionStorage {
     $query->orderBy('position', 'DESC');
     $query->condition('parent', isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0);
     $position = $query->execute()->fetchField();
-    if ($position != 0) {
+    if ($position > 0) {
       $position++;
     }
     $this->save($name, $item, $position);
@@ -43,11 +47,19 @@ class RegionStorageDatabase implements RegionStorage {
       $record->entity = serialize($item->content);
       $record->entity_type = $item->type;
       $record->eid = $item->entity_id;
-      $record->parent = isset($item->parent) && isset($item->parent->content) ? $item->parent->entity_id : 0;
+      $record->parent = isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0;
       $record->position = $position;
       return $record;
     }
     return FALSE;
+  }
+
+  private function itemExists($name, $entity_id) {
+    return db_select('region_storage', 'rs')
+      ->fields('rs', array('eid'))
+      ->condition('eid', $entity_id)
+      ->condition('name', $name)
+      ->execute()->fetchField();
   }
 
   /**
@@ -64,7 +76,13 @@ class RegionStorageDatabase implements RegionStorage {
     $values = array();
     $tree = new RegionNode();
     foreach ($result as $value) {
-      $tree->addChild($value->entity_type, $value->eid, unserialize($value->entity));
+      if ($value->parent > 0) {
+        $node = $tree->getChild($value->parent);
+      }
+      else {
+        $node = $tree;
+      }
+      $node->addChild($value->entity_type, $value->eid, unserialize($value->entity));
     }
     return $tree;
   }

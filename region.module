@@ -402,15 +402,37 @@ class RegionNode {
     if (!isset($this->children)) {
       $this->children = array();
     }
-    $this->children[] = $child;
+    $this->children[$child->entity_id] = $child;
   }
 
   public function removeChild($name) {
     unset($this->children[$child->name]);
   }
 
-  public function getChild($name) {
-    return $this->children[$name];
+  public function getChild($entity_id) {
+    // Return the child if it exists.
+    if (isset($this->children[$entity_id])) {
+      return $this->children[$entity_id];
+    }
+    // Return FALSE if this branch has no children.
+    if (!count($this->children)) {
+      return FALSE;
+    }
+    foreach ($this->children as $entity_id => $content) {
+      $result = $this->getChild($entity_id);
+      if (!empty($result)) {
+        return $result;
+      }
+    }
+    return FALSE;
+  }
+
+  public function getLastChild() {
+    return $this->children[count($this->children)-1];
+  }
+
+  public function truncate() {
+    $this->children = array();
   }
 
   public function getChildren() {

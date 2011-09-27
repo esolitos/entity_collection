@@ -6,22 +6,16 @@
 function region_storage_database_schema() {
   $schema['region_storage'] = array(
     'fields' => array(
-      'rsid' => array(
-        'type' => 'serial',
+      'eid' => array(
+        'description' => 'The entity id',
+        'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => 'Primary Key: Unique term ID.',
       ),
       'name' => array(
         'description' => 'Machine-readable name for a region.',
         'type' => 'varchar',
         'length' => 128,
-        'not null' => TRUE,
-      ),
-      'eid' => array(
-        'description' => 'The entity id',
-        'type' => 'int',
-        'unsigned' => TRUE,
         'not null' => TRUE,
       ),
       'entity_type' => array(
@@ -51,10 +45,9 @@ function region_storage_database_schema() {
         'description' => 'The parent, if any.',
       ),
     ),
-    'primary key' => array('rsid'),
+    'primary key' => array('eid', 'name'),
     'indexes' => array(
       'parent' => array('parent'),
-      'eid' => array('eid')
     ),
   );
   return $schema;

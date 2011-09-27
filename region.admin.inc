@@ -156,48 +156,13 @@ function region_admin() {
 function region_content_form($form, &$form_state, $region) {
   $form_state['region'] = $region;
   $tree = region_load_content($region->bundle, $region->name);
-  $entity_info = entity_get_info();
   $wrappers = array();
-  $form['content'] = array(
-    '#type' => 'tree',
-  );
+  $form['#tree'] = TRUE;
+  region_content_form_content($region, $form, $tree);
   $parent_options = array(0 => 'None');
-  $children = $tree->getChildren();
-  foreach ($children as $key => $child) {
-    $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
-    $parent_options[$child->entity_id] = $wrappers[$key]->label();
-  }
-  foreach ($tree->getChildren() as $key => $child) {
-    $entity = $child->content;
-    $entity_type = $child->type;
-    $info = $entity_info[$entity_type];
-    $from['content'][$key]['entity_id'] = array(
-      '#type' => 'hidden',
-      '#value' => $child->entity_id,
-    );
-    $form['content'][$key]['title'] = array(
-      '#markup' => check_plain($wrappers[$key]->label())
-    );
-    $form['content'][$key]['position'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Position'),
-      '#size' => 3,
-      '#default_value' => $key,
-    );
-    $form['content'][$key]['parent'] = array(
-      '#type' => 'hidden',
-      '#title' => t('Parent'),
-      '#default_value' => 0,
-      '#options' => $parent_options,
-    );
-    $form['content'][$key]['depth'] = array(
-      '#type' => 'hidden',
-      '#title' => t('Depth'),
-      '#default_value' => 0,
-    );
-  }
   $form['order_save'] = array(
-
+    '#type' => 'submit',
+    '#value' => t('Save order'),
   );
   $form['content_select'] = array(
     '#type' => 'textfield',
@@ -214,6 +179,91 @@ function region_content_form($form, &$form_state, $region) {
   return $form;
 }
 
+function region_content_form_content($region, &$form, $tree, $parent = 0, $depth = 0) {
+  $nodes = $tree->getChildren();
+  $wrappers  = array();
+  if (isset($tree->entity_id)) {
+    $tree->truncate();
+    array_unshift($nodes, $tree);
+  }
+  foreach ($nodes as $key => $child) {
+    $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
+    $parent_options[$child->entity_id] = $wrappers[$key]->label();
+  }
+  foreach ($nodes as $key => $child) {
+    $entity = $child->content;
+    $entity_type = $child->type;
+    $form['content'][$key]['entity_id'] = array(
+      '#type' => 'hidden',
+      '#title' => t('Entity ID'),
+      '#value' => $child->entity_id,
+    );
+    $form['content'][$key]['type'] = array(
+      '#type' => 'hidden',
+      '#value' => $child->type,
+    );
+    $form['content'][$key]['title'] = array(
+      '#markup' => check_plain($wrappers[$key]->label())
+    );
+    $form['content'][$key]['position'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Position'),
+      '#size' => 3,
+      '#default_value' => $key,
+    );
+    $form['content'][$key]['parent'] = array(
+      '#type' => 'hidden',
+      '#title' => t('Parent'),
+      '#default_value' => $parent,
+    );
+    $form['content'][$key]['depth'] = array(
+      '#type' => 'hidden',
+      '#title' => t('Depth'),
+      '#default_value' => $depth,
+    );
+    $form['content'][$key]['delete'] = array(
+      '#type' => 'markup',
+      '#markup' => l(t('Delete'), 'admin/structure/region/content/' . $region->name . '/delete/' . $child->entity_id),
+    );
+    $children = $child->getChildren();
+    if (count($children)) {
+      foreach($children as $child_node) {
+        region_content_form_content($region, $form, $child_node, $child_node->entity_id, $depth+1);
+      }
+    }
+  }
+}
+
+function region_content_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  $tree = region_content_build_tree($values['content']);
+  region_storage_factory($form_state['region']->bundle)->save($form_state['region']->name, $tree);
+}
+
+/**
+ * Build a tree from from a submitted form.
+ */
+function region_content_build_tree($values) {
+  $tree = new RegionNode();
+  uasort($values, 'region_content_compare');
+  foreach ($values as $value) {
+    if ($value['parent'] != 0 && $parent = $tree->getChild($value['parent'])) {
+      $node = $parent;
+    }
+    else {
+      $node = $tree;
+    }
+    $entity = current(entity_load($value['type'], array($value['entity_id'])));
+    $node->addChild($value['type'], $value['entity_id'], $entity);
+    $previous_value = $value;
+  }
+  return $tree;
+}
+
+function region_content_compare($a, $b) {
+  return $a['position'] > $b['position'];
+}
+
 /**
  * Theme function for the content form.
  * @param type $variables
@@ -228,18 +278,19 @@ function theme_region_content_form(&$variables) {
     $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
     $form['content'][$key]['position']['#attributes']['class'] = array('position');
     $title = drupal_render($form['content'][$key]['title']);
+    $delete = drupal_render($form['content'][$key]['delete']);
     $position = drupal_render($form['content'][$key]['position']);
     $parent = drupal_render($form['content'][$key]['parent']);
     $depth = drupal_render($form['content'][$key]['depth']);
-    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth, $position));
+    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth, $position, $delete));
   }
-  $header = array(t('Title'), t('Position'));
+  $header = array(t('Title'), t('Position'), t('Operations'));
   $output = theme('table', array(
     'header' => $header,
     'rows' => $rows,
     'attributes' => array('id' => 'region-table'),
   ));
-  drupal_add_tabledrag('region-table', 'match', 'parent', 'region-parent', 'region-parent', 'entity-id', FALSE);
+  drupal_add_tabledrag('region-table', 'match', 'parent', 'region-parent', 'region-parent', 'position', FALSE);
   drupal_add_tabledrag('region-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
   drupal_add_tabledrag('region-table', 'order', 'sibling', 'position');
   return $output . drupal_render_children($variables['form']);
