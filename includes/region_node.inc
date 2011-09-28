@@ -44,7 +44,7 @@ class RegionNode {
     if (!isset($child->key)) {
       $child->key = $this->getLastChildKey();
     }
-    $this->root = $this->root;
+    $child->root = $this->root;
     $this->root->list[$child->key] = $child;
     $this->children[$child->key] = $child;
   }
