@@ -174,7 +174,7 @@ function region_load($name) {
  * Implements hook_ctools_plugin_directory().
  */
 function region_ctools_plugin_directory($module, $type) {
-  if ($type == 'export_ui' || $type == 'region_renderer') {
+  if ($type == 'export_ui' || $type == 'region_renderer' || $type == 'cache') {
     return 'plugins/' . $type;
   }
 }

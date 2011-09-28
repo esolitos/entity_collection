@@ -11,6 +11,7 @@ class Region extends Entity {
   public $title;
   public $tree;
   public $cache;
+  public $requiredcontexts = array();
 
   public function __construct($values = array()) {
     parent::__construct($values, 'region');

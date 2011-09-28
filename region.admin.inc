@@ -57,11 +57,24 @@ function region_delete_form_submit($form, &$form_state) {
 function region_form($form = array(), &$form_state = array()) {
   // If the user has provided a block for us, then we should probably use
   // that. Otherwise, create a blank entity block.
-  if (!isset($form_state['region'])) {
+  ctools_include('context-admin');
+  ctools_include('plugins-admin');
+  ctools_include('cache');
+  ctools_context_admin_includes();
+
+  if (empty($form_state['region'])) {
     $form_state['region'] = new Region;
     $form_state['region']->bundle = $form_state['bundle'];
   }
   $region = $form_state['region'];
+  $cached_region = ctools_cache_get('region_cache_object', $region->name);
+  if ($cached_region) {
+    $form_state['region'] = $region = $cached_region;
+  }
+  else {
+    ctools_cache_set('region_cache_object', $region->name, $region);
+  }
+  ctools_context_add_required_context_form('region_cache_object', $form, $form_state, $form['contexts']['required'], $region, $region->name);
   $form['title'] = array(
     '#type' => 'textfield',
     '#required' => TRUE,
@@ -114,6 +127,7 @@ function region_form_validate($form, &$form_state) {
  */
 function region_form_submit($form, &$form_state) {
   $region = $form_state['region'];
+  ctools_cache_clear('region_cache_object', $region->name);
   field_attach_submit('region', $region, $form, $form_state);
   entity_save('region', $region);
   $form_state['redirect'] = 'admin/structure/region';
