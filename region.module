@@ -89,7 +89,6 @@ function region_entity_info() {
   $bundles = region_bundles();
   $bundle_info = array();
   foreach ($bundles as $key => $bundle) {
-    $i = 0;
     $bundle_info[$bundle->name] = array(
       'label' => $bundle->label,
       'admin' => array(
