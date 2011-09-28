@@ -6,3 +6,5 @@ core = 7.x
 package = Region
 files[] = plugins/export_ui/region.class.inc
 files[] = plugins/region_storage/region_storage.inc
+files[] = includes/region_node.inc
+files[] = includes/region.inc
