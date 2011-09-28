@@ -193,17 +193,17 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
   foreach ($nodes as $key => $child) {
     $entity = $child->content;
     $entity_type = $child->type;
-    $form['content'][$key]['entity_id'] = array(
-      '#type' => 'hidden',
-      '#title' => t('Entity ID'),
-      '#value' => $child->entity_id,
-    );
+    $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
       '#value' => $child->key,
     );
+    $form['content'][$key]['entity_id'] = array(
+      '#type' => 'value',
+      '#value' => $child->entity_id,
+    );
     $form['content'][$key]['type'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $child->type,
     );
     $form['content'][$key]['title'] = array(
@@ -217,12 +217,10 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
     );
     $form['content'][$key]['parent'] = array(
       '#type' => 'hidden',
-      '#title' => t('Parent'),
       '#default_value' => $parent,
     );
     $form['content'][$key]['depth'] = array(
       '#type' => 'hidden',
-      '#title' => t('Depth'),
       '#default_value' => $depth,
     );
     $form['content'][$key]['delete'] = array(
@@ -278,7 +276,6 @@ function theme_region_content_form(&$variables) {
   $rows = array();
   foreach (element_children($form['content']) as $key) {
     $form['content'][$key]['parent']['#attributes']['class'] = array('region-parent');
-    $form['content'][$key]['entity_id']['#attributes']['class'] = array('entity-id');
     $form['content'][$key]['key']['#attributes']['class'] = array('key');
     $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
     $form['content'][$key]['position']['#attributes']['class'] = array('position');
@@ -287,8 +284,9 @@ function theme_region_content_form(&$variables) {
     $position = drupal_render($form['content'][$key]['position']);
     $parent = drupal_render($form['content'][$key]['parent']);
     $depth = drupal_render($form['content'][$key]['depth']);
-    $key = drupal_render($form['content'][$key]['key']);
-    $rows[] = array('class' => array('draggable'), 'data' => array($title . $parent . $depth . $key, $position, $delete));
+    $rendered_key = drupal_render($form['content'][$key]['key']);
+    $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
+    $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $delete));
   }
   $header = array(t('Title'), t('Position'), t('Operations'));
   $output = theme('table', array(
