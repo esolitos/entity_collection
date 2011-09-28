@@ -190,9 +190,11 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
     $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
     $parent_options[$child->entity_id] = $wrappers[$key]->label();
   }
+  $i = 0;
   foreach ($nodes as $key => $child) {
     $entity = $child->content;
     $entity_type = $child->type;
+    $info = $wrappers[$key]->entityInfo();
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
@@ -213,7 +215,7 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
       '#type' => 'textfield',
       '#title' => t('Position'),
       '#size' => 3,
-      '#default_value' => $key,
+      '#default_value' => $i,
     );
     $form['content'][$key]['parent'] = array(
       '#type' => 'hidden',
@@ -222,6 +224,11 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
     $form['content'][$key]['depth'] = array(
       '#type' => 'hidden',
       '#default_value' => $depth,
+    );
+    $form['content'][$key]['view_mode'] = array(
+      '#type' => 'select',
+      '#default_value' => $child->view_mode,
+      '#options' => _region_get_view_mode_options($info),
     );
     $form['content'][$key]['delete'] = array(
       '#type' => 'markup',
@@ -233,7 +240,16 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
         region_content_form_content($region, $form, $child_node, $child_node->key, $depth+1);
       }
     }
+    $i++;
   }
+}
+
+function _region_get_view_mode_options($entity_info) {
+  $options = array();
+  foreach ($entity_info['view modes'] as $mode => $info) {
+    $options[$mode] = $info['label'];
+  }
+  return $options;
 }
 
 function region_content_form_submit($form, &$form_state) {
@@ -256,7 +272,7 @@ function region_content_build_tree($values) {
       $node = $tree;
     }
     $entity = current(entity_load($value['type'], array($value['entity_id'])));
-    $node->addChild($value['type'], $value['entity_id'], $entity, $value['key']);
+    $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
     $previous_value = $value;
   }
   return $tree;
@@ -282,13 +298,14 @@ function theme_region_content_form(&$variables) {
     $title = drupal_render($form['content'][$key]['title']);
     $delete = drupal_render($form['content'][$key]['delete']);
     $position = drupal_render($form['content'][$key]['position']);
+    $view_mode = drupal_render($form['content'][$key]['view_mode']);
     $parent = drupal_render($form['content'][$key]['parent']);
     $depth = drupal_render($form['content'][$key]['depth']);
     $rendered_key = drupal_render($form['content'][$key]['key']);
     $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-    $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $delete));
+    $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $view_mode, $delete));
   }
-  $header = array(t('Title'), t('Position'), t('Operations'));
+  $header = array(t('Title'), t('Position'), t('View mode'), t('Operations'));
   $output = theme('table', array(
     'header' => $header,
     'rows' => $rows,
