@@ -13,30 +13,48 @@ function region_menu() {
     'file' => 'region.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/structure/region/edit/%region'] = array(
+  $items['region/%region'] = array(
+    'title' => 'Region',
+    'page callback' => 'region_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view', 1),
+    'access callback' => 'region_access',
+    'file' => 'region.pages.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['region/%region/view'] = array(
+    'title' => 'Region',
+    'page callback' => 'region_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view', 1),
+    'access callback' => 'region_access',
+    'file' => 'region.pages.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['region/%region/edit'] = array(
     'title' => 'Edit region',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('region_edit_form', 4),
-    'access arguments' => array('edit', 4),
+    'page arguments' => array('region_edit_form', 1),
+    'access arguments' => array('edit', 1),
     'access callback' => 'region_access',
     'file' => 'region.admin.inc',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/structure/region/content/%region'] = array(
+  $items['region/%region/content'] = array(
     'title' => 'Region content',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('region_content_form', 4),
-    'access arguments' => array('content', 4),
+    'page arguments' => array('region_content_form', 1),
+    'access arguments' => array('content', 1),
     'access callback' => 'region_access',
     'file' => 'region.admin.inc',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/structure/region/delete/%region'] = array(
+  $items['region/%region/delete'] = array(
     'title' => 'Delete region',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('region_delete_form', 4),
+    'page arguments' => array('region_delete_form', 1),
     'access callback' => 'region_access',
-    'access arguments' => array('delete', 4),
+    'access arguments' => array('delete', 1),
     'file' => 'region.admin.inc',
     'type' => MENU_CALLBACK,
   );
@@ -91,7 +109,11 @@ function region_entity_info() {
       'exportable' => TRUE,
       'view modes' => array(
         'block' => array(
-          'label' => t('Region'),
+          'label' => t('Region Block'),
+          'custom settings' => FALSE,
+        ),
+        'full' => array(
+          'label' => t('Full content'),
           'custom settings' => FALSE,
         ),
       ),
@@ -323,7 +345,7 @@ function region_storage_factory($bundle) {
 }
 
 /**
- * This class is used to represent Regions.
+ * This class is used to represent a Region.
  */
 class Region extends Entity {
   // We provide the values here for reference.
@@ -331,12 +353,12 @@ class Region extends Entity {
   public $name;
   public $bid;
   public $title;
-  public $content;
+  public $tree;
   public $cache;
 
   public function __construct($values = array()) {
     parent::__construct($values, 'region');
-    $this->content = new RegionNode();
+    $this->tree = new RegionNode();
   }
 
   /**
@@ -362,11 +384,17 @@ class Region extends Entity {
    */
   public function buildContent($view_mode = 'block', $langcode = NULL) {
     $content = array();
+    // Fetch the contents of the tree.
+    $this->tree = region_storage_factory($this->bundle)->retrieve($this->name);
+    foreach ($this->tree->getChildren() as $child) {
+      $data = entity_view($child->type, array($child->entity_id => $child->content), $child->view_mode, $langcode);
+      $content['region'][] = $data['nodes'][$child->entity_id];
+    }
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
   }
 
   public function getTree() {
-    return $this->content;
+    return $this->tree;
   }
 }
 

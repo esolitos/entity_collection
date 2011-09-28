@@ -132,11 +132,11 @@ function region_admin() {
   $region_table = array();
   $region = new Region;
   foreach ($regions as $region) {
-    $operations = l(t('Edit'), 'admin/structure/region/edit/' . $region->name);
+    $operations = l(t('Edit'), 'region/edit/' . $region->name);
     if (!$region->hasStatus(ENTITY_IN_CODE)) {
-       $operations .= ' | ' . l(t('Delete'), 'admin/structure/region/delete/' . $region->name);
+       $operations .= ' | ' . l(t('Delete'), 'region/delete/' . $region->name);
     }
-    $operations .= l(' | ' . t('Manage content'), 'admin/structure/region/content/' . $region->name);
+    $operations .= l(' | ' . t('Manage content'), 'region/content/' . $region->name);
     $region_table[] = array(
       $region->title,
       $region->bundle,
@@ -232,12 +232,12 @@ function region_content_form_content($region, &$form, $tree, $parent = 0, $depth
     );
     $form['content'][$key]['delete'] = array(
       '#type' => 'markup',
-      '#markup' => l(t('Delete'), 'admin/structure/region/content/' . $region->name . '/delete/' . $child->entity_id),
+      '#markup' => l(t('Delete'), 'region/content/' . $region->name . '/delete/' . $child->entity_id),
     );
     $children = $child->getChildren();
     if (count($children)) {
       foreach($children as $child_node) {
-        region_content_form_content($region, $form, $child_node, $child_node->key, $depth+1);
+        region_content_form_content($region, $form, $child_node, $child->key, $depth+1);
       }
     }
     $i++;
