@@ -94,10 +94,17 @@ function region_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
-      'max_items' => array(
-        'description' => t('Maximum number of items'),
-        'type' => 'int',
-        'default' => 0,
+      'renderer' => array(
+        'description' => 'Which renderer to use.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'settings' => array(
+        'description' => 'A blob of arbitrary settings.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
       ),
     ),
     'primary key' => array('rid'),

@@ -80,12 +80,11 @@ function region_form($form = array(), &$form_state = array()) {
     ),
     '#description' => t('A unique machine-readable name for this block. It must only contain lowercase letters, numbers, and underscores.'),
   );
-  $form['max_items'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum number of items'),
-    '#default_value' => !empty($region->max_items) ? $region->max_items : 0,
-    '#description' => t('Enter the maximum number of items here. Enter 0 if you want to amount of items to be unlimited.'),
-    '#required' => TRUE,
+  $form['renderer'] = array(
+    '#type' => 'select',
+    '#title' => t('Style'),
+    '#options' => region_get_renderer_options(),
+    '#description' => t('Select the style you want to use for rendering this region here.')
   );
   field_attach_form('region', $region, $form, $form_state);
   $form['#validate'][] = 'region_form_validate';
@@ -104,10 +103,7 @@ function region_form_validate($form, &$form_state) {
   $region = &$form_state['region'];
   $region->name = $form_state['values']['name'];
   $region->title = $form_state['values']['title'];
-  $region->max_items = !empty($form_state['values']['max_items']) ? $form_state['values']['max_items'] : 0;
-  if (!is_numeric($region->max_items) && $region->max_items >= 0) {
-    form_set_error('max_items', t('Invalid value for max items'));
-  }
+  $region->renderer = $form_state['values']['renderer'];
   field_attach_form_validate('region', $region, $form, $form_state);
 }
 
