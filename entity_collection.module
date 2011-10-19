@@ -22,8 +22,8 @@ function entity_collection_menu() {
     'file' => 'entity_collection.pages.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['entity_collection/%entity_collection/view'] = array(
-    'title' => 'Entity Collection',
+  $items['entity-collection/%entity_collection/view'] = array(
+    'title' => 'View',
     'page callback' => 'entity_collection_page',
     'page arguments' => array(1),
     'access arguments' => array('view', 1),
@@ -31,8 +31,8 @@ function entity_collection_menu() {
     'file' => 'entity_collection.pages.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['entity_collection/%entity_collection/edit'] = array(
-    'title' => 'Edit entity_collection',
+  $items['entity-collection/%entity_collection/edit'] = array(
+    'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('entity_collection_edit_form', 1),
     'access arguments' => array('edit', 1),
@@ -40,8 +40,8 @@ function entity_collection_menu() {
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  $items['entity_collection/%entity_collection/content'] = array(
-    'title' => 'Entity Collection content',
+  $items['entity-collection/%entity_collection/content'] = array(
+    'title' => 'Content',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('entity_collection_content_form', 1),
     'access arguments' => array('content', 1),
@@ -49,8 +49,8 @@ function entity_collection_menu() {
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  $items['entity_collection/%entity_collection/delete'] = array(
-    'title' => 'Delete entity_collection',
+  $items['entity-collection/%entity_collection/delete'] = array(
+    'title' => 'Delete Entity collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('entity_collection_delete_form', 1),
     'access callback' => 'entity_collection_access',
