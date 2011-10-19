@@ -117,7 +117,7 @@ function entity_collection_entity_info() {
         ),
       ),
       'access callback' => 'entity_collection_access',
-      'base table' => 'entity_collection_entity_collections',
+      'base table' => 'entity_collection_collections',
       'module' => 'entity_collection',
       'bundles' => $bundle_info,
       'bundle keys' => array('bundle' => 'name'),

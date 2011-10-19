@@ -148,11 +148,11 @@ function entity_collection_admin() {
   $entity_collection_table = array();
   $entity_collection = new EntityCollection;
   foreach ($entity_collections as $entity_collection) {
-    $operations = l(t('Edit'), 'entity_collection/edit/' . $entity_collection->name);
+    $operations = l(t('Edit'), 'entity-collection/' . $entity_collection->name . '/edit');
     if (!$entity_collection->hasStatus(ENTITY_IN_CODE)) {
-       $operations .= ' | ' . l(t('Delete'), 'entity_collection/delete/' . $entity_collection->name);
+       $operations .= ' | ' . l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/delete');
     }
-    $operations .= l(' | ' . t('Manage content'), 'entity_collection/content/' . $entity_collection->name);
+    $operations .= l(' | ' . t('Manage content'), 'entity-collection/' . $entity_collection->name . '/content');
     $entity_collection_table[] = array(
       $entity_collection->title,
       $entity_collection->bundle,
