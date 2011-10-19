@@ -3,7 +3,7 @@
 /**
  * This class is used to represent a Region.
  */
-class Region extends Entity {
+class EntityCollection extends Entity {
   // We provide the values here for reference.
   public $type;
   public $name;
@@ -14,8 +14,8 @@ class Region extends Entity {
   public $requiredcontexts = array();
 
   public function __construct($values = array()) {
-    parent::__construct($values, 'region');
-    $this->tree = new RegionNode();
+    parent::__construct($values, 'entity_collection');
+    $this->tree = new EntityCollectionTreeNode();
   }
 
   /**
@@ -40,8 +40,8 @@ class Region extends Entity {
    *  An array that can be used with Drupals rendering system.
    */
   public function buildContent($view_mode = 'block', $langcode = NULL) {
-    $tree = region_storage_factory($this->bundle)->retrieve($this->name);
-    $content = region_renderer_factory($this)->build($tree);
+    $tree = entity_collection_storage_factory($this->bundle)->retrieve($this->name);
+    $content = entity_collection_renderer_factory($this)->build($tree);
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
   }
 

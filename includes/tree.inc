@@ -1,6 +1,6 @@
 <?php
 
-class RegionNode {
+class EntityCollectionTreeNode {
   public $type;
   public $entity_id;
   public $key;
@@ -25,7 +25,7 @@ class RegionNode {
    * @param stdClass $content
    */
   public function addChild($type, $entity_id, $content, $view_mode = NULL, $key = NULL) {
-    $node = new RegionNode($type, $entity_id, $content, $view_mode);
+    $node = new EntityCollectionTreeNode($type, $entity_id, $content, $view_mode);
     if (isset($key)) {
       $node->key = $key;
     }
@@ -35,9 +35,9 @@ class RegionNode {
 
   /**
    * Add a node as a child to this one.
-   * @param RegionNode $child
+   * @param EntityCollectionTreeNode $child
    */
-  public function addChildNode(RegionNode $child) {
+  public function addChildNode(EntityCollectionTreeNode $child) {
     if (!isset($this->children)) {
       $this->children = array();
     }

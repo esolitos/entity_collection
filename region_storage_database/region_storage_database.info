@@ -1,6 +1,0 @@
-name = Region database storage
-description = "Region storage database implementation."
-core = 7.x
-package = Region
-dependencies[] = region
-files[] = plugins/region_storage/region_storage_database.inc

@@ -2,20 +2,20 @@
 
 /**
  * @file
- * A region cache indirection mechanism that just uses the basic object cache.
+ * A entity_collection cache indirection mechanism that just uses the basic object cache.
  */
 
 $plugin = array(
   // cache plugins are the rare plugin types that have no real UI but
   // we're providing a title just in case.
   'title' => t('Region object cache'),
-  'cache get' => 'region_cache_object_get',
-  'cache set' => 'region_cache_object_set',
-  'cache clear' => 'region_cache_object_clear',
-  'cache finalize' => 'region_cache_object_set',
+  'cache get' => 'entity_collection_cache_object_get',
+  'cache set' => 'entity_collection_cache_object_set',
+  'cache clear' => 'entity_collection_cache_object_clear',
+  'cache finalize' => 'entity_collection_cache_object_set',
 );
 
-function region_cache_object_get($data, $key) {
+function entity_collection_cache_object_get($data, $key) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.
   if (empty($data)) {
@@ -25,7 +25,7 @@ function region_cache_object_get($data, $key) {
   return ctools_object_cache_get($data, $key);
 }
 
-function region_cache_object_set($data, $key, $object) {
+function entity_collection_cache_object_set($data, $key, $object) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.
   if (empty($data)) {
@@ -35,7 +35,7 @@ function region_cache_object_set($data, $key, $object) {
   return ctools_object_cache_set($data, $key, $object);
 }
 
-function region_cache_object_clear($data, $key) {
+function entity_collection_cache_object_clear($data, $key) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.
   if (empty($data)) {

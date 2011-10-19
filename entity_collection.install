@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Table definition for the region module.
+ * Table definition for the entity_collection module.
  */
 
 /**
  * Implements hook_schema().
  */
-function region_schema() {
-  // The region bundles table is used for store bundles. It's using the
+function entity_collection_schema() {
+  // The entity_collection bundles table is used for store bundles. It's using the
   // CTools export API to make it exportable.
-  $schema['region_bundles'] = array(
-    'description' => 'Table holding region bundles.',
+  $schema['entity_collection_bundles'] = array(
+    'description' => 'Table holding entity_collection bundles.',
     'export' => array(
       'api' => array(
-        'owner' => 'region',
-        'api' => 'region_bundles_default',
+        'owner' => 'entity_collection',
+        'api' => 'entity_collection_bundles_default',
         'minimum_version' => 1,
         'current_version' => 1,
       ),
@@ -24,19 +24,19 @@ function region_schema() {
       'key name' => 'Name',
       'primary key' => 'rbid',
       'identifier' => 'preset',
-      'default hook' => 'region_bundles_default',
-      'load callback' => 'region_bundle_load',
+      'default hook' => 'entity_collection_bundles_default',
+      'load callback' => 'entity_collection_bundle_load',
     ),
     'fields' => array(
       'rbid' => array(
-        'description' => 'Serial id for this region. Only used for internal lookups.',
+        'description' => 'Serial id for this entity_collection. Only used for internal lookups.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'no export' => TRUE,
       ),
       'name' => array(
-        'description' => 'Machine-readable name for this region.',
+        'description' => 'Machine-readable name for this entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
@@ -48,13 +48,13 @@ function region_schema() {
         'not null' => TRUE,
       ),
       'label' => array(
-        'description' => 'Administrative title for this region.',
+        'description' => 'Administrative title for this entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
       ),
       'description' => array(
-        'description' => 'Administrative description for this region.',
+        'description' => 'Administrative description for this entity_collection.',
         'type' => 'text',
         'size' => 'medium',
         'not null' => TRUE,
@@ -65,31 +65,31 @@ function region_schema() {
       'name' => array('name'),
     ),
   );
-  // Table for regions. Regions are exportable through the Entity API.
-  $schema['region_regions'] = array(
-    'description' => 'Table holding regions.',
+  // Table for entity_collections. Regions are exportable through the Entity API.
+  $schema['entity_collection_entity_collections'] = array(
+    'description' => 'Table holding entity_collections.',
     'fields' => array(
       'rid' => array(
-        'description' => 'Serial id for this region. Only used for internal lookups.',
+        'description' => 'Serial id for this entity_collection. Only used for internal lookups.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'no export' => TRUE,
       ),
       'name' => array(
-        'description' => 'Machine-readable name for this region.',
+        'description' => 'Machine-readable name for this entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
       ),
       'title' => array(
-        'description' => 'Administrative title for this region.',
+        'description' => 'Administrative title for this entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
       ),
       'bundle' => array(
-        'description' => 'Machine-readable name for this region.',
+        'description' => 'Machine-readable name for this entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,

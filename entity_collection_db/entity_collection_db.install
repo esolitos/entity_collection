@@ -3,8 +3,8 @@
 /**
  * Implementation of hook_schema().
  */
-function region_storage_database_schema() {
-  $schema['region_storage'] = array(
+function entity_collection_db_schema() {
+  $schema['entity_collection_storage'] = array(
     'fields' => array(
       'rsid' => array(
         'description' => 'Serial ID',
@@ -18,7 +18,7 @@ function region_storage_database_schema() {
         'not null' => TRUE,
       ),
       'name' => array(
-        'description' => 'Machine-readable name for a region.',
+        'description' => 'Machine-readable name for a entity_collection.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,

@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Sample region storage database implementation.
+ * Sample entity_collection storage database implementation.
  */
-class RegionStorageDatabase implements RegionStorage {
+class EntityCollectionStorageDB implements EntityCollectionStorage {
 
-  public function save($name, RegionNode $tree, $position = 0) {
+  public function save($name, EntityCollectionTreeNode $tree, $position = 0) {
     $record = $this->getRecord($name, $tree, $position);
     $primary_keys = array();
     if ($record) {
       if ($this->itemExists($record->name, $record->eid)) {
         $primary_keys = array('eid', 'name');
       }
-      drupal_write_record('region_storage', $record, $primary_keys);
+      drupal_write_record('entity_collection_storage', $record, $primary_keys);
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
@@ -23,13 +23,13 @@ class RegionStorageDatabase implements RegionStorage {
   }
 
   /**
-   * Append a new item to the region.
+   * Append a new item to the entity_collection.
    * @param string $name
-   * @param RegionNode $item
+   * @param EntityCollectionTreeNode $item
    */
-  public function appendItem($name, RegionNode $item) {
+  public function appendItem($name, EntityCollectionTreeNode $item) {
     // Fetch the last position.
-    $query = db_select('region_storage', 'rs');
+    $query = db_select('entity_collection_storage', 'rs');
     $query->addField('rs', 'position');
     $query->orderBy('position', 'DESC');
     $query->condition('parent', isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0);
@@ -40,7 +40,7 @@ class RegionStorageDatabase implements RegionStorage {
     $this->save($name, $item, $position);
   }
 
-  private function getRecord($name, RegionNode $item, $position = 0) {
+  private function getRecord($name, EntityCollectionTreeNode $item, $position = 0) {
     if (isset($item->content)) {
       $record = new stdClass();
       $record->name = $name;
@@ -56,7 +56,7 @@ class RegionStorageDatabase implements RegionStorage {
   }
 
   private function itemExists($name, $entity_id) {
-    return db_select('region_storage', 'rs')
+    return db_select('entity_collection_storage', 'rs')
       ->fields('rs', array('eid'))
       ->condition('eid', $entity_id)
       ->condition('name', $name)
@@ -64,18 +64,18 @@ class RegionStorageDatabase implements RegionStorage {
   }
 
   /**
-   * Retreive a region.
+   * Retreive a entity_collection.
    * @param type $name
    */
   public function retrieve($name) {
-    $query = db_select('region_storage', 'rs')
+    $query = db_select('entity_collection_storage', 'rs')
       ->fields('rs')
       ->condition('name', $name, '=')
       ->orderBy('parent')
       ->orderBy('position');
     $result = $query->execute();
     $values = array();
-    $tree = new RegionNode();
+    $tree = new EntityCollectionTreeNode();
     foreach ($result as $value) {
       if ($value->parent > 0) {
         $node = $tree->getChild($value->parent);
@@ -89,14 +89,14 @@ class RegionStorageDatabase implements RegionStorage {
   }
 
   public function delete($name, $entries) {
-    db_delete('region_storage')
+    db_delete('entity_collection_storage')
       ->condition('name', $name)
       ->condition('eid', array_keys($entries))
       ->execute();
   }
 
   /**
-   * Drop an entire region.
+   * Drop an entire entity_collection.
    * @param type $names
    */
   public function drop($name) {

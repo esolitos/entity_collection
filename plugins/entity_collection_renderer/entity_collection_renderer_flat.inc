@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Simple interface for storing regions.
+ * Simple interface for storing entity_collections.
  */
-class RegionRendererFlat {
+class EntityCollectionRendererFlat {
   public function getMaxDepth() {
     return 0;
   }
@@ -16,7 +16,7 @@ class RegionRendererFlat {
     return TRUE;
   }
 
-  public function build(RegionNode $tree, $langcode = NULL) {
+  public function build(EntityCollectionTreeNode $tree, $langcode = NULL) {
     $content = array();
     // Get a flat list of everything. We don't care about
     // grouping, we just want a flat array, sorted properly.
@@ -25,7 +25,7 @@ class RegionRendererFlat {
     foreach ($list as $item) {
       $data = entity_view($item->type, array($item->entity_id => $item->content), $item->view_mode, $langcode);
       // @todo, this sucks really bad...
-      $content['region'][$item->entity_id] = array(
+      $content['entity_collection'][$item->entity_id] = array(
           $data['nodes'][$item->entity_id],
           '#weight' => $i,
       );

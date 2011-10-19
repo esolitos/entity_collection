@@ -1,0 +1,390 @@
+<?php
+
+/**
+ * Imeplements hook_menu().
+ */
+function entity_collection_menu() {
+  $items = array();
+  $items['admin/structure/entity_collection'] = array(
+    'title' => 'Entity Collections',
+    'page callback' => 'entity_collection_admin',
+    'description' => t('Administer entity_collections'),
+    'access arguments' => array('administer entity_collections'),
+    'file' => 'entity_collection.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['entity-collection/%entity_collection'] = array(
+    'title' => 'Entity Collection',
+    'page callback' => 'entity_collection_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view', 1),
+    'access callback' => 'entity_collection_access',
+    'file' => 'entity_collection.pages.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['entity_collection/%entity_collection/view'] = array(
+    'title' => 'Entity Collection',
+    'page callback' => 'entity_collection_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view', 1),
+    'access callback' => 'entity_collection_access',
+    'file' => 'entity_collection.pages.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['entity_collection/%entity_collection/edit'] = array(
+    'title' => 'Edit entity_collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('entity_collection_edit_form', 1),
+    'access arguments' => array('edit', 1),
+    'access callback' => 'entity_collection_access',
+    'file' => 'entity_collection.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['entity_collection/%entity_collection/content'] = array(
+    'title' => 'Entity Collection content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('entity_collection_content_form', 1),
+    'access arguments' => array('content', 1),
+    'access callback' => 'entity_collection_access',
+    'file' => 'entity_collection.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['entity_collection/%entity_collection/delete'] = array(
+    'title' => 'Delete entity_collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('entity_collection_delete_form', 1),
+    'access callback' => 'entity_collection_access',
+    'access arguments' => array('delete', 1),
+    'file' => 'entity_collection.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $entity_collection_bundles = entity_collection_bundles();
+  // If we are using the block module, then we add links from there.
+  foreach ($entity_collection_bundles as $key => $info) {
+    $items['admin/structure/entity_collection/add/' . $info->name] = array(
+      'title' => 'Add ' . drupal_strtolower($info->label),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('entity_collection_add_form', 4),
+      'access arguments' => array("create {$info->name} entity blocks"),
+      'file' => 'entity_collection.admin.inc',
+      'type' => MENU_LOCAL_ACTION,
+    );
+  }
+  $items['entity_collection/autocomplete'] = array(
+    'title' => 'entity_collection autocomplete',
+    'page callback' => 'entity_collection_content_form_autocomplete',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer entity_collections'),
+    'type' => MENU_CALLBACK,
+    'file' => 'entity_collection.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function entity_collection_entity_info() {
+  $bundles = entity_collection_bundles();
+  $bundle_info = array();
+  foreach ($bundles as $key => $bundle) {
+    $bundle_info[$bundle->name] = array(
+      'label' => $bundle->label,
+      'admin' => array(
+        'path' => 'admin/structure/entity_collection_bundle/list/%entity_collection_bundle/edit',
+        'real path' => 'admin/structure/entity_collection_bundle/list/' . $bundle->name . '/edit',
+        'bundle argument' => 4,
+        'access arguments' => array('administer entity_collection types'),
+      ),
+    );
+  }
+  return array(
+    'entity_collection' => array(
+      'label' => t('Entity Collection'),
+      'entity class' => 'EntityCollection',
+      'controller class' => 'EntityAPIController',
+      'fieldable' => TRUE,
+      'exportable' => TRUE,
+      'view modes' => array(
+        'block' => array(
+          'label' => t('Region Block'),
+          'custom settings' => FALSE,
+        ),
+        'full' => array(
+          'label' => t('Full content'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'access callback' => 'entity_collection_access',
+      'base table' => 'entity_collection_entity_collections',
+      'module' => 'entity_collection',
+      'bundles' => $bundle_info,
+      'bundle keys' => array('bundle' => 'name'),
+      'entity keys' => array(
+        'id' => 'rid',
+        'name' => 'name',
+        'bundle' => 'bundle',
+        'label' => 'title',
+      ),
+    ),
+  );
+}
+
+/**
+ * Fetch all bundles for a entity_collection.
+ * @return array
+ *   An array of all available bundles.
+ */
+function entity_collection_bundles() {
+  ctools_include('export');
+  return ctools_export_load_object('entity_collection_bundles');
+}
+
+/**
+ * Load a entity_collection bundle
+ * @param $name
+ *   The name of the bundle.
+ * @return stdClass
+ *   The actual bundle.
+ */
+function entity_collection_bundle_load($name) {
+  ctools_include('export');
+  $result = ctools_export_load_object('entity_collection_bundles', 'names', array($name));
+  return isset($result[$name]) ?  $result[$name] : FALSE;
+}
+
+/**
+ * Load a entity_collection by name
+ * @param string $name the name of the entity_collection.
+ */
+function entity_collection_load($name) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'entity_collection')
+    ->propertyCondition('name', $name)
+    ->execute();
+  if (isset($result['entity_collection']) && count($result['entity_collection'])) {
+    return current(entity_load('entity_collection', array_keys($result['entity_collection'])));
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function entity_collection_ctools_plugin_directory($module, $type) {
+  if ($type == 'export_ui' || $type == 'entity_collection_renderer' || $type == 'cache') {
+    return 'plugins/' . $type;
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_plugin_type().
+ */
+function entity_collection_ctools_plugin_type() {
+  return array(
+    'plugins' => array(
+      'cache' => TRUE,
+      'use hooks' => TRUE,
+      'classes' => array('entity_collection_storage', 'entity_collection_renderer'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_collection_plugins().
+ */
+function entity_collection_entity_collection_plugins() {
+  $path = drupal_get_path('module', 'entity_collection') . '/plugins/entity_collection_renderer';
+  $info['entity_collection_renderer_flat'] = array(
+    'title' => t('Flat list'),
+    'entity_collection_renderer' => array(
+      'parent' => 'EntityCollectionRenderer',
+      'class' => 'EntityCollectionRendererFlat',
+      'file' => 'entity_collection_renderer_flat.inc',
+      'path' => $path,
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function entity_collection_permission() {
+  $permissions = array(
+    'administer entity_collection types' =>  array(
+      'title' => t('Administer entity_collection types'),
+      'description' => t('Create and delete fields on entity_collections, and set their permissions.'),
+    ),
+  );
+  /*
+  // Generate per profile type permissions.
+  foreach (entityblock_get_types() as $type) {
+    $type_name = check_plain($type->type);
+    $permissions += array(
+      "create $type_name entity blocks" => array(
+        'title' => t('%type_name: Create entity block', array('%type_name' => $type->label)),
+      ),
+      "edit $type_name entity blocks" => array(
+        'title' => t('%type_name: Edit entity block', array('%type_name' => $type->label)),
+      ),
+      "view $type_name entity blocks" => array(
+        'title' => t('%type_name: View entity block', array('%type_name' => $type->label)),
+      ),
+      "delete $type_name entity blocks" => array(
+        'title' => t('%type_name: Delete entity block', array('%type_name' => $type->label)),
+      ),
+    );
+  }
+   */
+  return $permissions;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function entity_collection_theme() {
+  return array(
+    'entity_collection_content_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * Access callback for entity_collections.
+ */
+function entity_collection_access($op, $entity_collection, $account = NULL) {
+  if (isset($entity_collection)) {
+    return user_access("$op {$entity_collection->bundle} profile", $account);
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function entity_collection_block_info() {
+  $entity_collections = array();
+  // Load all blocks
+  $entity_collections = entity_load('entity_collection');
+  foreach ($entity_collections as $entity_collection) {
+    $blocks[$entity_collection->name] = array(
+      'info' => $entity_collection->title,
+      'cache' => $entity_collection->cache,
+    );
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function entity_collection_block_configure($delta) {
+  $block = entity_load('entity_collection', array($delta));
+  if (user_access("edit {$block->bundle} entity blocks")) {
+    $form_state = array('type' => $block->bundle, 'entityblock' => $block);
+    // We attach our entity block form here.
+    return entityblock_form(array(), $form_state);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function entity_collection_block_view($delta) {
+  $block = array();
+  // The delta is always the same as the machine name of the
+  // entity block, so it's fairly easy to load.
+  $entity_collection = entity_load('entity_collection', array($delta));
+  if ($entityblock && user_access("view {$entityblock->type} entity blocks")) {
+    $block['subject'] = check_plain($entityblock->title);
+    $block['content'] = $entityblock->buildContent();
+    return $block;
+  }
+}
+
+/**
+ * Get all storage backends formatted for #options
+ * @return array
+ *   An array of storage backends.
+ */
+function entity_collection_get_storage_options() {
+  $storage_plugins = ctools_get_plugins('entity_collection', 'plugins');
+  // Get all available storage backends.
+  $storage_options = array();
+  foreach ($storage_plugins as $name => $info) {
+    if (isset($info['title']) && isset($info['entity_collection_storage'])) {
+      $storage_options[$name] = $info['title'];
+    }
+  }
+  return $storage_options;
+}
+/**
+ * Get all renderers formatted for #options
+ * @return array
+ *   An array of storage backends.
+ */
+function entity_collection_get_renderer_options() {
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins('entity_collection', 'plugins');
+  // Get all available storage backends.
+  $options = array();
+  foreach ($plugins as $name => $info) {
+    if (isset($info['title']) && isset($info['entity_collection_renderer'])) {
+      $options[$name] = $info['title'];
+    }
+  }
+  return $options;
+}
+
+/**
+ * Save the content of a entity_collection.
+ * @param string $name
+ *   The entity_collection name
+ * @param RegioNode $tree
+ *   The tree to save.
+ */
+function entity_collection_save_content($name, $bundle, EntityCollectionTreeNode $tree) {
+  return entity_collection_storage_factory($bundle)->save($name, $tree);
+}
+
+function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {
+  return entity_collection_storage_factory($bundle)->appendItem($name, $item);
+}
+
+/**
+ * Load content for a entity_collection.
+ * @param string $bundle
+ *   The name of the entity_collection bundle
+ * @param string $name
+ *   The name of the entity_collection.
+ * @return EntityCollectionTreeNode the content for a entity_collection.
+ */
+function entity_collection_load_content($bundle, $name) {
+  return entity_collection_storage_factory($bundle)->retrieve($name);
+}
+
+/**
+ * Factory function for fetching a storage backend for a bundle.
+ * @param string $bundle
+ * @return EntityCollectionStorage a entity_collection storage class.
+ */
+function entity_collection_storage_factory($bundle) {
+  ctools_include('plugins');
+  $bundle = entity_collection_bundle_load($bundle);
+  $plugin = ctools_get_plugins('entity_collection', 'plugins', $bundle->storage);
+  return new $plugin['entity_collection_storage']['class']();
+}
+
+/**
+ * Get the renderer for a particular entity_collection.
+ * @param Region $entity_collection
+ * @return plugin
+ */
+function entity_collection_renderer_factory(EntityCollection $entity_collection) {
+  ctools_include('plugins');
+  $plugin = ctools_get_plugins('entity_collection', 'plugins', $entity_collection->renderer);
+  return new $plugin['entity_collection_renderer']['class']();
+}
