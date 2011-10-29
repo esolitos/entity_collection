@@ -170,11 +170,19 @@ function entity_collection_load($name) {
   return FALSE;
 }
 
+function entity_collection_load_all() {
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'entity_collection')->execute();
+  if (isset($result['entity_collection'])) {
+    return entity_load('entity_collection', array_keys($result['entity_collection']));
+  }
+}
+
 /**
  * Implements hook_ctools_plugin_directory().
  */
 function entity_collection_ctools_plugin_directory($module, $type) {
-  if ($type == 'export_ui' || $type == 'entity_collection_renderer' || $type == 'cache') {
+  if ($type == 'export_ui' || $type == 'entity_collection_renderer' || $type == 'cache' || $type == 'content_types') {
     return 'plugins/' . $type;
   }
 }
