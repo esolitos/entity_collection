@@ -388,3 +388,26 @@ function entity_collection_renderer_factory(EntityCollection $entity_collection)
   $plugin = ctools_get_plugins('entity_collection', 'plugins', $entity_collection->renderer);
   return new $plugin['entity_collection_renderer']['class']();
 }
+
+/**
+ * Implements hook_entity_load().
+ */
+function entity_collection_entity_load($entities, $type) {
+  // Decode settings object.
+  if ($type == 'entity_collection') {
+    foreach ($entities as $entity) {
+      if (isset($entity->settings)) {
+        $entity->settings = unserialize($entity->settings);
+      }
+      else {
+        $entity->settings = new stdClass;
+      }
+    }
+  }
+}
+
+function entity_collection_entity_presave($entity, $type) {
+  if ($type == 'entity_collection' && isset($entity->settings)) {
+    $entity->settings = serialize($entity->settings);
+  }
+}

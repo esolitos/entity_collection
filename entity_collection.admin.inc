@@ -63,6 +63,9 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     _entity_collection_context_form($form, $form_state);
   }
   $entity_collection = $form_state['entity_collection'];
+  $form['settings'] = array(
+    '#tree' => TRUE,
+  );
   $form['title'] = array(
     '#type' => 'textfield',
     '#required' => TRUE,
@@ -100,14 +103,17 @@ function _entity_collection_context_form(&$form, &$form_state) {
   ctools_context_admin_includes();
 
   $entity_collection = $form_state['entity_collection'];
+  if (!isset($entity_collection->settings)) {
+    $entity_collection->settings = new stdClass;
+  }
   $cached_entity_collection = ctools_cache_get('entity_collection_cache_object', $entity_collection->name);
   if ($cached_entity_collection) {
-    $form_state['entity_collection'] = $entity_collection = $cached_entity_collection;
+    $form_state['entity_collection']->settings = $entity_collection->settings = $cached_entity_collection;
   }
   else {
-    ctools_cache_set('entity_collection_cache_object', $entity_collection->name, $entity_collection);
+    ctools_cache_set('entity_collection_cache_object', $entity_collection->name, $entity_collection->settings);
   }
-  ctools_context_add_required_context_form('entity_collection_cache_object', $form, $form_state, $form['contexts']['required'], $entity_collection, $entity_collection->name);
+  ctools_context_add_required_context_form('entity_collection_cache_object', $form['settings'], $form_state, $form['contexts']['required'], $entity_collection->settings, $entity_collection->name);
 }
 
 /**
