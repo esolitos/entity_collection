@@ -54,6 +54,11 @@ function entity_collection_db_schema() {
         'length' => 255,
         'description' => 'The view_mode to be used to render this row',
       ),
+      'contexts' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'The contexts used.'
+      ),
     ),
     'primary key' => array('rsid'),
     'indexes' => array(

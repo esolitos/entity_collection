@@ -32,9 +32,9 @@ function entity_collection_entity_collection_content_type_content_types() {
     $type['title'] = t('%block entity block', array('%block' => $entity->title));
     $type['defaults']['name'] = $entity->name;
     $type['defaults']['type'] = $entity->type;
-    if (!empty($entity->requiredcontexts)) {
+    if (!empty($entity->settings->requiredcontexts)) {
       $type['required context'] = array();
-      foreach ($entity->requiredcontexts as $context) {
+      foreach ($entity->settings->requiredcontexts as $context) {
         $info = ctools_get_context($context['name']);
         // TODO: allow an optional setting
         $type['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
@@ -50,9 +50,10 @@ function entity_collection_entity_collection_content_type_content_types() {
  *
  * Outputs a node based on the module and delta supplied in the configuration.
  */
-function entity_collection_entity_collection_content_type_render($subtype, $conf, $panel_args) {
+function entity_collection_entity_collection_content_type_render($subtype, $conf, $panel_args, $contexts) {
   $content = new stdClass;
   $entity = entity_collection_load($conf['name']);
+  $entity->setContexts($contexts);
   $content->subject = $entity->title;
   $content->content = $entity->view();
   return $content;

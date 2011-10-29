@@ -12,6 +12,7 @@ class EntityCollection extends Entity {
   public $tree;
   public $cache;
   public $requiredcontexts = array();
+  public $contexts = array();
 
   public function __construct($values = array()) {
     parent::__construct($values, 'entity_collection');
@@ -29,6 +30,13 @@ class EntityCollection extends Entity {
       return entity_get_types($this->type);
     }
   }
+  
+  /**
+   * Set the current contexts.
+   */
+  public function setContexts($contexts) {
+    $this->contexts = $contexts;
+  }
 
   /**
    * Build content.
@@ -40,7 +48,7 @@ class EntityCollection extends Entity {
    *  An array that can be used with Drupals rendering system.
    */
   public function buildContent($view_mode = 'block', $langcode = NULL) {
-    $tree = entity_collection_storage_factory($this->bundle)->retrieve($this->name);
+    $tree = entity_collection_storage_factory($this->bundle)->retrieve($this->name, $this->contexts);
     $content = entity_collection_renderer_factory($this)->build($tree);
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
   }

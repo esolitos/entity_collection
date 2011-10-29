@@ -178,9 +178,24 @@ function entity_collection_admin() {
  */
 function entity_collection_content_form($form, &$form_state, $entity_collection) {
   $form_state['entity_collection'] = $entity_collection;
-  $tree = entity_collection_load_content($entity_collection->bundle, $entity_collection->name);
+  ctools_include('context');
+  $contexts = array();
+  if (isset($_GET['contexts'])) {
+    $contexts = explode(':', $_GET['contexts']);
+  }
+  // Convert arguments to CTools Contexts.
+  foreach ($contexts as $i => &$context) {
+    $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
+  }
+  $tree = entity_collection_storage_factory($entity_collection->bundle)->retrieve($entity_collection->name, $contexts);
+  $form_state['contexts'] = $contexts;
   $wrappers = array();
   $form['#tree'] = TRUE;
+  $form['contexts'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Contexts'),
+    '#collapsible' => TRUE,
+  );
   entity_collection_content_form_content($entity_collection, $form, $tree);
   $parent_options = array(0 => 'None');
   $form['order_save'] = array(
@@ -278,7 +293,10 @@ function _entity_collection_get_view_mode_options($entity_info) {
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $tree = entity_collection_content_build_tree($values['content']);
-  entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection']->name, $tree);
+  if (isset($form_state['contexts'])) {
+    $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
+  }
+  entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection']->name, $tree, $form_state['contexts']);
 }
 
 /**
@@ -360,6 +378,9 @@ function entity_collection_content_form_add_content($form, &$form_state) {
   if (isset($entities[$value])) {
     $entity = $entities[$value];
     $item = new EntityCollectionTreeNode($type, $value, $entity);
-    entity_collection_storage_factory($entity_collection->bundle)->appendItem($entity_collection->name, $item);
+    if (isset($form_state['contexts'])) {
+      $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
+    }
+    entity_collection_storage_factory($entity_collection->bundle)->appendItem($entity_collection->name, $item, $form_state['contexts']);
   }
 }

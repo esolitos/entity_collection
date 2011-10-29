@@ -6,8 +6,8 @@
  */
 class EntityCollectionStorageDB implements EntityCollectionStorage {
 
-  public function save($name, EntityCollectionTreeNode $tree, $position = 0) {
-    $record = $this->getRecord($name, $tree, $position);
+  public function save($name, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0) {
+    $record = $this->getRecord($name, $tree, $position, $contexts);
     $primary_keys = array();
     if ($record) {
       if ($this->itemExists($record->name, $record->eid)) {
@@ -17,7 +17,7 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
-      $this->save($name, $node, $i);
+      $this->save($name, $node, $i, $contexts);
       $i++;
     }
   }
@@ -27,7 +27,7 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
    * @param string $name
    * @param EntityCollectionTreeNode $item
    */
-  public function appendItem($name, EntityCollectionTreeNode $item) {
+  public function appendItem($name, EntityCollectionTreeNode $item, $contexts = array()) {
     // Fetch the last position.
     $query = db_select('entity_collection_storage', 'rs');
     $query->addField('rs', 'position');
@@ -37,10 +37,10 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     if ($position > 0) {
       $position++;
     }
-    $this->save($name, $item, $position);
+    $this->save($name, $item, $contexts, $position);
   }
 
-  private function getRecord($name, EntityCollectionTreeNode $item, $position = 0) {
+  private function getRecord($name, EntityCollectionTreeNode $item, $position = 0, $contexts = array()) {
     if (isset($item->content)) {
       $record = new stdClass();
       $record->name = $name;
@@ -50,12 +50,13 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
       $record->view_mode = $item->view_mode;
       $record->parent = isset($item->parent) && isset($item->parent->key) ? $item->parent->key : 0;
       $record->position = $position;
+      $record->contexts = $this->serializeContexts($contexts);
       return $record;
     }
     return FALSE;
   }
 
-  private function itemExists($name, $entity_id) {
+  private function itemExists($name, $entity_id, $contexts = array()) {
     return db_select('entity_collection_storage', 'rs')
       ->fields('rs', array('eid'))
       ->condition('eid', $entity_id)
@@ -67,12 +68,16 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
    * Retreive a entity_collection.
    * @param type $name
    */
-  public function retrieve($name) {
+  public function retrieve($name, $contexts = array()) {
+    // Serialize the context arguments into a string.
     $query = db_select('entity_collection_storage', 'rs')
       ->fields('rs')
       ->condition('name', $name, '=')
       ->orderBy('parent')
       ->orderBy('position');
+    if (count($contexts)) {
+      $query->condition('contexts', $this->serializeContexts($contexts));
+    }
     $result = $query->execute();
     $values = array();
     $tree = new EntityCollectionTreeNode();
@@ -87,8 +92,18 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     }
     return $tree;
   }
+  
+  private function serializeContexts($contexts) {
+    $serialized = array();
+    foreach ($contexts as $context) {
+      if (isset($context->argument)) {
+        $serialized[] = $context->argument;
+      }
+    }
+    return implode(':', $serialized);
+  }
 
-  public function delete($name, $entries) {
+  public function delete($name, $entries, $contexts = array()) {
     db_delete('entity_collection_storage')
       ->condition('name', $name)
       ->condition('eid', array_keys($entries))
