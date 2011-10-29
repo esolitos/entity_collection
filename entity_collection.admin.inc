@@ -43,7 +43,7 @@ function entity_collection_delete_form($form, &$form_state, $entity_collection) 
 }
 
 function entity_collection_delete_form_submit($form, &$form_state) {
-  entity_delete('entity_collection', $form_state['entity_collection']->bid);
+  entity_delete('entity_collection', $form_state['entity_collection']->rid);
   $form_state['redirect'] = 'admin/structure/entity_collection';
 }
 
@@ -105,6 +105,7 @@ function _entity_collection_context_form(&$form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   if (!isset($entity_collection->settings)) {
     $entity_collection->settings = new stdClass;
+    $entity_collection->requiredcontexts = array();
   }
   $cached_entity_collection = ctools_cache_get('entity_collection_cache_object', $entity_collection->name);
   if ($cached_entity_collection) {
