@@ -17,7 +17,7 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
-      $this->save($name, $node, $i, $contexts);
+      $this->save($name, $node, $contexts, $position);
       $i++;
     }
   }
