@@ -293,7 +293,7 @@ function _entity_collection_get_view_mode_options($entity_info) {
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $tree = entity_collection_content_build_tree($values['content']);
-  if (isset($form_state['contexts'])) {
+  if (isset($_GET['contexts'])) {
     $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
   }
   entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection']->name, $tree, $form_state['contexts']);
