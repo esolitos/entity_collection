@@ -55,7 +55,7 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   $entity = entity_collection_load($conf['name']);
   $entity->setContexts($contexts);
   $content->subject = $entity->title;
-  $content->content = $entity->view();
+  $content->content = $entity->buildContent();
   return $content;
 }
 
