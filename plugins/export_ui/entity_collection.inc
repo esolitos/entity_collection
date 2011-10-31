@@ -35,7 +35,7 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Storage'),
     '#default_value' => isset($entity_collection->storage) ? $entity_collection->storage : NULL,
-    '#options' => entity_collection_get_storage_options(),
+    '#options' => EntityCollectionStorage::getStorageOptions(),
     '#required' => TRUE,
   );
   $form['description'] = array(

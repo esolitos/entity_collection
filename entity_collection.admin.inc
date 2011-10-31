@@ -91,8 +91,15 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   $form['style'] = array(
     '#type' => 'select',
     '#title' => t('Style'),
-    '#options' => entity_collection_get_style_options(),
+    '#options' => EntityCollectionStyle::getStyleOptions(),
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
+  );
+  
+  $form['row'] = array(
+    '#type' => 'select',
+    '#title' => t('Row'),
+    '#options' => EntityCollectionRow::getRowOptions(),
+    '#description' => t('Select the style you want to use for rendering this entity_collection here.') 
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
   $form['#validate'][] = 'entity_collection_form_validate';
@@ -135,7 +142,8 @@ function entity_collection_form_validate($form, &$form_state) {
   $entity_collection = &$form_state['entity_collection'];
   $entity_collection->name = $form_state['values']['name'];
   $entity_collection->title = $form_state['values']['title'];
-  $entity_collection->renderer = $form_state['values']['renderer'];
+  $entity_collection->style = $form_state['values']['style'];
+  $entity_collection->row = $form_state['values']['row'];
   foreach ($form_state['values']['settings'] as $key => $setting) {
     $entity_collection->settings->$key = $setting;
   }
@@ -271,7 +279,7 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
     $form['content'][$key]['view_mode'] = array(
       '#type' => 'select',
       '#default_value' => $child->view_mode,
-      '#options' => _entity_collection_get_view_mode_options($info),
+      '#options' => EntityCollectionRow::getRow($entity_collection)->getOptions($child->type, $child->content),
     );
     $form['content'][$key]['delete'] = array(
       '#type' => 'markup',

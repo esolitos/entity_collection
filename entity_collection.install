@@ -94,12 +94,18 @@ function entity_collection_schema() {
         'length' => 128,
         'not null' => TRUE,
       ),
-      'renderer' => array(
-        'description' => 'Which renderer to use.',
+      'style' => array(
+        'description' => 'The style to use when rendering.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
       ),
+  	  'row' => array(
+        'description' => 'The row style to use when rendering.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),      
       'settings' => array(
         'description' => 'A blob of arbitrary settings.',
         'type' => 'blob',

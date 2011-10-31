@@ -12,7 +12,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
     $list = $tree->getFlat();
     $i = 0;
     foreach ($list as $item) {
-      $data = entity_view($item->type, array($item->entity_id => $item->content), $item->view_mode, $langcode);
+      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
       // @todo, this sucks really bad...
       $content['entity_collection'][$item->entity_id] = array(
           $data['nodes'][$item->entity_id],

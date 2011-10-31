@@ -216,9 +216,10 @@ function entity_collection_ctools_plugin_type() {
       'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array(
-      	'entity_collection_storage',
+        'entity_collection_storage',
       	'entity_collection_style',
-      	'entity_collection_row'),
+        'entity_collection_row'
+      ),
     ),
   );
 }
@@ -234,6 +235,15 @@ function entity_collection_entity_collection_plugins() {
       'parent' => 'EntityCollectionStyle',
       'class' => 'EntityCollectionStyleFlat',
       'file' => 'entity_collection_style_flat.inc',
+      'path' => $path,
+    ),
+  );
+  $info['entity_collection_row_view_mode'] = array(
+    'title' => t('View mode'),
+    'entity_collection_row' => array(
+      'parent' => 'EntityCollectionRow',
+      'class' => 'EntityCollectionRowViewMode',
+      'file' => 'entity_collection_row_view_mode.inc',
       'path' => $path,
     ),
   );
@@ -347,41 +357,6 @@ function entity_collection_block_view($delta) {
     $block['content'] = $entityblock->buildContent();
     return $block;
   }
-}
-
-/**
- * Get all storage backends formatted for #options
- * @return array
- *   An array of storage backends.
- */
-function entity_collection_get_storage_options() {
-  $storage_plugins = ctools_get_plugins('entity_collection', 'plugins');
-  // Get all available storage backends.
-  $storage_options = array();
-  foreach ($storage_plugins as $name => $info) {
-    if (isset($info['title']) && isset($info['entity_collection_storage'])) {
-      $storage_options[$name] = $info['title'];
-    }
-  }
-  return $storage_options;
-}
-
-/**
- * Get all renderers formatted for #options
- * @return array
- *   An array of storage backends.
- */
-function entity_collection_get_style_options() {
-  ctools_include('plugins');
-  $plugins = ctools_get_plugins('entity_collection', 'plugins');
-  // Get all available storage backends.
-  $options = array();
-  foreach ($plugins as $name => $info) {
-    if (isset($info['title']) && isset($info['entity_collection_renderer'])) {
-      $options[$name] = $info['title'];
-    }
-  }
-  return $options;
 }
 
 /**
