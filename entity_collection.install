@@ -118,6 +118,8 @@ function entity_collection_schema() {
       'name' => array('name'),
     ),
   );
-
+  $cache_schema = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_entity_entity_collection'] = $cache_schema;
+  $schema['cache_entity_entity_collection']['description'] = "Cache table used to store entity_collection entity records."; 
   return $schema;
 }

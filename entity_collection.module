@@ -112,7 +112,7 @@ function entity_collection_entity_info() {
       ),
     );
   }
-  return array(
+  $definition = array(
     'entity_collection' => array(
       'label' => t('Entity Collection'),
       'entity class' => 'EntityCollection',
@@ -142,6 +142,10 @@ function entity_collection_entity_info() {
       ),
     ),
   );
+  if (module_exists('entitycache')) {
+    $definition['entity_collection']['entity cache'] = TRUE;
+  }
+  return $definition;
 }
 
 /**
@@ -172,22 +176,34 @@ function entity_collection_bundle_load($name) {
  * @param string $name the name of the entity_collection.
  */
 function entity_collection_load($name) {
-  $query = new EntityFieldQuery();
-  $result = $query
-    ->entityCondition('entity_type', 'entity_collection')
-    ->propertyCondition('name', $name)
-    ->execute();
-  if (isset($result['entity_collection']) && count($result['entity_collection'])) {
-    return current(entity_load('entity_collection', array_keys($result['entity_collection'])));
+  if($entity = cache_get($name, 'cache_entity_entity_collection')) {
+    return $entity->data;
+  }
+  else {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'entity_collection')
+      ->propertyCondition('name', $name)
+      ->execute();
+    if (isset($result['entity_collection']) && count($result['entity_collection'])) {
+      $entity = current(entity_load('entity_collection', array_keys($result['entity_collection'])));
+      cache_set($name, $entity, 'cache_entity_entity_collection');
+      return $entity;
+    }
   }
   return FALSE;
+  
 }
 
 function entity_collection_load_all() {
+  if ($collections = cache_get('entity_collections')) {
+    return $collections->data;
+  }
   $query = new EntityFieldQuery();
   $result = $query->entityCondition('entity_type', 'entity_collection')->execute();
   if (isset($result['entity_collection'])) {
-    return entity_load('entity_collection', array_keys($result['entity_collection']));
+    $collections = entity_load('entity_collection', array_keys($result['entity_collection']));
+    cache_set('entity_collections', $collections);
   }
 }
 
@@ -437,4 +453,8 @@ function entity_collection_contextual_links_view_alter(&$element, $items) {
       'query' => array('destination' => current_path()),
     );
   }
+}
+
+function entity_collection_flush_caches() {
+  return array('cache_entity_entity_collection');
 }

@@ -15,7 +15,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
       $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
       // @todo, this sucks really bad...
       $content['entity_collection'][$item->entity_id] = array(
-          $data['nodes'][$item->entity_id],
+          $data['node'][$item->entity_id],
           '#weight' => $i,
       );
       $i++;

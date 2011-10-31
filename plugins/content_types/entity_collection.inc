@@ -53,21 +53,23 @@ function entity_collection_entity_collection_content_type_content_types() {
 function entity_collection_entity_collection_content_type_render($subtype, $conf, $panel_args, $contexts) {
   $content = new stdClass;
   $entity = entity_collection_load($conf['name']);
-  $entity->setContexts($contexts);
-  $content->subject = $entity->title;
-  $content->content = $entity->buildContent();
-  $query = array();
-  $serialized = array();
-  foreach ($contexts as $context) {
-    $serialized[] = $context->argument;
+  if (!empty($entity)) {
+    $entity->setContexts($contexts);
+    $content->subject = $entity->title;
+    $content->content = $entity->buildContent();
+    $query = array();
+    $serialized = array();
+    foreach ($contexts as $context) {
+      $serialized[] = $context->argument;
+    }
+    $query = array(
+      'contexts' => implode(':', $serialized),
+    );
+    $content->admin_links = array(
+      array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query),
+      array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination()),
+    );
   }
-  $query = array(
-    'contexts' => implode(':', $serialized),
-  );
-  $content->admin_links = array(
-    array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query),
-    array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination()),
-  );
   return $content;
 }
 
