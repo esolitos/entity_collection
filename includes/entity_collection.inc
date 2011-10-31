@@ -47,10 +47,17 @@ class EntityCollection extends Entity {
    * @return array
    *  An array that can be used with Drupals rendering system.
    */
-  public function buildContent($view_mode = 'block', $langcode = NULL) {
-    $tree = entity_collection_storage_factory($this->bundle)->retrieve($this->name, $this->contexts);
+  public function buildContent($view_mode = 'default', $langcode = NULL) {
+    $tree = entity_collection_storage_factory($this->bundle)->retrieve($this, $this->contexts);
     $content = entity_collection_renderer_factory($this)->build($tree);
-    return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
+    $rendered = entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
+    $rendered['#entity_collection'] = $this;
+    $rendered['#theme'] = 'entity_collection';
+    $rendered['#contextual_links']['entity_collection'] = array(
+      'entity-collection', 
+      array($this->name)
+    );
+    return $rendered;
   }
 
   public function getTree() {

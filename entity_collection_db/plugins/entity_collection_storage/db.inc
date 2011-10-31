@@ -6,20 +6,34 @@
  */
 class EntityCollectionStorageDB implements EntityCollectionStorage {
 
-  public function save($name, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0) {
-    $record = $this->getRecord($name, $tree, $position, $contexts);
+  public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0) {
+    $record = $this->getRecord($collection, $tree, $position, $contexts);
     $primary_keys = array();
     if ($record) {
-      if ($this->itemExists($record->name, $record->eid)) {
+      if ($this->itemExists($collection, $record->eid, $record->entity_type, $contexts)) {
         $primary_keys = array('eid', 'name');
       }
       drupal_write_record('entity_collection_storage', $record, $primary_keys);
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
-      $this->save($name, $node, $contexts, $position);
+      $this->save($collection, $node, $contexts, $i);
       $i++;
     }
+  }
+  
+  /**
+   * Settings for this storage engine.
+   */
+  function settingsForm(EntityCollection $collection, &$form, &$form_state) {
+    $form['store_entity'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Store full entity'),
+      '#default_value' => isset($collection->settings->store_entity) ? $collection->settings->store_entity : FALSE,
+      '#description' => t('Store the full entity in the entity collection table.
+       This is performant in some cases, but it also requires you to set up your
+       cache invalidation settings.')
+    );
   }
 
   /**
@@ -27,7 +41,7 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
    * @param string $name
    * @param EntityCollectionTreeNode $item
    */
-  public function appendItem($name, EntityCollectionTreeNode $item, $contexts = array()) {
+  public function appendItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array()) {
     // Fetch the last position.
     $query = db_select('entity_collection_storage', 'rs');
     $query->addField('rs', 'position');
@@ -37,14 +51,16 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     if ($position > 0) {
       $position++;
     }
-    $this->save($name, $item, $contexts, $position);
+    $this->save($collection, $item, $contexts, $position);
   }
 
-  private function getRecord($name, EntityCollectionTreeNode $item, $position = 0, $contexts = array()) {
+  private function getRecord(EntityCollection $collection, EntityCollectionTreeNode $item, $position = 0, $contexts = array()) {
     if (isset($item->content)) {
       $record = new stdClass();
-      $record->name = $name;
-      $record->entity = serialize($item->content);
+      $record->name = $collection->name;
+      if (!empty($collection->settings->store_entity)) {
+        $record->entity = serialize($item->content);
+      }
       $record->entity_type = $item->type;
       $record->eid = $item->entity_id;
       $record->view_mode = $item->view_mode;
@@ -56,11 +72,12 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     return FALSE;
   }
 
-  private function itemExists($name, $entity_id, $contexts = array()) {
+  private function itemExists(EntityCollection $collection, $entity_id, $type, $contexts = array()) {
     return db_select('entity_collection_storage', 'rs')
       ->fields('rs', array('eid'))
       ->condition('eid', $entity_id)
-      ->condition('name', $name)
+      ->condition('name', $collection->name)
+      ->condition('contexts', $this->serializeContexts($contexts))
       ->execute()->fetchField();
   }
 
@@ -68,14 +85,14 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
    * Retreive a entity_collection.
    * @param type $name
    */
-  public function retrieve($name, $contexts = array()) {
+  public function retrieve(EntityCollection $collection, $contexts = NULL) {
     // Serialize the context arguments into a string.
     $query = db_select('entity_collection_storage', 'rs')
       ->fields('rs')
-      ->condition('name', $name, '=')
+      ->condition('name', $collection->name, '=')
       ->orderBy('parent')
       ->orderBy('position');
-    if (count($contexts)) {
+    if (isset($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $result = $query->execute();
@@ -88,7 +105,16 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
       if (empty($node)) {
         $node = $tree;
       }
-      $node->addChild($value->entity_type, $value->eid, unserialize($value->entity), $value->view_mode, $value->rsid);
+      if (!empty($collection->settings->store_entity)) {
+        $entity = unserialize($value->entity);
+      }
+      // @todo Fix this so we only do one entity_load.
+      else {
+        $entity = entity_load_single($value->entity_type, $value->eid);
+      }
+      if ($entity) {
+        $node->addChild($value->entity_type, $value->eid, $entity, $value->view_mode, $value->rsid);
+      }
     }
     return $tree;
   }
@@ -103,18 +129,24 @@ class EntityCollectionStorageDB implements EntityCollectionStorage {
     return implode(':', $serialized);
   }
 
-  public function delete($name, $entries, $contexts = array()) {
-    db_delete('entity_collection_storage')
-      ->condition('name', $name)
-      ->condition('eid', array_keys($entries))
-      ->execute();
+  public function delete(EntityCollection $collection, $entity_type, array $entries, $contexts = NULL) {
+    $query = db_delete('entity_collection_storage')
+      ->condition('name', $collection->name)
+      ->condition('entity_type', $entity_type)
+      ->condition('eid', $entries);
+    if (isset($contexts)) {
+      $query->condition('contexts', $this->serializeContexts($contexts));
+    }
+    $query->execute();
   }
 
   /**
    * Drop an entire entity_collection.
    * @param type $names
    */
-  public function drop($name) {
-
+  public function drop(EntityCollection $collection) {
+    db_delete('entity_collection_storage')
+      ->condition('name', $collection->name)
+      ->execute();
   }
 }

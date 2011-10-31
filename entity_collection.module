@@ -39,6 +39,7 @@ function entity_collection_menu() {
     'access callback' => 'entity_collection_access',
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
+  	'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['entity-collection/%entity_collection/content'] = array(
     'title' => 'Content',
@@ -48,6 +49,7 @@ function entity_collection_menu() {
     'access callback' => 'entity_collection_access',
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
+  	'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['entity-collection/%entity_collection/delete'] = array(
     'title' => 'Delete Entity collection',
@@ -57,6 +59,17 @@ function entity_collection_menu() {
     'access arguments' => array('delete', 1),
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_CALLBACK,
+  );
+  
+  $items['entity-collection/%entity_collection/content/delete/%/%'] = array(
+    'title' => 'Delete content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('entity_collection_content_delete_form', 1, 4, 5),
+    'access arguments' => array('content', 1),
+    'access callback' => 'entity_collection_access',
+    'file' => 'entity_collection.admin.inc',
+    'type' => MENU_CALLBACK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $entity_collection_bundles = entity_collection_bundles();
   // If we are using the block module, then we add links from there.
@@ -258,7 +271,20 @@ function entity_collection_theme() {
     'entity_collection_content_form' => array(
       'render element' => 'form',
     ),
+  	'entity_collection' => array(
+      'template' => 'entity_collection',
+      'render element' => 'element',
+    ),
   );
+}
+
+function template_preprocess_entity_collection(&$variables) {
+  // Here we take the object that is being themed and define some useful
+  // variables that we will print in the template file.
+  $variables['collection'] = isset($variables['element']['entity_collection']) ? $variables['element']['entity_collection'] : array();
+  $variables['title'] = $variables['element']['#entity_collection']->title;
+  // Never show title, for now.
+  $variables['show_title'] = FALSE;
 }
 
 /**
@@ -418,4 +444,23 @@ function entity_collection_entity_presave($entity, $type) {
   if ($type == 'entity_collection' && isset($entity->settings)) {
     $entity->settings = serialize($entity->settings);
   }
+}
+
+function entity_collection_entity_delete($entity, $type) {
+  $collections = entity_collection_load_all();
+  if (!empty($collections)) {
+    list($id) = entity_extract_ids($type, $entity);
+    foreach ($collections as $collection) {
+      entity_collection_storage_factory($collection->bundle)->delete($collection, $type, array($id));
+    }
+  }
+  // Remove any data attached to this entity collection.
+  if ($type == 'entity_collection') {
+    entity_collection_storage_factory($entity->bundle)->drop($entity);
+    field_attach_delete($type, $entity);
+  }
+}
+
+function entity_collection_contextual_links_view_alter(&$element, $items) {
+  $i = 0;
 }

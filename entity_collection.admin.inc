@@ -39,7 +39,7 @@ function entity_collection_edit_form($form, &$form_state, $entity_collection) {
 
 function entity_collection_delete_form($form, &$form_state, $entity_collection) {
   $form_state['entity_collection'] = $entity_collection;
-  return confirm_form($form, t('Are you sure you want to delete this block?'), 'admin/structure/entity_collection');
+  return confirm_form($form, t('Are you sure you want to delete this entity collection?'), 'admin/structure/entity_collection');
 }
 
 function entity_collection_delete_form_submit($form, &$form_state) {
@@ -66,6 +66,10 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   $form['settings'] = array(
     '#tree' => TRUE,
   );
+  $storage = entity_collection_storage_factory($entity_collection->bundle);
+  if (method_exists($storage, 'settingsForm')) {
+    $storage->settingsForm($entity_collection, $form['settings'], $form_state);
+  }
   $form['title'] = array(
     '#type' => 'textfield',
     '#required' => TRUE,
@@ -105,7 +109,10 @@ function _entity_collection_context_form(&$form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   if (!isset($entity_collection->settings)) {
     $entity_collection->settings = new stdClass;
-    $entity_collection->requiredcontexts = array();
+    
+  }
+  if (!isset($entity_collection->settings->requiredcontexts)) {
+    $entity_collection->settings->requiredcontexts = array();
   }
   $cached_entity_collection = ctools_cache_get('entity_collection_cache_object', $entity_collection->name);
   if ($cached_entity_collection) {
@@ -129,11 +136,14 @@ function entity_collection_form_validate($form, &$form_state) {
   $entity_collection->name = $form_state['values']['name'];
   $entity_collection->title = $form_state['values']['title'];
   $entity_collection->renderer = $form_state['values']['renderer'];
+  foreach ($form_state['values']['settings'] as $key => $setting) {
+    $entity_collection->settings->$key = $setting;
+  }
   field_attach_form_validate('entity_collection', $entity_collection, $form, $form_state);
 }
 
 /**
- * Finally time to actually save the block.
+ * Save the actual entity collection.
  * @param type $form
  * @param array $form_state
  */
@@ -187,15 +197,10 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
   foreach ($contexts as $i => &$context) {
     $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
   }
-  $tree = entity_collection_storage_factory($entity_collection->bundle)->retrieve($entity_collection->name, $contexts);
+  $tree = entity_collection_storage_factory($entity_collection->bundle)->retrieve($entity_collection, $contexts);
   $form_state['contexts'] = $contexts;
   $wrappers = array();
   $form['#tree'] = TRUE;
-  $form['contexts'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Contexts'),
-    '#collapsible' => TRUE,
-  );
   entity_collection_content_form_content($entity_collection, $form, $tree);
   $parent_options = array(0 => 'None');
   $form['order_save'] = array(
@@ -270,7 +275,7 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
     );
     $form['content'][$key]['delete'] = array(
       '#type' => 'markup',
-      '#markup' => l(t('Delete'), 'entity_collection/content/' . $entity_collection->name . '/delete/' . $child->entity_id),
+      '#markup' => l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, array('query' => array('destination' => current_path()))),
     );
     $children = $child->getChildren();
     if (count($children)) {
@@ -296,7 +301,7 @@ function entity_collection_content_form_submit($form, &$form_state) {
   if (isset($_GET['contexts'])) {
     $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
   }
-  entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection']->name, $tree, $form_state['contexts']);
+  entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection'], $tree, $form_state['contexts']);
 }
 
 /**
@@ -371,6 +376,21 @@ function entity_collection_content_form_autocomplete($string = '') {
   drupal_json_output($matches);
 }
 
+function entity_collection_content_delete_form($form, &$form_state, $entity_collection, $entity_type, $eid) {
+  $form_state['entity_collection'] = $entity_collection;
+  $form_state['entity_type'] = $entity_type;
+  $form_state['eid'] = $eid;
+  return confirm_form($form, t('Are you sure you want to delete this content from the entity collection?'), 'admin/structure/entity_collection');
+}
+
+function entity_collection_content_delete_form_submit($form, &$form_state) {
+  entity_collection_storage_factory($form_state['entity_collection']->bundle)->delete(
+    $form_state['entity_collection'],
+    $form_state['entity_type'],
+    array($form_state['eid'])
+  );
+}
+
 function entity_collection_content_form_add_content($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   list($type, $value) = explode(':', $form_state['values']['content_select']);
@@ -378,9 +398,9 @@ function entity_collection_content_form_add_content($form, &$form_state) {
   if (isset($entities[$value])) {
     $entity = $entities[$value];
     $item = new EntityCollectionTreeNode($type, $value, $entity);
-    if (isset($form_state['contexts'])) {
+    if (isset($_GET['contexts'])) {
       $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
     }
-    entity_collection_storage_factory($entity_collection->bundle)->appendItem($entity_collection->name, $item, $form_state['contexts']);
+    entity_collection_storage_factory($entity_collection->bundle)->appendItem($entity_collection, $item, $form_state['contexts']);
   }
 }

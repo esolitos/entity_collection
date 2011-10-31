@@ -56,6 +56,12 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   $entity->setContexts($contexts);
   $content->subject = $entity->title;
   $content->content = $entity->buildContent();
+  $content->content['#attached']['js'] = array(
+    drupal_get_path('module', 'entity_collection') . '/js/collection_admin.js',
+  );
+  $content->content['#attached']['library'] = array(
+    array('system', 'ui.draggable'),
+  );
   return $content;
 }
 
