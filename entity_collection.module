@@ -466,6 +466,7 @@ function entity_collection_contextual_links_view_alter(&$element, $items) {
     $element['#links']['entity-collection-delete'] = array(
       'title' => t('Delete from collection'),
       'href' => 'entity-collection/' . $element['#element']['#entity_collection']->name . '/content/delete/node/' . $element['#element']['#node']->nid,
+      'query' => array('destination' => current_path()),
     );
   }
 }
