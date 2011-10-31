@@ -3,7 +3,7 @@
 /**
  * Simple interface for storing entity_collections.
  */
-interface EntityCollectionStorage {
+interface EntityCollectionStorageInterface {
 
   public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0);
 
@@ -17,3 +17,12 @@ interface EntityCollectionStorage {
 
 }
 
+abstract class EntityCollectionStorage implements EntityCollectionStorageInterface {
+  
+  public static function getStorage($bundle) {
+    ctools_include('plugins');
+    $bundle = entity_collection_bundle_load($bundle);
+    $plugin = ctools_get_plugins('entity_collection', 'plugins', $bundle->storage);
+    return new $plugin['entity_collection_storage']['class']();
+  }
+}

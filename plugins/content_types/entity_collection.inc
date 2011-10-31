@@ -56,11 +56,17 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   $entity->setContexts($contexts);
   $content->subject = $entity->title;
   $content->content = $entity->buildContent();
-  $content->content['#attached']['js'] = array(
-    drupal_get_path('module', 'entity_collection') . '/js/collection_admin.js',
+  $query = array();
+  $serialized = array();
+  foreach ($contexts as $context) {
+    $serialized[] = $context->argument;
+  }
+  $query = array(
+    'contexts' => implode(':', $serialized),
   );
-  $content->content['#attached']['library'] = array(
-    array('system', 'ui.draggable'),
+  $content->admin_links = array(
+    array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query),
+    array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination()),
   );
   return $content;
 }

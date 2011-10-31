@@ -66,7 +66,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   $form['settings'] = array(
     '#tree' => TRUE,
   );
-  $storage = entity_collection_storage_factory($entity_collection->bundle);
+  $storage = EntityCollectionStorage::getStorage($entity_collection->bundle);
   if (method_exists($storage, 'settingsForm')) {
     $storage->settingsForm($entity_collection, $form['settings'], $form_state);
   }
@@ -88,10 +88,10 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     ),
     '#description' => t('A unique machine-readable name for this block. It must only contain lowercase letters, numbers, and underscores.'),
   );
-  $form['renderer'] = array(
+  $form['style'] = array(
     '#type' => 'select',
     '#title' => t('Style'),
-    '#options' => entity_collection_get_renderer_options(),
+    '#options' => entity_collection_get_style_options(),
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
@@ -197,7 +197,7 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
   foreach ($contexts as $i => &$context) {
     $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
   }
-  $tree = entity_collection_storage_factory($entity_collection->bundle)->retrieve($entity_collection, $contexts);
+  $tree = EntityCollectionStorage::getStorage($entity_collection->bundle)->retrieve($entity_collection, $contexts);
   $form_state['contexts'] = $contexts;
   $wrappers = array();
   $form['#tree'] = TRUE;
@@ -301,7 +301,7 @@ function entity_collection_content_form_submit($form, &$form_state) {
   if (isset($_GET['contexts'])) {
     $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
   }
-  entity_collection_storage_factory($form_state['entity_collection']->bundle)->save($form_state['entity_collection'], $tree, $form_state['contexts']);
+  EntityCollectionStorage::getStorage($form_state['entity_collection']->bundle)->save($form_state['entity_collection'], $tree, $form_state['contexts']);
 }
 
 /**
@@ -384,7 +384,7 @@ function entity_collection_content_delete_form($form, &$form_state, $entity_coll
 }
 
 function entity_collection_content_delete_form_submit($form, &$form_state) {
-  entity_collection_storage_factory($form_state['entity_collection']->bundle)->delete(
+  EntityCollectionStorage::getStorage($form_state['entity_collection']->bundle)->delete(
     $form_state['entity_collection'],
     $form_state['entity_type'],
     array($form_state['eid'])
@@ -401,6 +401,6 @@ function entity_collection_content_form_add_content($form, &$form_state) {
     if (isset($_GET['contexts'])) {
       $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
     }
-    entity_collection_storage_factory($entity_collection->bundle)->appendItem($entity_collection, $item, $form_state['contexts']);
+    EntityCollectionStorage::getStorage($entity_collection->bundle)->appendItem($entity_collection, $item, $form_state['contexts']);
   }
 }

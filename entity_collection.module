@@ -195,7 +195,14 @@ function entity_collection_load_all() {
  * Implements hook_ctools_plugin_directory().
  */
 function entity_collection_ctools_plugin_directory($module, $type) {
-  if ($type == 'export_ui' || $type == 'entity_collection_renderer' || $type == 'cache' || $type == 'content_types') {
+  $types = array(
+    'export_ui',
+    'entity_collection_style',
+  	'entity_collection_row',
+    'cache',
+    'content_types',
+  );
+  if (in_array($type, $types)) {
     return 'plugins/' . $type;
   }
 }
@@ -208,7 +215,10 @@ function entity_collection_ctools_plugin_type() {
     'plugins' => array(
       'cache' => TRUE,
       'use hooks' => TRUE,
-      'classes' => array('entity_collection_storage', 'entity_collection_renderer'),
+      'classes' => array(
+      	'entity_collection_storage',
+      	'entity_collection_style',
+      	'entity_collection_row'),
     ),
   );
 }
@@ -217,13 +227,13 @@ function entity_collection_ctools_plugin_type() {
  * Implements hook_entity_collection_plugins().
  */
 function entity_collection_entity_collection_plugins() {
-  $path = drupal_get_path('module', 'entity_collection') . '/plugins/entity_collection_renderer';
-  $info['entity_collection_renderer_flat'] = array(
+  $path = drupal_get_path('module', 'entity_collection') . '/plugins/entity_collection_style';
+  $info['entity_collection_style_flat'] = array(
     'title' => t('Flat list'),
-    'entity_collection_renderer' => array(
-      'parent' => 'EntityCollectionRenderer',
-      'class' => 'EntityCollectionRendererFlat',
-      'file' => 'entity_collection_renderer_flat.inc',
+    'entity_collection_style' => array(
+      'parent' => 'EntityCollectionStyle',
+      'class' => 'EntityCollectionStyleFlat',
+      'file' => 'entity_collection_style_flat.inc',
       'path' => $path,
     ),
   );
@@ -355,12 +365,13 @@ function entity_collection_get_storage_options() {
   }
   return $storage_options;
 }
+
 /**
  * Get all renderers formatted for #options
  * @return array
  *   An array of storage backends.
  */
-function entity_collection_get_renderer_options() {
+function entity_collection_get_style_options() {
   ctools_include('plugins');
   $plugins = ctools_get_plugins('entity_collection', 'plugins');
   // Get all available storage backends.
@@ -381,11 +392,11 @@ function entity_collection_get_renderer_options() {
  *   The tree to save.
  */
 function entity_collection_save_content($name, $bundle, EntityCollectionTreeNode $tree) {
-  return entity_collection_storage_factory($bundle)->save($name, $tree);
+  return EntityCollectionStorage::getStorage($bundle)->save($name, $tree);
 }
 
 function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {
-  return entity_collection_storage_factory($bundle)->appendItem($name, $item);
+  return EntityCollectionStorage::getStorage($bundle)->appendItem($name, $item);
 }
 
 /**
@@ -397,30 +408,12 @@ function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode 
  * @return EntityCollectionTreeNode the content for a entity_collection.
  */
 function entity_collection_load_content($bundle, $name) {
-  return entity_collection_storage_factory($bundle)->retrieve($name);
+  return EntityCollectionStorage::getStorage($bundle)->retrieve($name);
 }
 
-/**
- * Factory function for fetching a storage backend for a bundle.
- * @param string $bundle
- * @return EntityCollectionStorage a entity_collection storage class.
- */
-function entity_collection_storage_factory($bundle) {
-  ctools_include('plugins');
-  $bundle = entity_collection_bundle_load($bundle);
-  $plugin = ctools_get_plugins('entity_collection', 'plugins', $bundle->storage);
-  return new $plugin['entity_collection_storage']['class']();
-}
 
-/**
- * Get the renderer for a particular entity_collection.
- * @param Region $entity_collection
- * @return plugin
- */
-function entity_collection_renderer_factory(EntityCollection $entity_collection) {
-  ctools_include('plugins');
-  $plugin = ctools_get_plugins('entity_collection', 'plugins', $entity_collection->renderer);
-  return new $plugin['entity_collection_renderer']['class']();
+function entity_collection_admin_paths() {
+  return array('entity-collection/*' => TRUE);
 }
 
 /**
@@ -451,12 +444,12 @@ function entity_collection_entity_delete($entity, $type) {
   if (!empty($collections)) {
     list($id) = entity_extract_ids($type, $entity);
     foreach ($collections as $collection) {
-      entity_collection_storage_factory($collection->bundle)->delete($collection, $type, array($id));
+      EntityCollectionStorage::getStorage($collection->bundle)->delete($collection, $type, array($id));
     }
   }
   // Remove any data attached to this entity collection.
   if ($type == 'entity_collection') {
-    entity_collection_storage_factory($entity->bundle)->drop($entity);
+    EntityCollectionStorage::getStorage($entity->bundle)->drop($entity);
     field_attach_delete($type, $entity);
   }
 }

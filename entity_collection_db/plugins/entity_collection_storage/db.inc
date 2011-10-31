@@ -4,7 +4,7 @@
  * @file
  * Sample entity_collection storage database implementation.
  */
-class EntityCollectionStorageDB implements EntityCollectionStorage {
+class EntityCollectionStorageDB extends EntityCollectionStorage {
 
   public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0) {
     $record = $this->getRecord($collection, $tree, $position, $contexts);

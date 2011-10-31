@@ -6,5 +6,7 @@ core = 7.x
 package = Entity Collection
 files[] = plugins/export_ui/entity_collection.class.inc
 files[] = plugins/entity_collection_storage/entity_collection_storage.inc
+files[] = plugins/entity_collection_style/entity_collection_style.inc
+files[] = plugins/entity_collection_style/entity_collection_style_flat.inc
 files[] = includes/tree.inc
 files[] = includes/entity_collection.inc
