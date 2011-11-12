@@ -455,6 +455,17 @@ function entity_collection_contextual_links_view_alter(&$element, $items) {
   }
 }
 
+function entity_collection_references_dialog_search_attachables() {
+  // Return search views attachables for nodes.
+  $attachables = array();
+  foreach (entity_collection_load_all() as $collection) {
+    $attachables['node'][$collection->name] = array(
+      'label' => $collection->name,
+    );
+  }
+  return $attachables;
+}
+
 function entity_collection_flush_caches() {
   return array('cache_entity_entity_collection');
 }

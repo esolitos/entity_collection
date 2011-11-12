@@ -94,12 +94,12 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#options' => EntityCollectionStyle::getStyleOptions(),
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
-  
+
   $form['row'] = array(
     '#type' => 'select',
     '#title' => t('Row'),
     '#options' => EntityCollectionRow::getRowOptions(),
-    '#description' => t('Select the style you want to use for rendering this entity_collection here.') 
+    '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
   $form['#validate'][] = 'entity_collection_form_validate';
@@ -116,7 +116,7 @@ function _entity_collection_context_form(&$form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   if (!isset($entity_collection->settings)) {
     $entity_collection->settings = new stdClass;
-    
+
   }
   if (!isset($entity_collection->settings->requiredcontexts)) {
     $entity_collection->settings->requiredcontexts = array();
@@ -215,6 +215,11 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
     '#type' => 'submit',
     '#value' => t('Save order'),
   );
+  $form['entity_type'] = array(
+    '#type' => entity_collection_get_entity_type_options(),
+    '#title' => t('Entity type'),
+    '#description' => t('Select the type of entity to search for.')
+  );
   $form['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Add content'),
@@ -227,7 +232,22 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
     '#value' => t('Add content'),
     '#submit' => array('entity_collection_content_form_add_content'),
   );
+  $form['search-link'] = array(
+    '#type' => 'references_dialog',
+    '#format' => '$entity_type:$entity_id',
+    '#attachable' => $entity_collection->name,
+    '#target' => 'edit-content-select',
+  );
   return $form;
+}
+
+function entity_collection_get_entity_type_options() {
+  $info = entity_get_info();
+  $options = array();
+  foreach ($info as $name => $info) {
+    $options[$name] = $info['label'];
+  }
+  return $options;
 }
 
 function entity_collection_content_form_content($entity_collection, &$form, $tree, $parent = 0, $depth = 0) {
