@@ -56,21 +56,32 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   if (!empty($entity)) {
     $entity->setContexts($contexts);
     $content->subject = $entity->title;
-    $content->content = $entity->buildContent();
+    $content->content['#attached'] = references_dialog_attached();
+    $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add'));
+    $content->content['content'] = $entity->buildContent();
     $query = array();
     $serialized = array();
-    foreach ($contexts as $context) {
-      $serialized[] = $context->argument;
+    if (is_array($contexts)) {
+      foreach ($contexts as $context) {
+        $serialized[] = $context->argument;
+      }
+      $query = array(
+        'contexts' => implode(':', $serialized),
+      );
     }
-    $query = array(
-      'contexts' => implode(':', $serialized),
-    );
-    $content->admin_links = array(
-      array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query),
-      array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination()),
-    );
+    $content->admin_links = references_dialog_get_views_search_links($conf['name']);
+    $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query);
+    $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
+    $content->admin_links[] = references_dialog_link(array('href' => 'node/add/ns-article', 'title' => t('Add article')));
   }
   return $content;
+}
+
+/**
+ * Ajax callback for adding things into an entity collection.
+ */
+function entity_collection_ajax($entity_collection) {
+  $data = $_POST['data'];
 }
 
 /**

@@ -60,7 +60,15 @@ function entity_collection_menu() {
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_CALLBACK,
   );
-
+  $items['entity-collection/%entity_collection/ajax/add'] = array(
+      'title' => 'Add to Entity collection',
+      'page callback' => 'entity_collection_ajax_add',
+      'page arguments' => array(1),
+      'access callback' => 'entity_collection_access',
+      'access arguments' => array('add', 1),
+      'file' => 'entity_collection.admin.inc',
+      'type' => MENU_CALLBACK,
+  );
   $items['entity-collection/%entity_collection/content/delete/%/%'] = array(
     'title' => 'Delete content',
     'page callback' => 'drupal_get_form',

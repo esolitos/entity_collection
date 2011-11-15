@@ -255,8 +255,14 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
  * @param type $entity_type
  * @param type $entity
  */
-function entity_collection_ajax_callback($entity_type, $entity, $settings) {
-  
+function entity_collection_ajax_add($entity_collection) {
+  $entity_id = $_POST['entity_id'];
+  $entity_type = $_POST['entity_type'];
+  $entity = entity_load_single($entity_type, $entity_id);
+  if (isset($entity)) {
+    EntityCollectionStorage::getStorage($entity_collection->bundle)->appendItem($entity_collection, new EntityCollectionTreeNode($entity_type, $entity_id, $entity, 'default'));
+  }
+  return '';
 }
 
 function entity_collection_get_entity_type_options() {
