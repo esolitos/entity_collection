@@ -60,7 +60,7 @@ function entity_collection_menu() {
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_CALLBACK,
   );
-  
+
   $items['entity-collection/%entity_collection/content/delete/%/%'] = array(
     'title' => 'Delete content',
     'page callback' => 'drupal_get_form',
@@ -86,6 +86,15 @@ function entity_collection_menu() {
   $items['entity_collection/autocomplete'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer entity_collections'),
+    'type' => MENU_CALLBACK,
+    'file' => 'entity_collection.admin.inc',
+  );
+
+  $items['entity_collection/ajax'] = array(
+    'title' => 'entity_collection autocomplete',
+    'page callback' => 'entity_collection_ajax_callback',
     'access callback' => 'user_access',
     'access arguments' => array('administer entity_collections'),
     'type' => MENU_CALLBACK,
@@ -192,7 +201,7 @@ function entity_collection_load($name) {
     }
   }
   return FALSE;
-  
+
 }
 
 function entity_collection_load_all() {

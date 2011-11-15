@@ -232,13 +232,31 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
     '#value' => t('Add content'),
     '#submit' => array('entity_collection_content_form_add_content'),
   );
-  $form['search-link'] = array(
+  $form['reference'] = array(
     '#type' => 'references_dialog',
     '#format' => '$entity_type:$entity_id',
     '#attachable' => $entity_collection->name,
     '#target' => 'edit-content-select',
+    '#operations' => array(
+      'add_node' => array(
+        'title' => 'Add article',
+        'href' => 'node/add/ns-article',
+      ),
+    ),
   );
+  if (isset($_GET['context'])) {
+    $form['reference']['#ajax_parameters'] = array('contexts' => $_GET['contexts']);
+  }
   return $form;
+}
+
+/**
+ * Add an entity to an entity collection.
+ * @param type $entity_type
+ * @param type $entity
+ */
+function entity_collection_ajax_callback($entity_type, $entity, $settings) {
+  
 }
 
 function entity_collection_get_entity_type_options() {
