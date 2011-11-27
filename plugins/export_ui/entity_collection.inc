@@ -13,6 +13,9 @@ $plugin = array(
   'title plural' => t('Entity collection types'),
   'title singular proper' => t('Entity Collection type'),
   'title plural proper' => t('Entity Collection types'),
+  'export' => array(
+    'admin_title' => 'label',
+  ),
   'form' => array(
      'settings' => 'entity_collection_export_ui_form',
      'submit' => 'entity_collection_export_ui_form_submit'
@@ -25,12 +28,7 @@ $plugin = array(
 
 function entity_collection_export_ui_form(&$form, &$form_state) {
   $entity_collection = $form_state['item'];
-  $form['label'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Title'),
-    '#default_value' => $entity_collection->label,
-    '#required' => TRUE,
-  );
+
   $form['storage'] = array(
     '#type' => 'select',
     '#title' => t('Storage'),
@@ -41,11 +39,13 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
-    '#description' => t('The human readable name or description of this preset.'),
     '#default_value' => $entity_collection->description,
-    '#required' => TRUE,
   );
   return $form;
+}
+
+function entity_collection_name_exists($name) {
+  return entity_collection_bundle_load($name) !== FALSE;
 }
 
 function entity_collection_export_ui_form_submit(&$form, &$form_state) {
