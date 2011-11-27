@@ -48,4 +48,5 @@ function entity_collection_export_ui_form_submit(&$form, &$form_state) {
   $form_state['item']->label = $form_state['values']['label'];
   $form_state['item']->storage = $form_state['values']['storage'];
   $form_state['item']->description = $form_state['values']['description'];
+  menu_cache_clear_all();
 }

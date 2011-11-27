@@ -211,28 +211,30 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
   $form['#tree'] = TRUE;
   entity_collection_content_form_content($entity_collection, $form, $tree);
   $parent_options = array(0 => 'None');
-  $form['order_save'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save order'),
+  if (isset($form['content'])) {
+    $form['order_save'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save order'),
+    );
+  }
+  $form['add_content'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add content'),
   );
-  $form['entity_type'] = array(
-    '#type' => entity_collection_get_entity_type_options(),
+  $form['add_content']['entity_type'] = array(
+    '#type' => 'select',
+    '#options' => entity_collection_get_entity_type_options(),
     '#title' => t('Entity type'),
     '#description' => t('Select the type of entity to search for.')
   );
-  $form['content_select'] = array(
+  $form['add_content']['content_select'] = array(
     '#type' => 'textfield',
-    '#title' => t('Add content'),
+    '#title' => t('Search'),
     '#maxlength' => 60,
     '#description' => t('Type in the name of the content you want to add here.'),
     '#autocomplete_path' => 'entity_collection/autocomplete',
   );
-  $form['add_content'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add content'),
-    '#submit' => array('entity_collection_content_form_add_content'),
-  );
-  $form['reference'] = array(
+  $form['add_content']['reference'] = array(
     '#type' => 'references_dialog',
     '#format' => '$entity_type:$entity_id',
     '#attachable' => $entity_collection->name,
@@ -244,6 +246,12 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
       ),
     ),
   );
+  $form['add_content']['add_content'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add content'),
+    '#submit' => array('entity_collection_content_form_add_content'),
+  );
+
   if (isset($_GET['context'])) {
     $form['reference']['#ajax_parameters'] = array('contexts' => $_GET['contexts']);
   }
@@ -388,30 +396,33 @@ function entity_collection_content_compare($a, $b) {
 function theme_entity_collection_content_form(&$variables) {
   $form = &$variables['form'];
   $rows = array();
-  foreach (element_children($form['content']) as $key) {
-    $form['content'][$key]['parent']['#attributes']['class'] = array('entity_collection-parent');
-    $form['content'][$key]['key']['#attributes']['class'] = array('key');
-    $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
-    $form['content'][$key]['position']['#attributes']['class'] = array('position');
-    $title = drupal_render($form['content'][$key]['title']);
-    $delete = drupal_render($form['content'][$key]['delete']);
-    $position = drupal_render($form['content'][$key]['position']);
-    $view_mode = drupal_render($form['content'][$key]['view_mode']);
-    $parent = drupal_render($form['content'][$key]['parent']);
-    $depth = drupal_render($form['content'][$key]['depth']);
-    $rendered_key = drupal_render($form['content'][$key]['key']);
-    $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-    $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $view_mode, $delete));
+  $output = '';
+  if (isset($form['content'])) {
+    foreach (element_children($form['content']) as $key) {
+      $form['content'][$key]['parent']['#attributes']['class'] = array('entity_collection-parent');
+      $form['content'][$key]['key']['#attributes']['class'] = array('key');
+      $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
+      $form['content'][$key]['position']['#attributes']['class'] = array('position');
+      $title = drupal_render($form['content'][$key]['title']);
+      $delete = drupal_render($form['content'][$key]['delete']);
+      $position = drupal_render($form['content'][$key]['position']);
+      $view_mode = drupal_render($form['content'][$key]['view_mode']);
+      $parent = drupal_render($form['content'][$key]['parent']);
+      $depth = drupal_render($form['content'][$key]['depth']);
+      $rendered_key = drupal_render($form['content'][$key]['key']);
+      $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
+      $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $view_mode, $delete));
+    }
+    $header = array(t('Title'), t('Position'), t('View mode'), t('Operations'));
+    $output = theme('table', array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array('id' => 'entity_collection-table'),
+    ));
+    drupal_add_tabledrag('entity_collection-table', 'match', 'parent', 'entity_collection-parent', 'entity_collection-parent', 'key', FALSE);
+    drupal_add_tabledrag('entity_collection-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
+    drupal_add_tabledrag('entity_collection-table', 'order', 'sibling', 'position');
   }
-  $header = array(t('Title'), t('Position'), t('View mode'), t('Operations'));
-  $output = theme('table', array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array('id' => 'entity_collection-table'),
-  ));
-  drupal_add_tabledrag('entity_collection-table', 'match', 'parent', 'entity_collection-parent', 'entity_collection-parent', 'key', FALSE);
-  drupal_add_tabledrag('entity_collection-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
-  drupal_add_tabledrag('entity_collection-table', 'order', 'sibling', 'position');
   return $output . drupal_render_children($variables['form']);
 }
 
@@ -445,7 +456,7 @@ function entity_collection_content_delete_form_submit($form, &$form_state) {
 
 function entity_collection_content_form_add_content($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
-  list($type, $value) = explode(':', $form_state['values']['content_select']);
+  list($type, $value) = explode(':', $form_state['values']['add_content']['content_select']);
   $entities = entity_load($type, array($value));
   if (isset($entities[$value])) {
     $entity = $entities[$value];
