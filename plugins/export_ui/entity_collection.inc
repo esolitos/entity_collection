@@ -44,10 +44,6 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
   return $form;
 }
 
-function entity_collection_name_exists($name) {
-  return entity_collection_bundle_load($name) !== FALSE;
-}
-
 function entity_collection_export_ui_form_submit(&$form, &$form_state) {
   $form_state['item']->label = $form_state['values']['label'];
   $form_state['item']->storage = $form_state['values']['storage'];

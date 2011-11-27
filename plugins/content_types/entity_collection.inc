@@ -57,7 +57,7 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
     $entity->setContexts($contexts);
     $content->subject = $entity->title;
     $content->content['#attached'] = references_dialog_attached();
-    $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add'));
+    $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add', 'refresh' => TRUE));
     $content->content['content'] = $entity->buildContent();
     $query = array();
     $serialized = array();
