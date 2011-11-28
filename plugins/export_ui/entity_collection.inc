@@ -48,10 +48,10 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
     '#suffix' => '</div>',
   );
   if (isset($form_state['values']['storage'])) {
-    $storage = EntityCollectionStorage::getBundleStorage($form_state['values']['storage']);
+    $storage = EntityCollectionStorage::getStorage($form_state['values']['storage']);
   }
   elseif(isset($bundle->storage)) {
-    $storage = EntityCollectionStorage::getBundleStorage($bundle->storage);
+    $storage = EntityCollectionStorage::getStorage($bundle->storage);
   }
   if (isset($storage) && method_exists($storage, 'bundleSettingsForm')) {
     $storage->bundleSettingsForm($bundle, $form['storage_settings'], $form_state);
