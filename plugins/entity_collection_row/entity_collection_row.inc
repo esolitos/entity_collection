@@ -2,13 +2,13 @@
 
 interface EntityCollectionRowInterface {
   public function getOptions($entity_type, $entity);
-  public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL);  
+  public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL);
 }
 /**
 * Simple interface for storing entity_collections.
 */
 abstract class EntityCollectionRow implements EntityCollectionRowInterface {
-  
+
   /**
    * Get the EntityCollectionRow style attached to this collection.
    * @param EntityCollection $collection
@@ -20,7 +20,20 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
     $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->row);
     return new $plugin['entity_collection_row']['class']();
   }
-  
+
+  public static function getRows() {
+    ctools_include('plugins');
+    $plugins = ctools_get_plugins('entity_collection', 'plugins');
+    // Get all available storage backends.
+    $row_plugins = array();
+    foreach ($plugins as $name => $info) {
+      if (isset($info['title']) && isset($info['entity_collection_row'])) {
+        $row_plugins[$name] = $info;
+      }
+    }
+    return $row_plugins;
+  }
+
  /**
   * Get all row styles formatted for #options
   * @return array
@@ -28,7 +41,7 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
   */
   public static function getRowOptions() {
     ctools_include('plugins');
-    $plugins = ctools_get_plugins('entity_collection', 'plugins');
+    $plugins = EntityCollectionRow::getRows();
     // Get all available storage backends.
     $options = array();
     foreach ($plugins as $name => $info) {

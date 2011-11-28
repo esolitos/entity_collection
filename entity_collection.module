@@ -352,15 +352,24 @@ function entity_collection_permission() {
  * Implements hook_theme().
  */
 function entity_collection_theme() {
-  return array(
-    'entity_collection_content_form' => array(
-      'render element' => 'form',
-    ),
-  	'entity_collection' => array(
-      'template' => 'entity_collection',
-      'render element' => 'element',
-    ),
+  $theme = array();
+  // Get all row plugins.
+  $row_plugins = EntityCollectionRow::getRows();
+  $style_plugins = EntityCollectionStyle::getStyles();
+  foreach ($row_plugins + $style_plugins as $name => $info) {
+    if (isset($info['theme'])) {
+      $theme[$name] = $info['theme'];
+    }
+  }
+
+  $theme['entity_collection_content_form'] = array(
+    'render element' => 'form',
   );
+  $theme['entity_collection'] = array(
+    'template' => 'entity_collection',
+    'render element' => 'element',
+  );
+  return $theme;
 }
 
 function template_preprocess_entity_collection(&$variables) {
