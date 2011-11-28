@@ -18,7 +18,7 @@ interface EntityCollectionStorageInterface {
 }
 
 abstract class EntityCollectionStorage implements EntityCollectionStorageInterface {
-  
+
   /**
    * Get a storage plugin for a specific bundle.
    * @param $bundle
@@ -26,13 +26,24 @@ abstract class EntityCollectionStorage implements EntityCollectionStorageInterfa
    * @return EntityCollectionStorageInterface
    *   A storage plugin object.
    */
-  public static function getStorage($bundle) {
+  public static function getBundleStorage($bundle) {
+    if (!is_object($bundle)) {
+      $bundle = entity_collection_bundle_load($bundle);
+    }
+    return EntityCollectionStorage::getStorage($bundle->storage);
+  }
+
+  /**
+   * Get a storage plugin by name.
+   * @param name
+   *   The name of the storage plugin.
+   */
+  public static function getStorage($name) {
     ctools_include('plugins');
-    $bundle = entity_collection_bundle_load($bundle);
-    $plugin = ctools_get_plugins('entity_collection', 'plugins', $bundle->storage);
+    $plugin = ctools_get_plugins('entity_collection', 'plugins', $name);
     return new $plugin['entity_collection_storage']['class']();
   }
-  
+
   /**
    * Get all storage backends formatted for #options
    * @return array

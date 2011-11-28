@@ -21,15 +21,15 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       $i++;
     }
   }
-  
+
   /**
    * Settings for this storage engine.
    */
-  function settingsForm(EntityCollection $collection, &$form, &$form_state) {
+  function bundleSettingsForm($bundle, &$form, &$form_state) {
     $form['store_entity'] = array(
       '#type' => 'checkbox',
       '#title' => t('Store full entity'),
-      '#default_value' => isset($collection->settings->store_entity) ? $collection->settings->store_entity : FALSE,
+      '#default_value' => isset($bundle->settings['store_entity']) ? $bundle->settings['store_entity'] : FALSE,
       '#description' => t('Store the full entity in the entity collection table.
        This is performant in some cases, but it also requires you to set up your
        cache invalidation settings.')
@@ -98,6 +98,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $result = $query->execute();
     $values = array();
     $tree = new EntityCollectionTreeNode();
+    $bundle = entity_collection_bundle_load($collection->bundle);
     foreach ($result as $value) {
       if ($value->parent > 0) {
         $node = $tree->getChild($value->parent);
@@ -105,7 +106,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       if (empty($node)) {
         $node = $tree;
       }
-      if (!empty($collection->settings->store_entity)) {
+      if (!empty($bundle->settings->store_entity)) {
         $entity = unserialize($value->entity);
       }
       // @todo Fix this so we only do one entity_load.
@@ -118,7 +119,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     }
     return $tree;
   }
-  
+
   private function serializeContexts($contexts) {
     $serialized = array();
     foreach ($contexts as $context) {

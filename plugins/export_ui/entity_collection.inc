@@ -27,26 +27,52 @@ $plugin = array(
 );
 
 function entity_collection_export_ui_form(&$form, &$form_state) {
-  $entity_collection = $form_state['item'];
+  ctools_include('export');
+  $bundle = $form_state['item'];
 
   $form['storage'] = array(
     '#type' => 'select',
     '#title' => t('Storage'),
-    '#default_value' => isset($entity_collection->storage) ? $entity_collection->storage : NULL,
+    '#default_value' => isset($bundle->storage) ? $bundle->storage : NULL,
     '#options' => EntityCollectionStorage::getStorageOptions(),
+    '#ajax' => array(
+      'callback' => 'entity_collection_export_ui_storage_settings',
+      'wrapper' => 'storage-settings',
+    ),
     '#required' => TRUE,
   );
+  $form['storage_settings'] = array(
+    '#type' => 'item',
+    '#tree' => TRUE,
+    '#prefix' => '<div id="storage-settings">',
+    '#suffix' => '</div>',
+  );
+  if (isset($form_state['values']['storage'])) {
+    $storage = EntityCollectionStorage::getBundleStorage($form_state['values']['storage']);
+  }
+  elseif(isset($bundle->storage)) {
+    $storage = EntityCollectionStorage::getBundleStorage($bundle->storage);
+  }
+  if (isset($storage) && method_exists($storage, 'bundleSettingsForm')) {
+    $storage->bundleSettingsForm($bundle, $form['storage_settings'], $form_state);
+  }
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
-    '#default_value' => $entity_collection->description,
+    '#default_value' => $bundle->description,
   );
   return $form;
+}
+
+
+function entity_collection_export_ui_storage_settings(&$form, &$form_state) {
+  return $form['storage_settings'];
 }
 
 function entity_collection_export_ui_form_submit(&$form, &$form_state) {
   $form_state['item']->label = $form_state['values']['label'];
   $form_state['item']->storage = $form_state['values']['storage'];
   $form_state['item']->description = $form_state['values']['description'];
+  $form_state['item']->settings = $form_state['values']['storage_settings'];
   menu_cache_clear_all();
 }

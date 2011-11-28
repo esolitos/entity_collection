@@ -30,7 +30,7 @@ class EntityCollection extends Entity {
       return entity_get_types($this->type);
     }
   }
-  
+
   /**
    * Set the current contexts.
    */
@@ -48,10 +48,12 @@ class EntityCollection extends Entity {
    *  An array that can be used with Drupals rendering system.
    */
   public function buildContent($view_mode = 'default', $langcode = NULL) {
-    $tree = EntityCollectionStorage::getStorage($this->bundle)->retrieve($this, $this->contexts);
+    $tree = EntityCollectionStorage::getBundleStorage($this->bundle)->retrieve($this, $this->contexts);
     $content = EntityCollectionStyle::getStyle($this)->build($this, $tree);
-    foreach ($content['entity_collection'] as &$row) {
-      $row[0]['#entity_collection'] = $this;
+    if (isset($content['entity_collection'])) {
+      foreach ($content['entity_collection'] as &$row) {
+        $row[]['#entity_collection'] = $this;
+      }
     }
     $rendered = entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
     $rendered['#entity_collection'] = $this;

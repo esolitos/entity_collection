@@ -26,10 +26,11 @@ function entity_collection_schema() {
       'identifier' => 'preset',
       'default hook' => 'entity_collection_bundles_default',
       'load callback' => 'entity_collection_bundle_load',
+      'save callback' => 'entity_collection_bundle_save',
     ),
     'fields' => array(
-      'rbid' => array(
-        'description' => 'Serial id for this entity_collection. Only used for internal lookups.',
+      'ebid' => array(
+        'description' => 'Serial id for this entity collection bundle. Only used for internal lookups.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -59,8 +60,14 @@ function entity_collection_schema() {
         'size' => 'medium',
         'not null' => TRUE,
       ),
+      'settings' => array(
+        'description' => 'A blob with serialized settings.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+      ),
     ),
-    'primary key' => array('rbid'),
+    'primary key' => array('ebid'),
     'unique keys' => array(
       'name' => array('name'),
     ),
@@ -69,7 +76,7 @@ function entity_collection_schema() {
   $schema['entity_collection_collections'] = array(
     'description' => 'Table holding entity_collections.',
     'fields' => array(
-      'rid' => array(
+      'eid' => array(
         'description' => 'Serial id for this entity_collection. Only used for internal lookups.',
         'type' => 'serial',
         'unsigned' => TRUE,
@@ -100,12 +107,12 @@ function entity_collection_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
-  	  'row' => array(
+      'row' => array(
         'description' => 'The row style to use when rendering.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-      ),      
+      ),
       'settings' => array(
         'description' => 'A blob of arbitrary settings.',
         'type' => 'blob',
@@ -113,13 +120,13 @@ function entity_collection_schema() {
         'size' => 'big',
       ),
     ),
-    'primary key' => array('rid'),
+    'primary key' => array('eid'),
     'unique keys' => array(
       'name' => array('name'),
     ),
   );
   $cache_schema = drupal_get_schema_unprocessed('system', 'cache');
   $schema['cache_entity_entity_collection'] = $cache_schema;
-  $schema['cache_entity_entity_collection']['description'] = "Cache table used to store entity_collection entity records."; 
+  $schema['cache_entity_entity_collection']['description'] = "Cache table used to store entity_collection entity records.";
   return $schema;
 }

@@ -152,16 +152,19 @@ function entity_collection_entity_info() {
       'bundles' => $bundle_info,
       'bundle keys' => array('bundle' => 'name'),
       'entity keys' => array(
-        'id' => 'rid',
+        'id' => 'eid',
         'name' => 'name',
         'bundle' => 'bundle',
         'label' => 'title',
       ),
     ),
   );
+  /*
   if (module_exists('entitycache')) {
     $definition['entity_collection']['entity cache'] = TRUE;
   }
+
+   */
   return $definition;
 }
 
@@ -185,7 +188,22 @@ function entity_collection_bundles() {
 function entity_collection_bundle_load($name) {
   ctools_include('export');
   $result = ctools_export_load_object('entity_collection_bundles', 'names', array($name));
-  return isset($result[$name]) ?  $result[$name] : FALSE;
+  if (isset($result[$name])) {
+    $result[$name]->settings = isset($result[$name]->settings) && !is_array($result[$name]->settings) ? unserialize($result[$name]->settings) : array();
+    return $result[$name];
+  }
+  return FALSE;
+}
+
+function entity_collection_bundle_save($bundle) {
+  $update = (isset($bundle->ebid) && $bundle->ebid != 'new') ? array('ebid') : array();
+  $bundle->settings = serialize($bundle->settings);
+  drupal_write_record('entity_collection_bundles', $bundle, $update);
+  return $bundle;
+}
+
+function entity_collection_bundle_exists($name) {
+  return entity_collection_bundle_load($name) !== FALSE;
 }
 
 /**
@@ -400,11 +418,11 @@ function entity_collection_block_view($delta) {
  *   The tree to save.
  */
 function entity_collection_save_content($name, $bundle, EntityCollectionTreeNode $tree) {
-  return EntityCollectionStorage::getStorage($bundle)->save($name, $tree);
+  return EntityCollectionStorage::getBundleStorage($bundle)->save($name, $tree);
 }
 
 function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {
-  return EntityCollectionStorage::getStorage($bundle)->appendItem($name, $item);
+  return EntityCollectionStorage::getBundleStorage($bundle)->appendItem($name, $item);
 }
 
 /**
@@ -416,7 +434,7 @@ function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode 
  * @return EntityCollectionTreeNode the content for a entity_collection.
  */
 function entity_collection_load_content($bundle, $name) {
-  return EntityCollectionStorage::getStorage($bundle)->retrieve($name);
+  return EntityCollectionStorage::getBundleStorage($bundle)->retrieve($name);
 }
 
 
@@ -452,12 +470,12 @@ function entity_collection_entity_delete($entity, $type) {
   if (!empty($collections)) {
     list($id) = entity_extract_ids($type, $entity);
     foreach ($collections as $collection) {
-      EntityCollectionStorage::getStorage($collection->bundle)->delete($collection, $type, array($id));
+      EntityCollectionStorage::getBundleStorage($collection->bundle)->delete($collection, $type, array($id));
     }
   }
   // Remove any data attached to this entity collection.
   if ($type == 'entity_collection') {
-    EntityCollectionStorage::getStorage($entity->bundle)->drop($entity);
+    EntityCollectionStorage::getBundleStorage($entity->bundle)->drop($entity);
     field_attach_delete($type, $entity);
   }
 }

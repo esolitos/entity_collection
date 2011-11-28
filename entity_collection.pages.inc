@@ -20,7 +20,7 @@ function entity_collection_page(EntityCollection $entity_collection) {
   drupal_set_title($entity_collection->title);
   $content = $entity_collection->buildContent('full');
   $content['#contextual_links'] = array(
-    'entity-collection' => array('contextual-links', array($entity_collection->rid)),
+    'entity-collection' => array('contextual-links', array($entity_collection->eid)),
   );
   return $content;
 }
