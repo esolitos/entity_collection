@@ -11,12 +11,11 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
     // grouping, we just want a flat array, sorted properly.
     $list = $tree->getFlat();
     $i = 0;
-    foreach ($list as $item) {
+    foreach ($list as $key => $item) {
       $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
-      // @todo, this sucks really bad...
-      $content['entity_collection'][$item->entity_id] = array(
-          $data['node'][$item->entity_id],
-          '#weight' => $i,
+      $content['entity_collection'][$key] = array(
+        $data[$item->type][$item->entity_id],
+        '#weight' => $i,
       );
       $i++;
     }
