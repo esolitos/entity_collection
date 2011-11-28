@@ -211,8 +211,13 @@ function entity_collection_bundle_exists($name) {
  * @param string $name the name of the entity_collection.
  */
 function entity_collection_load($name) {
+  $entity_collections = &drupal_static(__FUNCTION__, array());
+  $entity = FALSE;
+  if (isset($entity_collections[$name])) {
+    return $entity_collections[$name];
+  }
   if($entity = cache_get($name, 'cache_entity_entity_collection')) {
-    return $entity->data;
+    $entity = $entity->data;
   }
   else {
     $query = new EntityFieldQuery();
@@ -223,11 +228,10 @@ function entity_collection_load($name) {
     if (isset($result['entity_collection']) && count($result['entity_collection'])) {
       $entity = current(entity_load('entity_collection', array_keys($result['entity_collection'])));
       cache_set($name, $entity, 'cache_entity_entity_collection');
-      return $entity;
     }
   }
-  return FALSE;
-
+  $entity_collections[$entity->name] = $entity;
+  return $entity;
 }
 
 function entity_collection_load_all() {
