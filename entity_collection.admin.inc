@@ -43,7 +43,7 @@ function entity_collection_delete_form($form, &$form_state, $entity_collection) 
 }
 
 function entity_collection_delete_form_submit($form, &$form_state) {
-  entity_delete('entity_collection', $form_state['entity_collection']->rid);
+  entity_delete('entity_collection', $form_state['entity_collection']->eid);
   $form_state['redirect'] = 'admin/structure/entity_collection';
 }
 
@@ -67,7 +67,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#tree' => TRUE,
   );
   $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
-  if (method_exists($storage, 'settingsForm')) {
+  if (method_exists($storage, 'entitySettingsForm')) {
     $storage->settingsForm($entity_collection, $form['settings'], $form_state);
   }
   $form['title'] = array(
@@ -144,9 +144,6 @@ function entity_collection_form_validate($form, &$form_state) {
   $entity_collection->title = $form_state['values']['title'];
   $entity_collection->style = $form_state['values']['style'];
   $entity_collection->row = $form_state['values']['row'];
-  foreach ($form_state['values']['settings'] as $key => $setting) {
-    $entity_collection->settings->$key = $setting;
-  }
   field_attach_form_validate('entity_collection', $entity_collection, $form, $form_state);
 }
 

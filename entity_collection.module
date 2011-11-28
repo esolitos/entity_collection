@@ -159,12 +159,9 @@ function entity_collection_entity_info() {
       ),
     ),
   );
-  /*
   if (module_exists('entitycache')) {
     $definition['entity_collection']['entity cache'] = TRUE;
   }
-
-   */
   return $definition;
 }
 
@@ -230,7 +227,9 @@ function entity_collection_load($name) {
       cache_set($name, $entity, 'cache_entity_entity_collection');
     }
   }
-  $entity_collections[$entity->name] = $entity;
+  if ($entity) {
+    $entity_collections[$entity->name] = $entity;
+  }
   return $entity;
 }
 
@@ -463,12 +462,26 @@ function entity_collection_entity_load($entities, $type) {
   }
 }
 
+/**
+ * Implements hook_entity_presave().
+ */
 function entity_collection_entity_presave($entity, $type) {
   if ($type == 'entity_collection' && isset($entity->settings)) {
     $entity->settings = serialize($entity->settings);
   }
 }
 
+function entity_collection_entity_update($entity, $type) {
+  // Store a new version of the entity in the cache
+  if ($type == 'entity_collection') {
+    $entity->settings = unserialize($entity->settings);
+    cache_set($entity->name, $entity, 'cache_entity_entity_collection');
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
 function entity_collection_entity_delete($entity, $type) {
   $collections = entity_collection_load_all();
   if (!empty($collections)) {
