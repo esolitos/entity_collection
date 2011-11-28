@@ -96,25 +96,33 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $result = $query->execute();
-    $values = array();
     $tree = new EntityCollectionTreeNode();
     $bundle = entity_collection_bundle_load($collection->bundle);
     foreach ($result as $value) {
+      $entity = NULL;
       if ($value->parent > 0) {
         $node = $tree->getChild($value->parent);
       }
       if (empty($node)) {
         $node = $tree;
       }
-      if (!empty($bundle->settings->store_entity)) {
+      if (!empty($bundle->settings['store_entity'])) {
         $entity = unserialize($value->entity);
       }
-      // @todo Fix this so we only do one entity_load.
-      else {
-        $entity = entity_load_single($value->entity_type, $value->eid);
+      $node->addChild($value->entity_type, $value->eid, $entity, $value->view_mode, $value->rsid);
+    }
+    // Load all entities, and make sure we only do as few entity_loads as possible.
+    if (empty($bundle->settings['store_entity'])) {
+      $nodes = $tree->getFlat();
+      $entities = array();
+      foreach ($nodes as $node) {
+        $entities[$node->type][$node->key] = $node->entity_id;
       }
-      if ($entity) {
-        $node->addChild($value->entity_type, $value->eid, $entity, $value->view_mode, $value->rsid);
+    }
+    foreach ($entities as $type => $ids) {
+      $loaded_entities = entity_load($type, $ids);
+      foreach ($ids as $key => $id) {
+        $nodes[$key]->content = $loaded_entities[$id];
       }
     }
     return $tree;
