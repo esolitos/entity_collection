@@ -301,6 +301,17 @@ function entity_collection_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+  if (module_exists('panels_mini')) {
+    $info['entity_collection_row_panels_mini'] = array(
+      'title' => t('Mini panels'),
+      'entity_collection_row' => array(
+        'parent' => 'EntityCollectionRow',
+        'class' => 'EntityCollectionRowPanelsMini',
+        'file' => 'entity_collection_row_panels_mini.inc',
+        'path' => $path,
+      ),
+    );
+  }
   return $info;
 }
 

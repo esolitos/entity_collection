@@ -10,5 +10,6 @@ files[] = plugins/entity_collection_style/entity_collection_style.inc
 files[] = plugins/entity_collection_style/entity_collection_style_flat.inc
 files[] = plugins/entity_collection_row/entity_collection_row.inc
 files[] = plugins/entity_collection_row/entity_collection_row_view_mode.inc
+files[] = plugins/entity_collection_row/entity_collection_row_panels_mini.inc
 files[] = includes/tree.inc
 files[] = includes/entity_collection.inc

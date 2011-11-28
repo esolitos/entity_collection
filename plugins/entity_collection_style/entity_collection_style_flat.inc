@@ -14,7 +14,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
     foreach ($list as $key => $item) {
       $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
       $content['entity_collection'][$key] = array(
-        $data[$item->type][$item->entity_id],
+        $data,
         '#weight' => $i,
       );
       $i++;
