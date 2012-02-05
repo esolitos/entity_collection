@@ -310,22 +310,22 @@ function entity_collection_permission() {
     $name = check_plain($bundle->name);
     $permissions += array(
       "create $name entity collections" => array(
-        'title' => t('%type_name: Create entity collection', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Create entity collection', array('%type_name' => $bundle->label)),
       ),
       "edit $name entity collections" => array(
-        'title' => t('%type_name: Edit entity collection', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Edit entity collection', array('%type_name' => $bundle->label)),
       ),
       "view $name entity collections" => array(
-        'title' => t('%type_name: View entity collection', array('%type_name' => $type->label)),
+        'title' => t('%type_name: View entity collection', array('%type_name' => $bundle->label)),
       ),
       "delete $name entity collections" => array(
-        'title' => t('%type_name: Delete entity collection', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Delete entity collection', array('%type_name' => $bundle->label)),
       ),
       "add content to $name entity collections" => array(
-        'title' => t('%type_name: Add content', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Add content', array('%type_name' => $bundle->label)),
       ),
       "manage content in $name entity collections" => array(
-        'title' => t('%type_name: Manage content', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Manage content', array('%type_name' => $bundle->label)),
       ),
     );
   }

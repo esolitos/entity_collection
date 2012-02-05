@@ -62,14 +62,8 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   else {
     _entity_collection_context_form($form, $form_state);
   }
+  $entity_info = entity_get_info();
   $entity_collection = $form_state['entity_collection'];
-  $form['settings'] = array(
-    '#tree' => TRUE,
-  );
-  $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
-  if (method_exists($storage, 'entitySettingsForm')) {
-    $storage->settingsForm($entity_collection, $form['settings'], $form_state);
-  }
   $form['title'] = array(
     '#type' => 'textfield',
     '#required' => TRUE,
@@ -102,6 +96,41 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
+  $form['settings'] = array(
+    '#tree' => TRUE,
+  );
+  $form['settings']['restrict'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Restrict content'),
+    '#description' => t('Restrict the type of content in this collection to certain entity types and bundles.'),
+    '#default_value' => isset($entity_collection->settings['restrict']) ? $entity_collection->settings['restrict'] : FALSE,
+  );
+  $form['settings']['allowed_bundles'] = array(
+    '#type' => 'container',
+    '#states' => array(
+      'visible' => array(
+       'input[name="settings[restrict]"]' => array('checked' => TRUE),
+      ),
+    ),
+    '#tree' => TRUE,
+  );
+  foreach ($entity_info as $entity_name => $info) {
+    $bundle_options = array();
+    foreach ($info['bundles'] as $bundle_name => $bundle) {
+      $bundle_options[$bundle_name] = $bundle['label'];
+    }
+    $form['settings']['allowed_bundles'][$entity_name] = array(
+      '#type' => 'checkboxes',
+      '#title' => $info['label'],
+      '#options' => $bundle_options,
+      '#default_value' => isset($entity_collection->settings['allowed_bundles'][$entity_name]) ?
+      drupal_map_assoc($entity_collection->settings['allowed_bundles'][$entity_name]) : NULL,
+    );
+  }
+  $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
+  if (method_exists($storage, 'entitySettingsForm')) {
+    $storage->settingsForm($entity_collection, $form['settings'], $form_state);
+  }
   $form['#validate'][] = 'entity_collection_form_validate';
   $form['#submit'][] = 'entity_collection_form_submit';
   return $form;
@@ -153,6 +182,15 @@ function entity_collection_form_validate($form, &$form_state) {
 function entity_collection_form_submit($form, &$form_state) {
   ctools_include('cache');
   $entity_collection = $form_state['entity_collection'];
+  $entity_collection->settings['restrict'] = $form_state['values']['settings']['restrict'];
+  foreach ($form_state['values']['settings']['allowed_bundles'] as $entity_name => $allowed) {
+    $entity_collection->settings['allowed_bundles'][$entity_name] = array();
+    foreach ($allowed as $bundle => $allowed) {
+      if ($allowed) {
+        $entity_collection->settings['allowed_bundles'][$entity_name][] = $bundle;
+      }
+    }
+  }
   ctools_cache_clear('entity_collection_cache_object', $entity_collection->name);
   field_attach_submit('entity_collection', $entity_collection, $form, $form_state);
   entity_save('entity_collection', $entity_collection);
@@ -238,10 +276,11 @@ function entity_collection_ajax_add($entity_collection) {
   return '';
 }
 
-function entity_collection_get_entity_type_options() {
+function entity_collection_get_entity_type_options($entity_collection) {
   $info = entity_get_info();
   $options = array();
   foreach ($info as $name => $info) {
+  if (empty($entity_collection->settings['restrict']) || !empty($entity_collection->settings['allowed_bundles'][$name]))
     $options[$name] = $info['label'];
   }
   return $options;
@@ -412,7 +451,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   );
   $form['add_content']['entity_type'] = array(
     '#type' => 'select',
-    '#options' => entity_collection_get_entity_type_options(),
+    '#options' => entity_collection_get_entity_type_options($entity_collection),
     '#title' => t('Entity type'),
     '#description' => t('Select the type of entity to search for.')
   );
@@ -438,12 +477,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
     '#format' => '$entity_type:$entity_id',
     '#attachable' => $entity_collection->name,
     '#target' => 'edit-content-select',
-    '#operations' => array(
-      'add_node' => array(
-        'title' => 'Add article',
-        'href' => 'node/add/ns-article',
-      ),
-    ),
+    '#operations' => array(),
   );
   $form['add_content']['add_content'] = array(
     '#type' => 'submit',
