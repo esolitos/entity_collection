@@ -32,9 +32,9 @@ function entity_collection_entity_collection_content_type_content_types() {
     $type['title'] = t('%block entity block', array('%block' => $entity->title));
     $type['defaults']['name'] = $entity->name;
     $type['defaults']['type'] = $entity->type;
-    if (!empty($entity->settings->requiredcontexts)) {
+    if (!empty($entity->requiredcontexts)) {
       $type['required context'] = array();
-      foreach ($entity->settings->requiredcontexts as $context) {
+      foreach ($entity->requiredcontexts as $context) {
         $info = ctools_get_context($context['name']);
         // TODO: allow an optional setting
         $type['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
@@ -69,10 +69,13 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
         'contexts' => implode(':', $serialized),
       );
     }
-    $content->admin_links = references_dialog_get_views_search_links($conf['name']);
+    if (module_exists('references_dialog')) {
+      $content->admin_links = references_dialog_get_views_search_links($conf['name']);
+      $content->admin_links[] = references_dialog_link(array('href' => 'node/add/ns-article', 'title' => t('Add article')));
+    }
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query);
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
-    $content->admin_links[] = references_dialog_link(array('href' => 'node/add/ns-article', 'title' => t('Add article')));
+
   }
   return $content;
 }
