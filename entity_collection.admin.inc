@@ -188,11 +188,16 @@ function entity_collection_admin() {
 }
 
 /**
- * Manage the content of a entity_collection.
- * This is a simple and included admin-side form.
+ * Content admin page callback.
  */
-function entity_collection_content_form($form, &$form_state, $entity_collection) {
-  $form_state['entity_collection'] = $entity_collection;
+function entity_collection_content_admin($entity_collection) {
+  return array(
+    drupal_get_form('entity_collection_content_form', $entity_collection),
+    drupal_get_form('entity_collection_content_add_form', $entity_collection),
+  );
+}
+
+function _entity_collection_get_contexts($entity_collection) {
   ctools_include('context');
   $contexts = array();
   if (isset($_GET['contexts'])) {
@@ -202,8 +207,17 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
   foreach ($contexts as $i => &$context) {
     $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
   }
+  return $contexts;
+}
+
+/**
+ * Manage the content of a entity_collection.
+ * This is a simple and included admin-side form.
+ */
+function entity_collection_content_form($form, &$form_state, $entity_collection) {
+  $form_state['entity_collection'] = $entity_collection;
+  $contexts = $form_state['contexts'] = _entity_collection_get_contexts($entity_collection);
   $tree = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $contexts);
-  $form_state['contexts'] = $contexts;
   $wrappers = array();
   $form['#tree'] = TRUE;
   entity_collection_content_form_content($entity_collection, $form, $tree);
@@ -214,41 +228,6 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
       '#value' => t('Save order'),
     );
   }
-  $form['add_content'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Add content'),
-  );
-  $form['add_content']['entity_type'] = array(
-    '#type' => 'select',
-    '#options' => entity_collection_get_entity_type_options(),
-    '#title' => t('Entity type'),
-    '#description' => t('Select the type of entity to search for.')
-  );
-  $form['add_content']['content_select'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Search'),
-    '#maxlength' => 60,
-    '#description' => t('Type in the name of the content you want to add here.'),
-    '#autocomplete_path' => 'entity_collection/autocomplete',
-  );
-  $form['add_content']['reference'] = array(
-    '#type' => 'references_dialog',
-    '#format' => '$entity_type:$entity_id',
-    '#attachable' => $entity_collection->name,
-    '#target' => 'edit-content-select',
-    '#operations' => array(
-      'add_node' => array(
-        'title' => 'Add article',
-        'href' => 'node/add/ns-article',
-      ),
-    ),
-  );
-  $form['add_content']['add_content'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add content'),
-    '#submit' => array('entity_collection_content_form_add_content'),
-  );
-
   if (isset($_GET['context'])) {
     $form['reference']['#ajax_parameters'] = array('contexts' => $_GET['contexts']);
   }
@@ -423,19 +402,6 @@ function theme_entity_collection_content_form(&$variables) {
   return $output . drupal_render_children($variables['form']);
 }
 
-function entity_collection_content_form_autocomplete($string = '') {
-  // Let's limit this to nodes for now.
-  // @todo support all entities.
-  $matches = array();
-  $result = db_select('node')
-    ->fields('node', array('nid', 'title'))
-    ->condition('title', db_like($string) . '%', 'LIKE')->range(0, 10)->execute();
-  foreach ($result as $node) {
-    $matches['node:' . $node->nid] = check_plain($node->title);
-  }
-  drupal_json_output($matches);
-}
-
 function entity_collection_content_delete_form($form, &$form_state, $entity_collection, $entity_type, $eid) {
   $form_state['entity_collection'] = $entity_collection;
   $form_state['entity_type'] = $entity_type;
@@ -451,9 +417,61 @@ function entity_collection_content_delete_form_submit($form, &$form_state) {
   );
 }
 
-function entity_collection_content_form_add_content($form, &$form_state) {
+/**
+ * A form for adding content to an entity collection.
+ */
+function entity_collection_content_add_form($form, &$form_state, $entity_collection) {
+  $form_state['entity_collection'] = $entity_collection;
+  $form['add_content'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add content'),
+  );
+  $form['add_content']['entity_type'] = array(
+    '#type' => 'select',
+    '#options' => entity_collection_get_entity_type_options(),
+    '#title' => t('Entity type'),
+    '#description' => t('Select the type of entity to search for.')
+  );
+  // We can't use the regular autocomplete, because we need to send the selected entity type
+  // and the search.
+  $form['add_content']['content_select'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Search'),
+    '#maxlength' => 60,
+    '#description' => t('Type in the name of the content you want to add here.'),
+    '#attributes' => array('class' => array('form-autocomplete')),
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'entity_collection') . '/js/entity_autocomplete.js',
+      ),
+      'library' => array(
+        array('system', 'drupal.autocomplete'),
+      ),
+    ),
+  );
+  $form['add_content']['reference'] = array(
+    '#type' => 'references_dialog',
+    '#format' => '$entity_type:$entity_id',
+    '#attachable' => $entity_collection->name,
+    '#target' => 'edit-content-select',
+    '#operations' => array(
+      'add_node' => array(
+        'title' => 'Add article',
+        'href' => 'node/add/ns-article',
+      ),
+    ),
+  );
+  $form['add_content']['add_content'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add content'),
+  );
+  return $form;
+}
+
+function entity_collection_content_add_form_submit($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
-  list($type, $value) = explode(':', $form_state['values']['add_content']['content_select']);
+  $contexts = _entity_collection_get_contexts($entity_collection);
+  list($type, $value) = explode(':', $form_state['values']['content_select']);
   $entities = entity_load($type, array($value));
   if (isset($entities[$value])) {
     $entity = $entities[$value];
@@ -461,6 +479,34 @@ function entity_collection_content_form_add_content($form, &$form_state) {
     if (isset($_GET['contexts'])) {
       $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
     }
-    EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->appendItem($entity_collection, $item, $form_state['contexts']);
+    EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
+      ->appendItem($entity_collection, $item, $contexts);
   }
+}
+
+/**
+ * Autocomplete for entity collection content form.
+ * @param type $string
+ */
+function entity_collection_content_form_autocomplete($entity_type, $string = '') {
+  // Let's limit this to nodes for now.
+  $info = entity_get_info($entity_type);
+  $label_property = $info['entity keys']['label'];
+  $matches = array();
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', $entity_type)
+    ->propertyCondition($label_property, db_like($string) . '%', 'LIKE')
+    ->range(0, 10)
+    ->execute();
+
+  if (isset($result[$entity_type])) {
+    $entities = entity_load($entity_type, array_keys($result[$entity_type]));
+    foreach ($entities as $entity) {
+      if (entity_access('view', $entity_type, $entity)) {
+        list($id) = entity_extract_ids($entity_type, $entity);
+        $matches[$entity_type . ':' . $id] = check_plain(entity_label($entity_type, $entity));
+      }
+    }
+  }
+  drupal_json_output($matches);
 }

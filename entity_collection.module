@@ -43,8 +43,8 @@ function entity_collection_menu() {
   );
   $items['entity-collection/%entity_collection/content'] = array(
     'title' => 'Content',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('entity_collection_content_form', 1),
+    'page callback' => 'entity_collection_content_admin',
+    'page arguments' => array(1),
     'access arguments' => array('content', 1),
     'access callback' => 'entity_collection_access',
     'file' => 'entity_collection.admin.inc',
@@ -91,9 +91,10 @@ function entity_collection_menu() {
       'type' => MENU_LOCAL_ACTION,
     );
   }
-  $items['entity_collection/autocomplete'] = array(
+  $items['entity_collection/autocomplete/%/%'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
+    'page arguments' => array(2, 3),
     'access callback' => 'user_access',
     'access arguments' => array('administer entity_collections'),
     'type' => MENU_CALLBACK,
@@ -196,6 +197,7 @@ function entity_collection_bundle_save($bundle) {
   $update = (isset($bundle->ebid) && $bundle->ebid != 'new') ? array('ebid') : array();
   $bundle->settings = serialize($bundle->settings);
   drupal_write_record('entity_collection_bundles', $bundle, $update);
+  menu_cache_clear_all();
   return $bundle;
 }
 
