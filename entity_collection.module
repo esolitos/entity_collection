@@ -81,7 +81,7 @@ function entity_collection_menu() {
   );
   $entity_collection_bundles = entity_collection_bundles();
   // If we are using the block module, then we add links from there.
-  foreach ($entity_collection_bundles as $key => $info) {
+  foreach ($entity_collection_bundles as $info) {
     $items['admin/structure/entity_collection/add/' . $info->name] = array(
       'title' => 'Add ' . drupal_strtolower($info->label),
       'page callback' => 'drupal_get_form',
@@ -494,7 +494,7 @@ function entity_collection_entity_delete($entity, $type) {
   }
 }
 
-function entity_collection_contextual_links_view_alter(&$element, $items) {
+function entity_collection_contextual_links_view_alter(&$element) {
   if (isset($element['#element']['#entity_collection'])) {
     $element['#links']['entity-collection-delete'] = array(
       'title' => t('Delete from collection'),
