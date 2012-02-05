@@ -216,10 +216,8 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
   $form_state['entity_collection'] = $entity_collection;
   $contexts = $form_state['contexts'] = _entity_collection_get_contexts($entity_collection);
   $tree = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $contexts);
-  $wrappers = array();
   $form['#tree'] = TRUE;
   entity_collection_content_form_content($entity_collection, $form, $tree);
-  $parent_options = array(0 => 'None');
   if (isset($form['content'])) {
     $form['order_save'] = array(
       '#type' => 'submit',
@@ -265,13 +263,9 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
   }
   foreach ($nodes as $key => $child) {
     $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
-    $parent_options[$child->entity_id] = $wrappers[$key]->label();
   }
   $i = 0;
   foreach ($nodes as $key => $child) {
-    $entity = $child->content;
-    $entity_type = $child->type;
-    $info = $wrappers[$key]->entityInfo();
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
@@ -353,7 +347,6 @@ function entity_collection_content_build_tree($values) {
     }
     $entity = current(entity_load($value['type'], array($value['entity_id'])));
     $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
-    $previous_value = $value;
   }
   return $tree;
 }
