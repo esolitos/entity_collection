@@ -189,31 +189,16 @@ function entity_collection_admin() {
  * Content admin page callback.
  */
 function entity_collection_content_admin($entity_collection) {
-  return array(
-    drupal_get_form('entity_collection_content_form', $entity_collection),
-    drupal_get_form('entity_collection_content_add_form', $entity_collection),
-  );
-}
-
-function _entity_collection_get_contexts($entity_collection) {
-  ctools_include('context');
-  // We got the contexts prepulated already. Great.
-  if (isset($entity_collection->contexts)) {
-    return $entity_collection->contexts;
+  $contexts = _entity_collection_get_contexts($entity_collection);
+  if (count($contexts) != count($entity_collection->requiredcontexts)) {
+    return drupal_get_form('entity_collection_context_input_form', $entity_collection);
   }
-  // This hack is necessary if you don't create your own contextual administration.
-  // We can probably deal with this in a nice way, but what we actually want to do
-  // is to let the user create their administrative pages and fetch their contexts
-  // through page manager.
-  $contexts = array();
-  if (isset($_GET['contexts'])) {
-    $contexts = explode(':', check_plain($_GET['contexts']));
+  else {
+    return array(
+      drupal_get_form('entity_collection_content_form', $entity_collection),
+      drupal_get_form('entity_collection_content_add_form', $entity_collection),
+    );
   }
-  // Convert arguments to CTools Contexts.
-  foreach ($contexts as $i => &$context) {
-    $contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
-  }
-  return $contexts;
 }
 
 /**
@@ -244,8 +229,8 @@ function entity_collection_content_form($form, &$form_state, $entity_collection)
  * @param type $entity
  */
 function entity_collection_ajax_add($entity_collection) {
-  $entity_id = $_POST['entity_id'];
-  $entity_type = $_POST['entity_type'];
+  $entity_id = check_plain($_POST['entity_id']);
+  $entity_type = check_plain($_POST['entity_type']);
   $entity = entity_load_single($entity_type, $entity_id);
   if (isset($entity)) {
     EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->appendItem($entity_collection, new EntityCollectionTreeNode($entity_type, $entity_id, $entity, 'default'));

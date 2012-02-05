@@ -519,3 +519,62 @@ function entity_collection_references_dialog_search_attachables() {
 function entity_collection_flush_caches() {
   return array('cache_entity_entity_collection');
 }
+
+/**
+ * Get contexts for this entity collection, either from the collection itself
+ * or from the URL.
+ * @param EntityCollection $entity_collection
+ * @return array an array of contexts that exists.
+ */
+function _entity_collection_get_contexts(EntityCollection $entity_collection) {
+  ctools_include('context');
+  // We got the contexts prepulated already. Great.
+  if (isset($entity_collection->contexts) && count($entity_collection->contexts) == count($entity_collection->requiredcontexts)) {
+    return $entity_collection->contexts;
+  }
+  $loaded_contexts = array();
+  // This hack is necessary if you don't create your own contextual administration.
+  // We can probably deal with this in a nice way, but what we actually want to do
+  // is to let the user create their administrative pages and fetch their contexts
+  // through page manager.
+  $contexts = array();
+  if (isset($_GET['contexts'])) {
+    $contexts = explode(':', check_plain($_GET['contexts']));
+  }
+  // Convert arguments to CTools Contexts.
+  foreach ($contexts as $i => &$context) {
+    $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
+  }
+  return $loaded_contexts;
+}
+
+/**
+ * This form let's the user enter the contexts that are needed to view the entity collection.
+ */
+function entity_collection_context_input_form($form, &$form_state, EntityCollection $entity_collection) {
+  $form = array();
+  $form['info']['#markup'] = t('This entity collection has required contexts. Please enter them below in order to manage the content of this entity collection.');
+  $form['contexts'] = array(
+    '#tree' => TRUE,
+  );
+  foreach ($entity_collection->requiredcontexts as $context) {
+    $plugin = ctools_get_context($context['name']);
+    if (isset($plugin['placeholder form'])) {
+      $form['contexts'][$context['id']] = array('#title' => $context['identifier']) + $plugin['placeholder form'];
+    }
+  }
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit contexts'),
+  );
+  return $form;
+}
+
+function entity_collection_context_input_form_submit($form, &$form_state) {
+  $contexts = $form_state['values']['contexts'];
+  foreach ($contexts as $key => $context) {
+    $contexts[$key] = check_plain($context);
+  }
+  $contexts = implode(':', $contexts);
+  $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $contexts)));
+}

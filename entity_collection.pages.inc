@@ -1,26 +1,20 @@
 <?php
-
 /**
  * @file
  * Page callbacks for entity_collections.
  */
 
 function entity_collection_page(EntityCollection $entity_collection) {
-  // Return a basic entity_collection with the "full" view mode.
-  $contexts = array();
-  if (isset($_GET['contexts'])) {
-    ctools_include('context');
-    $contexts = explode(':', $_GET['contexts']);
-    // Convert arguments to CTools Contexts.
-    foreach ($contexts as $i => &$context) {
-      $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
-    }
-    $entity_collection->setContexts($contexts);
+  $contexts = $entity_collection->contexts = _entity_collection_get_contexts($entity_collection);
+  if (count($contexts) != count($entity_collection->requiredcontexts)) {
+    return drupal_get_form('entity_collection_context_input_form', $entity_collection);
   }
-  drupal_set_title($entity_collection->title);
-  $content = $entity_collection->buildContent('full');
-  $content['#contextual_links'] = array(
-    'entity-collection' => array('contextual-links', array($entity_collection->eid)),
-  );
-  return $content;
+  else {
+    drupal_set_title($entity_collection->title);
+    $content = $entity_collection->buildContent('full');
+    $content['#contextual_links'] = array(
+      'entity-collection' => array('contextual-links', array($entity_collection->eid)),
+    );
+    return $content;
+  }
 }
