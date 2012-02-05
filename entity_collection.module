@@ -327,26 +327,30 @@ function entity_collection_permission() {
       'description' => t('Create and delete fields on entity_collections, and set their permissions.'),
     ),
   );
-  /*
-  // Generate per profile type permissions.
-  foreach (entityblock_get_types() as $type) {
-    $type_name = check_plain($type->type);
+  // Generate per entity colletion type permissions.
+  foreach (entity_collection_bundles() as $bundle) {
+    $name = check_plain($bundle->name);
     $permissions += array(
-      "create $type_name entity blocks" => array(
-        'title' => t('%type_name: Create entity block', array('%type_name' => $type->label)),
+      "create $name entity collections" => array(
+        'title' => t('%type_name: Create entity collection', array('%type_name' => $type->label)),
       ),
-      "edit $type_name entity blocks" => array(
-        'title' => t('%type_name: Edit entity block', array('%type_name' => $type->label)),
+      "edit $name entity collections" => array(
+        'title' => t('%type_name: Edit entity collection', array('%type_name' => $type->label)),
       ),
-      "view $type_name entity blocks" => array(
-        'title' => t('%type_name: View entity block', array('%type_name' => $type->label)),
+      "view $name entity collections" => array(
+        'title' => t('%type_name: View entity collection', array('%type_name' => $type->label)),
       ),
-      "delete $type_name entity blocks" => array(
-        'title' => t('%type_name: Delete entity block', array('%type_name' => $type->label)),
+      "delete $name entity collections" => array(
+        'title' => t('%type_name: Delete entity collection', array('%type_name' => $type->label)),
+      ),
+      "add content to $name entity collections" => array(
+        'title' => t('%type_name: Add content', array('%type_name' => $type->label)),
+      ),
+      "manage content in $name entity collections" => array(
+        'title' => t('%type_name: Manage content', array('%type_name' => $type->label)),
       ),
     );
   }
-   */
   return $permissions;
 }
 
@@ -397,27 +401,16 @@ function entity_collection_access($op, $entity_collection, $account = NULL) {
  */
 function entity_collection_block_info() {
   $entity_collections = array();
-  // Load all blocks
+  $blocks = array();
+  // Load all entity collections and add them.
   $entity_collections = entity_load('entity_collection');
   foreach ($entity_collections as $entity_collection) {
     $blocks[$entity_collection->name] = array(
       'info' => $entity_collection->title,
-      'cache' => $entity_collection->cache,
+      'cache' => 0,
     );
   }
   return $blocks;
-}
-
-/**
- * Implements hook_block_configure().
- */
-function entity_collection_block_configure($delta) {
-  $block = entity_load('entity_collection', array($delta));
-  if (user_access("edit {$block->bundle} entity blocks")) {
-    $form_state = array('type' => $block->bundle, 'entityblock' => $block);
-    // We attach our entity block form here.
-    return entityblock_form(array(), $form_state);
-  }
 }
 
 /**
@@ -427,10 +420,10 @@ function entity_collection_block_view($delta) {
   $block = array();
   // The delta is always the same as the machine name of the
   // entity block, so it's fairly easy to load.
-  $entity_collection = entity_load('entity_collection', array($delta));
-  if ($entityblock && user_access("view {$entityblock->type} entity blocks")) {
-    $block['subject'] = check_plain($entityblock->title);
-    $block['content'] = $entityblock->buildContent();
+  $entity_collection = entity_collection_load($delta);
+  if (!empty($entity_collection) && user_access("view {$entity_collection->bundle} entity collections")) {
+    $block['subject'] = check_plain($entity_collection->title);
+    $block['content'] = $entity_collection->buildContent();
     return $block;
   }
 }
