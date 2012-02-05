@@ -203,7 +203,7 @@ function _entity_collection_get_contexts($entity_collection) {
   }
   // Convert arguments to CTools Contexts.
   foreach ($contexts as $i => &$context) {
-    $contexts[] = ctools_context_create($entity_collection->settings->requiredcontexts[$i]['name'], $context);
+    $contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
   }
   return $contexts;
 }

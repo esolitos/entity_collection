@@ -29,7 +29,7 @@ function entity_collection_entity_collection_content_type_content_types() {
   $entities = entity_collection_load_all();
   foreach ($entities as $entity) {
     $type = $defaults;
-    $type['title'] = t('%block entity block', array('%block' => $entity->title));
+    $type['title'] = t('%entity entity collection', array('%entity' => $entity->title));
     $type['defaults']['name'] = $entity->name;
     $type['defaults']['type'] = $entity->type;
     if (!empty($entity->requiredcontexts)) {
@@ -56,8 +56,10 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   if (!empty($entity)) {
     $entity->setContexts($contexts);
     $content->subject = $entity->title;
-    $content->content['#attached'] = references_dialog_attached();
-    $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add', 'refresh' => TRUE));
+    if (module_exists('references_dialog')) {
+      $content->content['#attached'] = references_dialog_attached();
+      $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add', 'refresh' => TRUE));
+    }
     $content->content['content'] = $entity->buildContent();
     $query = array();
     $serialized = array();
