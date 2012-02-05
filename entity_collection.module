@@ -233,6 +233,7 @@ function entity_collection_ctools_plugin_directory($module, $type) {
   	'entity_collection_row',
     'cache',
     'content_types',
+    'relationships',
   );
   if (in_array($type, $types)) {
     return 'plugins/' . $type;

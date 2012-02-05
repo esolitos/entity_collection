@@ -172,7 +172,7 @@ function entity_collection_admin() {
     if (!$entity_collection->hasStatus(ENTITY_IN_CODE)) {
        $operations .= ' | ' . l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/delete');
     }
-    $operations .= l(' | ' . t('Manage content'), 'entity-collection/' . $entity_collection->name . '/content');
+    $operations .= ' | ' . l(t('Manage content'), 'entity-collection/' . $entity_collection->name . '/content');
     $entity_collection_table[] = array(
       $entity_collection->title,
       $entity_collection->bundle,
@@ -197,9 +197,17 @@ function entity_collection_content_admin($entity_collection) {
 
 function _entity_collection_get_contexts($entity_collection) {
   ctools_include('context');
+  // We got the contexts prepulated already. Great.
+  if (isset($entity_collection->contexts)) {
+    return $entity_collection->contexts;
+  }
+  // This hack is necessary if you don't create your own contextual administration.
+  // We can probably deal with this in a nice way, but what we actually want to do
+  // is to let the user create their administrative pages and fetch their contexts
+  // through page manager.
   $contexts = array();
   if (isset($_GET['contexts'])) {
-    $contexts = explode(':', $_GET['contexts']);
+    $contexts = explode(':', check_plain($_GET['contexts']));
   }
   // Convert arguments to CTools Contexts.
   foreach ($contexts as $i => &$context) {
