@@ -31,7 +31,7 @@ function entity_collection_edit_form($form, &$form_state, $entity_collection) {
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save block'),
+    '#value' => t('Save'),
     '#weight' => 40,
   );
   return $form;
