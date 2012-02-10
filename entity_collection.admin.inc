@@ -467,6 +467,14 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
     '#attached' => array(
       'js' => array(
         drupal_get_path('module', 'entity_collection') . '/js/entity_autocomplete.js',
+        array(
+          'data' => array(
+            'EntityCollection' => array(
+              'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE))
+             ),
+           ),
+           'type' => 'setting',
+        ),
       ),
       'library' => array(
         array('system', 'drupal.autocomplete'),
@@ -507,11 +515,16 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
  * Autocomplete for entity collection content form.
  * @param type $string
  */
-function entity_collection_content_form_autocomplete($entity_type, $string = '') {
+function entity_collection_content_form_autocomplete($entity_collection, $entity_type, $string = '') {
   // Let's limit this to nodes for now.
   $info = entity_get_info($entity_type);
   $label_property = $info['entity keys']['label'];
   $matches = array();
+  $types = entity_collection_get_entity_type_options($entity_collection);
+  // Don't output any results if we get an invalid input.
+  if (!isset($types[$entity_type])) {
+    drupal_json_output(array());
+  }
   $query = new EntityFieldQuery();
   $result = $query->entityCondition('entity_type', $entity_type)
     ->propertyCondition($label_property, db_like($string) . '%', 'LIKE')

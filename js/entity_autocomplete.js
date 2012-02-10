@@ -2,6 +2,7 @@
 Drupal.behaviors.entitycollectionAdmin = {
   attach: function (context, settings) {
     var acdb = [];
+    var path = Drupal.settings.EntityCollection.path;
     $('#edit-entity-type', context).change(attachAutocomplete);
     $('#edit-content-select', context).once('autocomplete', function() {
       var $input = $('#edit-content-select')
@@ -17,7 +18,7 @@ Drupal.behaviors.entitycollectionAdmin = {
     });
 
     function attachAutocomplete() {
-      var uri = '/entity_collection/autocomplete/' + $('#edit-entity-type').val();
+      var uri = path  + '/' + $('#edit-entity-type').val();
       var $input = $('#edit-content-select');
       if (!acdb[uri]) {
         acdb[uri] = new Drupal.ACDB(uri);

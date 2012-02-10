@@ -91,7 +91,7 @@ function entity_collection_menu() {
       'type' => MENU_LOCAL_ACTION,
     );
   }
-  $items['entity_collection/autocomplete/%/%'] = array(
+  $items['entity_collection/autocomplete/%entity_collection/%/%'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
     'page arguments' => array(2, 3),
