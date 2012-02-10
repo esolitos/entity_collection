@@ -114,6 +114,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     ),
     '#tree' => TRUE,
   );
+
   foreach ($entity_info as $entity_name => $info) {
     $bundle_options = array();
     foreach ($info['bundles'] as $bundle_name => $bundle) {
@@ -124,7 +125,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
       '#title' => $info['label'],
       '#options' => $bundle_options,
       '#default_value' => isset($entity_collection->settings['allowed_bundles'][$entity_name]) ?
-      drupal_map_assoc($entity_collection->settings['allowed_bundles'][$entity_name]) : NULL,
+      drupal_map_assoc($entity_collection->settings['allowed_bundles'][$entity_name]) : array(),
     );
   }
   $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
