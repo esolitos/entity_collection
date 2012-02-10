@@ -518,7 +518,13 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
 function entity_collection_content_form_autocomplete($entity_collection, $entity_type, $string = '') {
   // Let's limit this to nodes for now.
   $info = entity_get_info($entity_type);
-  $label_property = $info['entity keys']['label'];
+  if (isset($info['entity keys']['label'])) {
+    $label_property = $info['entity keys']['label'];
+  }
+  // Let's hardcode this for now until we figure out a nice way to do it.
+  if ($entity_type == 'user') {
+    $label_property = 'name';
+  }
   $matches = array();
   $types = entity_collection_get_entity_type_options($entity_collection);
   // Don't output any results if we get an invalid input.

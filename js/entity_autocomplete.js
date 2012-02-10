@@ -18,11 +18,12 @@ Drupal.behaviors.entitycollectionAdmin = {
     });
 
     function attachAutocomplete() {
-      var uri = path  + '/' + $('#edit-entity-type').val();
+      var uri = path  + '/' +  $('#edit-entity-type').val();
       var $input = $('#edit-content-select');
       if (!acdb[uri]) {
         acdb[uri] = new Drupal.ACDB(uri);
       }
+      $input.unbind();
       new Drupal.jsAC($input, acdb[uri]);
     }
   }
