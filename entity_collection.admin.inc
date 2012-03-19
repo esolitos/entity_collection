@@ -290,10 +290,6 @@ function entity_collection_get_entity_type_options($entity_collection) {
 function entity_collection_content_form_content($entity_collection, &$form, $tree, $parent = 0, $depth = 0) {
   $nodes = $tree->getChildren();
   $wrappers  = array();
-  if (isset($tree->entity_id)) {
-    $tree->truncate();
-    array_unshift($nodes, $tree);
-  }
   foreach ($nodes as $key => $child) {
     $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
   }
@@ -338,11 +334,8 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
       '#type' => 'markup',
       '#markup' => l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, array('query' => array('destination' => current_path()))),
     );
-    $children = $child->getChildren();
-    if (count($children)) {
-      foreach($children as $child_node) {
-        entity_collection_content_form_content($entity_collection, $form, $child_node, $child->key, $depth+1);
-      }
+    if (count($child->getChildren())) {
+      entity_collection_content_form_content($entity_collection, $form, $child, $child->key, $depth+1);
     }
     $i++;
   }
@@ -371,15 +364,19 @@ function entity_collection_content_form_submit($form, &$form_state) {
 function entity_collection_content_build_tree($values) {
   $tree = new EntityCollectionTreeNode();
   uasort($values, 'entity_collection_content_compare');
+  // Insert all root items first.
+  foreach ($values as $value) {
+    if ($value['parent'] == 0) {
+      $entity = current(entity_load($value['type'], array($value['entity_id'])));
+      $tree->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
+    }
+  }
   foreach ($values as $value) {
     if ($value['parent'] != 0 && $parent = $tree->getChild($value['parent'])) {
       $node = $parent;
+      $entity = current(entity_load($value['type'], array($value['entity_id'])));
+      $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
     }
-    else {
-      $node = $tree;
-    }
-    $entity = current(entity_load($value['type'], array($value['entity_id'])));
-    $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
   }
   return $tree;
 }
