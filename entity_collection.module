@@ -94,7 +94,7 @@ function entity_collection_menu() {
   $items['entity_collection/autocomplete/%entity_collection/%/%'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
-    'page arguments' => array(2, 3),
+    'page arguments' => array(2, 3, 4),
     'access callback' => 'user_access',
     'access arguments' => array('administer entity_collections'),
     'type' => MENU_CALLBACK,
