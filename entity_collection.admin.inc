@@ -512,7 +512,7 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
  * Autocomplete for entity collection content form.
  * @param type $string
  */
-function entity_collection_content_form_autocomplete($entity_collection, $entity_type, $string = '') {
+function entity_collection_content_form_autocomplete(EntityCollection $entity_collection, $entity_type, $string = '') {
   // Let's limit this to nodes for now.
   $info = entity_get_info($entity_type);
   if (isset($info['entity keys']['label'])) {
