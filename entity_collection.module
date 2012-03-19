@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Imeplements hook_menu().
+ * Implements hook_menu().
  */
 function entity_collection_menu() {
   $items = array();
