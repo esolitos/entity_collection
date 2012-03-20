@@ -100,7 +100,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $bundle = entity_collection_bundle_load($collection->bundle);
     foreach ($result as $value) {
       $entity = NULL;
-      if ($value->parent > 0) {
+      if (!empty($value->parent)) {
         $node = $tree->getChild($value->parent);
       }
       if (empty($node)) {
@@ -122,7 +122,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     foreach ($entities as $type => $ids) {
       $loaded_entities = entity_load($type, $ids);
       foreach ($ids as $key => $id) {
-        $nodes[$key]->content = $loaded_entities[$id];
+        $nodes[$tree->getChildKey($type, $id)]->content = $loaded_entities[$id];
       }
     }
     return $tree;

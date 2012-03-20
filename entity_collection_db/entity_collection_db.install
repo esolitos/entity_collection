@@ -43,10 +43,9 @@ function entity_collection_db_schema() {
         'description' => 'Position.',
       ),
       'parent' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => '',
         'description' => 'The parent, if any.',
       ),
       'view_mode' => array(

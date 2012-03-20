@@ -26,31 +26,28 @@ class EntityCollectionTreeNode {
    */
   public function addChild($type, $entity_id, $content, $view_mode = NULL, $key = NULL) {
     $node = new EntityCollectionTreeNode($type, $entity_id, $content, $view_mode);
-    if (isset($key)) {
-      $node->key = $key;
-    }
     $node->parent = $this;
     $this->addChildNode($node);
   }
 
   /**
-   * Add a node as a child to this one.
+   * Add a node as a child to this node.
    * @param EntityCollectionTreeNode $child
    */
   public function addChildNode(EntityCollectionTreeNode $child) {
     if (!isset($this->children)) {
       $this->children = array();
     }
-    if (!isset($child->key)) {
-      $child->key = $this->getLastChildKey();
-    }
     $child->root = $this->root;
-    $this->root->list[$child->key] = $child;
-    $this->children[$child->key] = $child;
+    $child->key = $key = $this->getNodeKey($child);
+    $this->root->list[$key] = $child;
+    $this->children[$key] = $child;
   }
 
-  public function removeChild($name) {
-    unset($this->children[$child->name]);
+  public function removeChild(EntityCollectionTreeNode $child) {
+    $key = $this->getNodeKey($child);
+    unset($this->root->list[$key]);
+    unset($this->children[$key]);
   }
 
   public function getChild($key) {
@@ -76,15 +73,24 @@ class EntityCollectionTreeNode {
   }
 
   public function getLastChild() {
-    return $this->children[count($this->children)-1];
+    return end($this->children);
+  }
+  /**
+   * Get a child key based on entity type and entity id.
+   */
+  public function getChildKey($entity_type, $entity_id) {
+    return $entity_type . ':' . $entity_id;
+  }
+  
+  /**
+   * Get a node key.
+   */
+  public function getNodeKey(EntityCollectionTreeNode $node) {
+    return $node->type . ':' . $node->entity_id;
   }
 
   public function getLastChildKey() {
-    $keys = array_keys($this->children);
-    if (count($keys)) {
-      return $keys[count($keys)-1];
-    }
-    return -1;
+    return end(array_keys($this->children));
   }
 
   public function truncate() {

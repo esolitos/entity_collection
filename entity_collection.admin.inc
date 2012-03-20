@@ -366,13 +366,13 @@ function entity_collection_content_build_tree($values) {
   uasort($values, 'entity_collection_content_compare');
   // Insert all root items first.
   foreach ($values as $value) {
-    if ($value['parent'] == 0) {
+    if (empty($value['parent'])) {
       $entity = current(entity_load($value['type'], array($value['entity_id'])));
       $tree->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
     }
   }
   foreach ($values as $value) {
-    if ($value['parent'] != 0 && $parent = $tree->getChild($value['parent'])) {
+    if (!empty($value['parent']) && $parent = $tree->getChild($value['parent'])) {
       $node = $parent;
       $entity = current(entity_load($value['type'], array($value['entity_id'])));
       $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
@@ -450,8 +450,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   $form['add_content']['entity_type'] = array(
     '#type' => 'select',
     '#options' => entity_collection_get_entity_type_options($entity_collection),
-    '#title' => t('Entity type'),
-    '#description' => t('Select the type of entity to search for.')
+    '#title' => t('Type'),
   );
   // We can't use the regular autocomplete, because we need to send the selected entity type
   // and the search.
