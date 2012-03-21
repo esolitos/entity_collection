@@ -48,6 +48,13 @@ function entity_collection_db_schema() {
         'default' => '',
         'description' => 'The parent, if any.',
       ),
+      'depth' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The parent, if any.',
+      ),
       'view_mode' => array(
         'type' => 'varchar',
         'length' => 255,

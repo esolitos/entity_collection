@@ -315,7 +315,7 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
       '#type' => 'textfield',
       '#title' => t('Position'),
       '#size' => 3,
-      '#default_value' => $i,
+      '#default_value' => $child->position,
     );
     $form['content'][$key]['parent'] = array(
       '#type' => 'hidden',
@@ -364,18 +364,20 @@ function entity_collection_content_form_submit($form, &$form_state) {
 function entity_collection_content_build_tree($values) {
   $tree = new EntityCollectionTreeNode();
   uasort($values, 'entity_collection_content_compare');
-  // Insert all root items first.
-  foreach ($values as $value) {
+  while (!empty($values)) {
+    $value = array_shift($values);
+    $entity = current(entity_load($value['type'], array($value['entity_id'])));
+    // If the we have no parent, we can insert the item on the root.
     if (empty($value['parent'])) {
-      $entity = current(entity_load($value['type'], array($value['entity_id'])));
-      $tree->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
+      $tree->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key'], $value['position']);
     }
-  }
-  foreach ($values as $value) {
-    if (!empty($value['parent']) && $parent = $tree->getChild($value['parent'])) {
-      $node = $parent;
-      $entity = current(entity_load($value['type'], array($value['entity_id'])));
-      $node->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key']);
+    // If we have a parent and that parent is already inserted, add it to that node.
+    elseif (!empty($value['parent']) && $parent = $tree->getChild($value['parent'])) {
+      $parent->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key'], $value['position']);
+    }
+    // Push the value onto our array again and try again.
+    else {
+      array_push($values, $value);
     }
   }
   return $tree;

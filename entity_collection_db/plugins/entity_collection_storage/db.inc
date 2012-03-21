@@ -6,8 +6,8 @@
  */
 class EntityCollectionStorageDB extends EntityCollectionStorage {
 
-  public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0) {
-    $record = $this->getRecord($collection, $tree, $position, $contexts);
+  public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0, $depth = 0) {
+    $record = $this->getRecord($collection, $tree, $position, $contexts, $depth);
     $primary_keys = array();
     if ($record) {
       if ($this->itemExists($collection, $record->eid, $record->entity_type, $contexts)) {
@@ -17,7 +17,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     }
     $i = 0;
     foreach ($tree->getChildren() as $node) {
-      $this->save($collection, $node, $contexts, $i);
+      $this->save($collection, $node, $contexts, $i, $depth + 1);
       $i++;
     }
   }
@@ -54,7 +54,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $this->save($collection, $item, $contexts, $position);
   }
 
-  private function getRecord(EntityCollection $collection, EntityCollectionTreeNode $item, $position = 0, $contexts = array()) {
+  private function getRecord(EntityCollection $collection, EntityCollectionTreeNode $item, $position = 0, $contexts = array(), $depth) {
     if (isset($item->content)) {
       $record = new stdClass();
       $record->name = $collection->name;
@@ -63,9 +63,10 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       }
       $record->entity_type = $item->type;
       $record->eid = $item->entity_id;
+      $record->depth = $depth;
       $record->view_mode = $item->view_mode;
       $record->parent = isset($item->parent) && isset($item->parent->key) ? $item->parent->key : 0;
-      $record->position = $position;
+      $record->position = $item->position;
       $record->contexts = $this->serializeContexts($contexts);
       return $record;
     }
@@ -90,7 +91,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $query = db_select('entity_collection_storage', 'rs')
       ->fields('rs')
       ->condition('name', $collection->name, '=')
-      ->orderBy('parent')
+      ->orderBy('depth')
       ->orderBy('position');
     if (isset($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
@@ -103,13 +104,13 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       if (!empty($value->parent)) {
         $node = $tree->getChild($value->parent);
       }
-      if (empty($node)) {
+      else {
         $node = $tree;
       }
       if (!empty($bundle->settings['store_entity'])) {
         $entity = unserialize($value->entity);
       }
-      $node->addChild($value->entity_type, $value->eid, $entity, $value->view_mode, $value->rsid);
+      $node->addChild($value->entity_type, $value->eid, $entity, $value->view_mode, $value->rsid, $value->position);
     }
     // Load all entities, and make sure we only do as few entity_loads as possible.
     if (empty($bundle->settings['store_entity'])) {

@@ -8,6 +8,7 @@ class EntityCollectionTreeNode {
   public $root;
   public $content;
   public $view_mode;
+  public $position = 0;
   private $children = array();
   public $list = array();
 
@@ -24,10 +25,11 @@ class EntityCollectionTreeNode {
    * @param string $name
    * @param stdClass $content
    */
-  public function addChild($type, $entity_id, $content, $view_mode = NULL, $key = NULL) {
+  public function addChild($type, $entity_id, $content, $view_mode = NULL, $key = NULL, $position = NULL) {
     $node = new EntityCollectionTreeNode($type, $entity_id, $content, $view_mode);
+    $node->position = isset($position) ? $position : count($this->children);
     $node->parent = $this;
-    $this->addChildNode($node);
+    return $this->addChildNode($node);
   }
 
   /**
@@ -42,6 +44,7 @@ class EntityCollectionTreeNode {
     $child->key = $key = $this->getNodeKey($child);
     $this->root->list[$key] = $child;
     $this->children[$key] = $child;
+    return $child;
   }
 
   public function removeChild(EntityCollectionTreeNode $child) {
@@ -81,7 +84,7 @@ class EntityCollectionTreeNode {
   public function getChildKey($entity_type, $entity_id) {
     return $entity_type . ':' . $entity_id;
   }
-  
+
   /**
    * Get a node key.
    */

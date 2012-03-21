@@ -5,7 +5,7 @@
  */
 interface EntityCollectionStorageInterface {
 
-  public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0);
+  public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0, $depth = 0);
 
   public function appendItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array());
 
