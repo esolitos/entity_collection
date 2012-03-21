@@ -443,6 +443,7 @@ function entity_collection_content_delete_form_submit($form, &$form_state) {
  */
 function entity_collection_content_add_form($form, &$form_state, $entity_collection) {
   $form_state['entity_collection'] = $entity_collection;
+  $form['#attributes'] = array('class' => array($entity_collection->name));
   $form['add_content'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add content'),
@@ -462,14 +463,18 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
     '#attributes' => array('class' => array('form-autocomplete')),
     '#attached' => array(
       'js' => array(
-        drupal_get_path('module', 'entity_collection') . '/js/entity_autocomplete.js',
+        drupal_get_path('module', 'entity_collection') . '/js/entity_autocomplete.js' => array(
+          'type' => 'file',
+        ),
         array(
           'data' => array(
-            'EntityCollection' => array(
-              'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE))
-             ),
-           ),
-           'type' => 'setting',
+            'entity_collection' => array(
+              $entity_collection->name => array(
+                'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE))
+              ),
+            ),
+          ),
+          'type' => 'setting'
         ),
       ),
       'library' => array(
@@ -494,16 +499,18 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
 function entity_collection_content_add_form_submit($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   $contexts = _entity_collection_get_contexts($entity_collection);
-  list($type, $value) = explode(':', $form_state['values']['content_select']);
-  $entities = entity_load($type, array($value));
-  if (isset($entities[$value])) {
-    $entity = $entities[$value];
-    $item = new EntityCollectionTreeNode($type, $value, $entity);
-    if (isset($_GET['contexts'])) {
-      $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
+  if (!empty($form_state['values']['content_select'])) {
+    list($type, $value) = explode(':', $form_state['values']['content_select']);
+    $entities = entity_load($type, array($value));
+    if (isset($entities[$value])) {
+      $entity = $entities[$value];
+      $item = new EntityCollectionTreeNode($type, $value, $entity);
+      if (isset($_GET['contexts'])) {
+        $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
+      }
+      EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
+        ->appendItem($entity_collection, $item, $contexts);
     }
-    EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
-      ->appendItem($entity_collection, $item, $contexts);
   }
 }
 
