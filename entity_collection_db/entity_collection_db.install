@@ -55,10 +55,10 @@ function entity_collection_db_schema() {
         'default' => 0,
         'description' => 'The parent, if any.',
       ),
-      'view_mode' => array(
+      'style' => array(
         'type' => 'varchar',
         'length' => 255,
-        'description' => 'The view_mode to be used to render this row',
+        'description' => 'The styles to be used to render this row',
       ),
       'contexts' => array(
         'type' => 'varchar',

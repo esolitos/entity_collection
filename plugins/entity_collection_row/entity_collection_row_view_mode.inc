@@ -11,7 +11,7 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
 
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
     if ($item->type != 'entity_collection') {
-      return entity_view($item->type, array($item->entity_id => $item->content), $item->view_mode, $langcode);
+      return entity_view($item->type, array($item->entity_id => $item->content), $item->style, $langcode);
     }
   }
 }

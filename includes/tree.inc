@@ -7,17 +7,17 @@ class EntityCollectionTreeNode {
   public $parent;
   public $root;
   public $content;
-  public $view_mode;
+  public $style;
   public $position = 0;
   private $children = array();
   public $list = array();
 
-  public function __construct($type = NULL, $entity_id = NULL, $content = NULL, $view_mode = NULL) {
+  public function __construct($type = NULL, $entity_id = NULL, $content = NULL, $style = NULL) {
     $this->type = $type;
     $this->root = $this;
     $this->entity_id = $entity_id;
     $this->content = $content;
-    $this->view_mode = $view_mode;
+    $this->style = $style;
   }
 
   /**
@@ -25,8 +25,8 @@ class EntityCollectionTreeNode {
    * @param string $name
    * @param stdClass $content
    */
-  public function addChild($type, $entity_id, $content, $view_mode = NULL, $key = NULL, $position = NULL) {
-    $node = new EntityCollectionTreeNode($type, $entity_id, $content, $view_mode);
+  public function addChild($type, $entity_id, $content, $style = NULL, $key = NULL, $position = NULL) {
+    $node = new EntityCollectionTreeNode($type, $entity_id, $content, $style);
     $node->position = isset($position) ? $position : count($this->children);
     $node->parent = $this;
     return $this->addChildNode($node);

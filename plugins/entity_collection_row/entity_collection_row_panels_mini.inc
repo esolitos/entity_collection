@@ -12,7 +12,7 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
   }
 
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
-    $panel = panels_mini_load($item->view_mode);
+    $panel = panels_mini_load($item->style);
     if (isset($panel)) {
       $contexts = array(ctools_context_create('entity:' . $item->type, $item->content));
       $context = ctools_context_match_required_contexts($panel->requiredcontexts, $contexts);

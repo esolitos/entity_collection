@@ -325,9 +325,9 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
       '#type' => 'hidden',
       '#default_value' => $depth,
     );
-    $form['content'][$key]['view_mode'] = array(
+    $form['content'][$key]['style'] = array(
       '#type' => 'select',
-      '#default_value' => $child->view_mode,
+      '#default_value' => $child->style,
       '#options' => EntityCollectionRow::getRow($entity_collection)->getOptions($child->type, $child->content),
     );
     $form['content'][$key]['delete'] = array(
@@ -339,14 +339,6 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
     }
     $i++;
   }
-}
-
-function _entity_collection_get_view_mode_options($entity_info) {
-  $options = array();
-  foreach ($entity_info['view modes'] as $mode => $info) {
-    $options[$mode] = $info['label'];
-  }
-  return $options;
 }
 
 function entity_collection_content_form_submit($form, &$form_state) {
@@ -369,11 +361,11 @@ function entity_collection_content_build_tree($values) {
     $entity = current(entity_load($value['type'], array($value['entity_id'])));
     // If the we have no parent, we can insert the item on the root.
     if (empty($value['parent'])) {
-      $tree->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key'], $value['position']);
+      $tree->addChild($value['type'], $value['entity_id'], $entity, $value['style'], $value['key'], $value['position']);
     }
     // If we have a parent and that parent is already inserted, add it to that node.
     elseif (!empty($value['parent']) && $parent = $tree->getChild($value['parent'])) {
-      $parent->addChild($value['type'], $value['entity_id'], $entity, $value['view_mode'], $value['key'], $value['position']);
+      $parent->addChild($value['type'], $value['entity_id'], $entity, $value['style'], $value['key'], $value['position']);
     }
     // Push the value onto our array again and try again.
     else {
@@ -405,14 +397,14 @@ function theme_entity_collection_content_form(&$variables) {
       $title = drupal_render($form['content'][$key]['title']);
       $delete = drupal_render($form['content'][$key]['delete']);
       $position = drupal_render($form['content'][$key]['position']);
-      $view_mode = drupal_render($form['content'][$key]['view_mode']);
+      $style = drupal_render($form['content'][$key]['style']);
       $parent = drupal_render($form['content'][$key]['parent']);
       $depth = drupal_render($form['content'][$key]['depth']);
       $rendered_key = drupal_render($form['content'][$key]['key']);
       $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-      $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $view_mode, $delete));
+      $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $style, $delete));
     }
-    $header = array(t('Title'), t('Position'), t('View mode'), t('Operations'));
+    $header = array(t('Title'), t('Position'), t('Style'), t('Operations'));
     $output = theme('table', array(
       'header' => $header,
       'rows' => $rows,

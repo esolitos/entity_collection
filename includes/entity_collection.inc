@@ -40,7 +40,7 @@ class EntityCollection extends Entity {
 
   /**
    * Build content.
-   * @param string $view_mode
+   * @param string $view_mod
    *   The current view mode.
    * @param type $langcode
    *   The language code to use.
