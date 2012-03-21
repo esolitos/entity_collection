@@ -1,5 +1,7 @@
 <?php
 class EntityCollectionRowPanelsMini extends EntityCollectionRow {
+  private $panels = array();
+  
   public function getOptions($entity_type, $entity) {
     $mini_panels = panels_mini_load_all();
     $options = array();
@@ -12,7 +14,10 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
   }
 
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
-    $panel = panels_mini_load($item->style);
+    if (!isset($panels[$item->style])) {
+      $panels[$item->style] = panels_mini_load($item->style);
+    }
+    $panel = $panels[$item->style];
     if (isset($panel)) {
       $contexts = array(ctools_context_create('entity:' . $item->type, $item->content));
       $context = ctools_context_match_required_contexts($panel->requiredcontexts, $contexts);
