@@ -1,7 +1,7 @@
 <?php
 class EntityCollectionRowPanelsMini extends EntityCollectionRow {
   private $panels = array();
-  
+
   public function getOptions($entity_type, $entity) {
     $mini_panels = panels_mini_load_all();
     $options = array();

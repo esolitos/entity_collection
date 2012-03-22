@@ -1,21 +1,37 @@
 <?php
 
 /**
- * Simple interface for viewing hierarchies of entities.
+ * This style can show groups of content in hierarchies.
  */
 class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
 
   public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL) {
     $content = array();
-    foreach ($tree->getChildren() as $key => $item) {
-      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
-      $content['entity_collection'][$key] = array(
-        $data,
-        '#weight' => $i,
-      );
-      $i++;
-    }
+    $this->renderTreeNode($content, $entity, $tree, $langcode);
     return $content;
+  }
+  
+  private function renderTreeNode(&$content, $entity, EntityCollectionTreeNode $item, $langcode = NULL) {
+    $element = array(
+    	'#children' => array(),
+      '#weight' => $item->position,
+      '#theme' => 'entity_collection_style_hierarchy',
+    );
+    if (isset($item->content)) {
+      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
+      $element['#parent'] = $data;
+    }
+    foreach ($item->getChildren() as $key => $child) {
+      $this->renderTreeNode($element['#children'], $entity, $child, $langcode);
+    }
+    $content[] = $element;
   }
 }
 
+/**
+ * Preprocess function for this plugin.
+ */
+function template_preprocess_entity_collection_style_hierarchy(&$variables) {
+  $variables['parent'] = isset($variables['element']['#parent']) ? $variables['element']['#parent'] : 0;
+  $variables['children'] = $variables['element']['#children'];
+}

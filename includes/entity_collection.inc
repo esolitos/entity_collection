@@ -49,7 +49,8 @@ class EntityCollection extends Entity {
    */
   public function buildContent($view_mode = 'default', $langcode = NULL) {
     $tree = EntityCollectionStorage::getBundleStorage($this->bundle)->retrieve($this, $this->contexts);
-    $content = EntityCollectionStyle::getStyle($this)->build($this, $tree);
+    $content = array();
+    $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree);
     if (isset($content['entity_collection'])) {
       foreach ($content['entity_collection'] as &$row) {
         $row[]['#entity_collection'] = $this;

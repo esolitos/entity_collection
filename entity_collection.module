@@ -272,6 +272,19 @@ function entity_collection_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+  $info['entity_collection_style_hierarchy'] = array(
+    'title' => t('Hierarchy'),
+    'theme' => array(
+  		'template' => 'entity_collection_style_hierarchy',
+      'render element' => 'element',
+    ),
+    'entity_collection_style' => array(
+      'parent' => 'EntityCollectionStyle',
+      'class' => 'EntityCollectionStyleHierarchy',
+      'file' => 'entity_collection_style_hiearchy.inc',
+      'path' => $path,
+    ),
+  );
   $info['entity_collection_row_view_mode'] = array(
     'title' => t('View mode'),
     'entity_collection_row' => array(
@@ -337,7 +350,7 @@ function entity_collection_permission() {
  */
 function entity_collection_theme() {
   $theme = array();
-  // Get all row plugins.
+  // Get all row and style plugins and add theme functions for them..
   $row_plugins = EntityCollectionRow::getRows();
   $style_plugins = EntityCollectionStyle::getStyles();
   foreach ($row_plugins + $style_plugins as $name => $info) {
@@ -345,7 +358,6 @@ function entity_collection_theme() {
       $theme[$name] = $info['theme'];
     }
   }
-
   $theme['entity_collection_content_form'] = array(
     'render element' => 'form',
   );
