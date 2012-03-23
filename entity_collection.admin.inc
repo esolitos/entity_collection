@@ -86,6 +86,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#type' => 'select',
     '#title' => t('Style'),
     '#options' => EntityCollectionStyle::getStyleOptions(),
+    '#default_value' => $entity_collection->style,
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
 
@@ -93,6 +94,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#type' => 'select',
     '#title' => t('Row'),
     '#options' => EntityCollectionRow::getRowOptions(),
+    '#default_value' => $entity_collection->row,
     '#description' => t('Select the style you want to use for rendering this entity_collection here.')
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
