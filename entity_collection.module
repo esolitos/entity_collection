@@ -221,11 +221,11 @@ function entity_collection_content_property_set(&$data, $name, $value, $langcode
  */
 function entity_collection_context_property_get($data, array $options, $name, $type, $info) {
   $list = array();
-  if (!isset($data->context)) {
-    $data->context = array();
+  if (!isset($data->contexts)) {
+    $data->contexts = array();
   }
   $contexts = array();
-  foreach ($data->context as $context) {
+  foreach ($data->contexts as $context) {
     list(,$entity_type) = explode(':', $context->type);
     $contexts[] = entity_metadata_wrapper($entity_type, $context->data);
   }
@@ -236,10 +236,10 @@ function entity_collection_context_property_get($data, array $options, $name, $t
  * Setter callback for the contextd property on entity collections.
  */
 function entity_collection_context_property_set(&$data, $name, $value, $langcode, $type, $info) {
-  $data->context = array();
+  $data->contexts = array();
   ctools_include('context');
   foreach ($value as $context) {
-    $data->context[] = ctools_context_create('entity:' . $context->type(), $context->value()); 
+    $data->contexts[] = ctools_context_create('entity:' . $context->type(), $context->value()); 
   }
 }
 
