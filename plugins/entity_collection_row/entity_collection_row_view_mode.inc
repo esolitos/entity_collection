@@ -1,5 +1,17 @@
 <?php
+/**
+ * @file
+ * Plugin for view mode row.
+ */
+
+/**
+ * This class let's you render each row with a particular view mode.
+ */
 class EntityCollectionRowViewMode extends EntityCollectionRow {
+
+  /**
+   * @see EntityCollectionRowInterface::getOptions()
+   */
   public function getOptions($entity_type, $entity) {
     $entity_info = entity_get_info($entity_type);
     $options = array();
@@ -9,6 +21,9 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
     return $options;
   }
 
+  /**
+   * @see EntityCollectionRowInterface::build()
+   */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
     if ($item->type != 'entity_collection') {
       return entity_view($item->type, array($item->entity_id => $item->content), $item->style, $langcode);

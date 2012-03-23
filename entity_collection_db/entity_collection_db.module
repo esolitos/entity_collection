@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Main module file
+ */
 
 /**
  * Implements hook_entity_collection_plugins().

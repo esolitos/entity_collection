@@ -1,9 +1,7 @@
 <?php
-// $Id$
-
 /**
  * @file
- * Plugin to provide an relationship handler for a view by argument input settings.
+ * Plugin to provide an relationship handler for a entity collection.
  */
 
 /**
@@ -18,6 +16,9 @@ $plugin = array(
   'get children' => 'entity_collection_entity_collection_get_children',
 );
 
+/**
+ * Get a particular child of this plugin type.
+ */
 function entity_collection_entity_collection_get_child($plugin, $parent, $child) {
   $entity_collection = entity_collection_load($child);
   if (!$entity_collection) {
@@ -26,6 +27,9 @@ function entity_collection_entity_collection_get_child($plugin, $parent, $child)
   return _entity_collection_context_info($entity_collection);
 }
 
+/**
+ * Get an ctools info aray for a particular entity collection.
+ */
 function _entity_collection_context_info($entity_collection) {
   $info = array(
     'name' => 'entity_collection:' . $entity_collection->name,
@@ -40,13 +44,15 @@ function _entity_collection_context_info($entity_collection) {
     $info['required context'] = array();
     foreach ($entity_collection->requiredcontexts as $context) {
       $context_info = ctools_get_context($context['name']);
-      // TODO: allow an optional setting
       $info['required context'][] = new ctools_context_required($context['identifier'], $context_info['context name']);
     }
   }
   return $info;
 }
 
+/**
+ * Get all children for this plugin.
+ */
 function entity_collection_entity_collection_get_children($plugin, $parent) {
   $types = array();
   $collections = entity_collection_load_all();

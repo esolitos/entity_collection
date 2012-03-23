@@ -1,12 +1,12 @@
 <?php
-
 /**
  * @file
- * A entity_collection cache indirection mechanism that just uses the basic object cache.
+ * An entity_collection cache indirection mechanism
+ * that just uses the basic object cache.
  */
 
 $plugin = array(
-  // cache plugins are the rare plugin types that have no real UI but
+  // Cache plugins are the rare plugin types that have no real UI but
   // we're providing a title just in case.
   'title' => t('Region object cache'),
   'cache get' => 'entity_collection_cache_object_get',
@@ -15,6 +15,9 @@ $plugin = array(
   'cache finalize' => 'entity_collection_cache_object_set',
 );
 
+/**
+ * Get a cache object.
+ */
 function entity_collection_cache_object_get($data, $key) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.
@@ -25,6 +28,9 @@ function entity_collection_cache_object_get($data, $key) {
   return ctools_object_cache_get($data, $key);
 }
 
+/**
+ * Set the cache object.
+ */
 function entity_collection_cache_object_set($data, $key, $object) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.
@@ -35,6 +41,9 @@ function entity_collection_cache_object_set($data, $key, $object) {
   return ctools_object_cache_set($data, $key, $object);
 }
 
+/**
+ * Clear the cache for an object.
+ */
 function entity_collection_cache_object_clear($data, $key) {
   // Ensure that if there is somehow no data, we at least don't stomp on other
   // people's caches.

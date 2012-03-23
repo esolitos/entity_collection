@@ -2,9 +2,7 @@
 
 /**
  * @file
- *
- * Plugin to provide a node context. A node context is a node wrapped in a
- * context object that can be utilized by anything that accepts contexts.
+ * Plugin to provide a form context for manipulating entity collection content.
  */
 
 /**
@@ -23,6 +21,9 @@ $plugin = array(
   'get children' => 'entity_collection_content_form_context_get_children',
 );
 
+/**
+ * Get a child context.
+ */
 function entity_collection_content_form_context_get_child($plugin, $parent, $child) {
   $entity_collection = entity_collection_load($child);
   if (!$entity_collection) {
@@ -31,6 +32,9 @@ function entity_collection_content_form_context_get_child($plugin, $parent, $chi
   return _entity_collection_content_form_context_info($entity_collection);
 }
 
+/**
+ * Get a ctools context info array that matches a particular entity collection.
+ */
 function _entity_collection_content_form_context_info($entity_collection) {
   $info = array(
     'name' => 'entity_collection_form:' . $entity_collection,
@@ -39,19 +43,21 @@ function _entity_collection_content_form_context_info($entity_collection) {
     'keyword' => 'entity_collection_form',
     'context' => 'entity_collection_content_form_context_create',
     'context name' => 'entity_collection_form:' . $entity_collection->name,
-    'entity collection' => $entity_collection->name
+    'entity collection' => $entity_collection->name,
   );
   if (!empty($entity_collection->requiredcontexts)) {
     $info['required context'] = array();
     foreach ($entity_collection->requiredcontexts as $context) {
       $context_info = ctools_get_context($context['name']);
-      // TODO: allow an optional setting
       $info['required context'][] = new ctools_context_required($context['identifier'], $context_info['context name']);
     }
   }
   return $info;
 }
 
+/**
+ * Get all context children.
+ */
 function entity_collection_content_form_context_get_children($plugin, $parent) {
   $types = array();
   $collections = entity_collection_load_all();
@@ -62,6 +68,9 @@ function entity_collection_content_form_context_get_children($plugin, $parent) {
   return $types;
 }
 
+/**
+ * Get a form for this context.
+ */
 function entity_collection_content_form_context_create($empty, $data = NULL, $conf = FALSE, $plugin = array()) {
   $context = new ctools_context('entity_collection_form');
   $context->plugin = 'entity_collection';

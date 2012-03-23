@@ -1,7 +1,11 @@
 <?php
+/**
+ * @file
+ * Install-related things for entity collection.
+ */
 
 /**
- * Implementation of hook_schema().
+ * Implements of hook_schema().
  */
 function entity_collection_db_schema() {
   $schema['entity_collection_storage'] = array(

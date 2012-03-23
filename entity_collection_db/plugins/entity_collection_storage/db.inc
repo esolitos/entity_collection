@@ -1,11 +1,18 @@
 <?php
-
 /**
  * @file
  * Sample entity_collection storage database implementation.
  */
+
+/**
+ * Entity collection storage backend using the database.
+ */
 class EntityCollectionStorageDB extends EntityCollectionStorage {
 
+  /**
+   * Save an entity collection
+   * @see EntityCollectionStorageInterface::save().
+   */
   public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0, $depth = 0) {
     if (isset($collection->contexts) && empty($contexts)) {
       $contexts = $collection->contexts;
@@ -35,7 +42,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       '#default_value' => isset($bundle->settings['store_entity']) ? $bundle->settings['store_entity'] : FALSE,
       '#description' => t('Store the full entity in the entity collection table.
        This is performant in some cases, but it also requires you to set up your
-       cache invalidation settings.')
+       cache invalidation settings.'),
     );
   }
 
@@ -57,7 +64,10 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $this->save($collection, $item, $contexts, $position);
   }
 
-  private function getRecord(EntityCollection $collection, EntityCollectionTreeNode $item, $position = 0, $contexts = array(), $depth) {
+  /**
+   * @see EntityCollectionStorageInterface::getRecord().
+   */
+  protected function getRecord(EntityCollection $collection, EntityCollectionTreeNode $item, $position = 0, $contexts = array(), $depth = 0) {
     if (isset($item->content)) {
       $record = new stdClass();
       $record->name = $collection->name;
@@ -76,7 +86,10 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     return FALSE;
   }
 
-  private function itemExists(EntityCollection $collection, $entity_id, $type, $contexts = array()) {
+  /**
+   * Check if an item already exists in the database.
+   */
+  protected function itemExists(EntityCollection $collection, $entity_id, $type, $contexts = array()) {
     return db_select('entity_collection_storage', 'rs')
       ->fields('rs', array('eid'))
       ->condition('eid', $entity_id)
@@ -87,7 +100,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
 
   /**
    * Retreive a entity_collection.
-   * @param type $name
+   * @param string $name
    */
   public function retrieve(EntityCollection $collection, $contexts = NULL) {
     // Serialize the context arguments into a string.
@@ -118,7 +131,8 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       }
       $node->addChild($value->entity_type, $value->eid, $entity, $value->style, $value->rsid, $value->position);
     }
-    // Load all entities, and make sure we only do as few entity_loads as possible.
+    // Load all entities
+    // and make sure we only do as few entity_loads as possible.
     if (empty($bundle->settings['store_entity'])) {
       $nodes = $tree->getFlat();
       $entities = array();
@@ -135,7 +149,10 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     return $tree;
   }
 
-  private function serializeContexts($contexts) {
+  /**
+   * Serialize contexts so that they form a materialized path as a string.
+   */
+  protected function serializeContexts($contexts) {
     $serialized = array();
     foreach ($contexts as $context) {
       if (isset($context->argument)) {
@@ -145,6 +162,9 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     return implode(':', $serialized);
   }
 
+  /**
+   * @see EntityCollectionStorageInterface::delete().
+   */
   public function delete(EntityCollection $collection, $entity_type, array $entries, $contexts = NULL) {
     $query = db_delete('entity_collection_storage')
       ->condition('name', $collection->name)

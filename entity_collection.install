@@ -10,8 +10,8 @@
  */
 function entity_collection_schema() {
   $schema = array();
-  // The entity_collection bundles table is used for store bundles. It's using the
-  // CTools export API to make it exportable.
+  // The entity_collection bundles table is used for store bundles.
+  // It's using the CTools export API to make it exportable.
   $schema['entity_collection_bundles'] = array(
     'description' => 'Table holding entity_collection bundles.',
     'export' => array(

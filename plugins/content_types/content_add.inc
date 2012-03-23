@@ -1,8 +1,12 @@
 <?php
+/**
+ * @file
+ * Content add form plugin for entity collections.
+ */
+/**
 
 /**
  * Plugins are described by creating a $plugin array which will be used
- * by the system that includes this file.
  */
 $plugin = array(
   'single' => TRUE,
@@ -14,7 +18,7 @@ $plugin = array(
 );
 
 /**
- * Render the custom content type.
+ * Render the content add form.
  */
 function entity_collection_content_add_content_type_render($subtype, $conf, $panel_args, $context) {
   if (empty($context) || empty($context->data)) {
@@ -32,7 +36,7 @@ function entity_collection_content_add_content_type_render($subtype, $conf, $pan
 }
 
 /**
- * Returns an edit form for custom type settings.
+ * Settings form for content add.
  */
 function entity_collection_content_add_content_type_edit_form($form, &$form_state) {
   $conf = $form_state['conf'];
@@ -40,7 +44,7 @@ function entity_collection_content_add_content_type_edit_form($form, &$form_stat
 }
 
 /**
- * Submit handler for the custom type settings form.
+ * Submit handler for the entity collection add settings form.
  */
 function entity_collection_content_add_content_type_edit_form_submit($form, &$form_state) {
   // Copy everything from our defaults.

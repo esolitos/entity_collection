@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Main module file.
+ */
 
 /**
  * Implements hook_menu().
@@ -39,7 +43,7 @@ function entity_collection_menu() {
     'access callback' => 'entity_collection_access',
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
-  	'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['entity-collection/%entity_collection/content'] = array(
     'title' => 'Content',
@@ -49,7 +53,7 @@ function entity_collection_menu() {
     'access callback' => 'entity_collection_access',
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_LOCAL_TASK,
-  	'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['entity-collection/%entity_collection/delete'] = array(
     'title' => 'Delete Entity collection',
@@ -163,19 +167,22 @@ function entity_collection_entity_info() {
   return $definition;
 }
 
+/**
+ * Implements hook_entity_property_info().
+ */
 function entity_collection_entity_property_info() {
   $info = array();
   $properties = &$info['entity_collection']['properties'];
   $properties['content'] = array(
-    'label' => t("Entity collection content"), 
-    'type' => 'list<entity>', 
+    'label' => t("Entity collection content"),
+    'type' => 'list<entity>',
     'description' => t("The content in the entity collection"),
     'getter callback' => 'entity_collection_content_property_get',
     'setter callback' => 'entity_collection_content_property_set',
   );
   $properties['contexts'] = array(
-    'label' => t("Contexts"), 
-    'type' => 'list<entity>', 
+    'label' => t("Contexts"),
+    'type' => 'list<entity>',
     'description' => t("A list of contexts to use for this entity collection."),
     'getter callback' => 'entity_collection_context_property_get',
     'setter callback' => 'entity_collection_context_property_set',
@@ -183,6 +190,9 @@ function entity_collection_entity_property_info() {
   return $info;
 }
 
+/**
+ * Getter function for the content property on entity collections.
+ */
 function entity_collection_content_property_get($data, array $options, $name, $type, $info) {
   $content = entity_collection_load_content($data->bundle, $data)->getFlat();
   $list = array();
@@ -192,6 +202,9 @@ function entity_collection_content_property_get($data, array $options, $name, $t
   return $list;
 }
 
+/**
+ * Setter function for the content property on entity collections.
+ */
 function entity_collection_content_property_set(&$data, $name, $value, $langcode, $type, $info) {
   $tree = entity_collection_load_content($data->bundle, $data);
   $items = array();
@@ -239,7 +252,7 @@ function entity_collection_context_property_set(&$data, $name, $value, $langcode
   $data->contexts = array();
   ctools_include('context');
   foreach ($value as $context) {
-    $data->contexts[] = ctools_context_create('entity:' . $context->type(), $context->value()); 
+    $data->contexts[] = ctools_context_create('entity:' . $context->type(), $context->value());
   }
 }
 
@@ -270,6 +283,9 @@ function entity_collection_bundle_load($name) {
   return FALSE;
 }
 
+/**
+ * Save an entity collection bundle.
+ */
 function entity_collection_bundle_save($bundle) {
   $update = (isset($bundle->ebid) && $bundle->ebid != 'new') ? array('ebid') : array();
   $bundle->settings = serialize($bundle->settings);
@@ -278,6 +294,9 @@ function entity_collection_bundle_save($bundle) {
   return $bundle;
 }
 
+/**
+ * Check if an entity collection bundle exists.
+ */
 function entity_collection_bundle_exists($name) {
   return entity_collection_bundle_load($name) !== FALSE;
 }
@@ -299,6 +318,9 @@ function entity_collection_load($name) {
   return FALSE;
 }
 
+/**
+ * Load all entity collections.
+ */
 function entity_collection_load_all() {
   return entity_load_multiple_by_name('entity_collection');
 }
@@ -310,7 +332,7 @@ function entity_collection_ctools_plugin_directory($module, $type) {
   $types = array(
     'export_ui',
     'entity_collection_style',
-  	'entity_collection_row',
+    'entity_collection_row',
     'cache',
     'content_types',
     'relationships',
@@ -330,8 +352,8 @@ function entity_collection_ctools_plugin_type() {
       'use hooks' => TRUE,
       'classes' => array(
         'entity_collection_storage',
-      	'entity_collection_style',
-        'entity_collection_row'
+        'entity_collection_style',
+        'entity_collection_row',
       ),
     ),
   );
@@ -355,7 +377,7 @@ function entity_collection_entity_collection_plugins() {
   $info['entity_collection_style_hierarchy'] = array(
     'title' => t('Hierarchy'),
     'theme' => array(
-  		'template' => 'entity_collection_style_hierarchy',
+      'template' => 'entity_collection_style_hierarchy',
       'render element' => 'element',
     ),
     'entity_collection_style' => array(
@@ -448,6 +470,9 @@ function entity_collection_theme() {
   return $theme;
 }
 
+/**
+ * Preprocess function for entity collections.
+ */
 function template_preprocess_entity_collection(&$variables) {
   // Here we take the object that is being themed and define some useful
   // variables that we will print in the template file.
@@ -512,6 +537,9 @@ function entity_collection_save_content(EntityCollection $entity_collection, Ent
   return EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->save($entity_collection, $tree);
 }
 
+/**
+ * Append an item to an entity collection.
+ */
 function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {
   return EntityCollectionStorage::getBundleStorage($bundle)->appendItem($name, $item);
 }
@@ -528,7 +556,9 @@ function entity_collection_load_content($bundle, $name) {
   return EntityCollectionStorage::getBundleStorage($bundle)->retrieve($name);
 }
 
-
+/**
+ * Implements hook_admin_paths().
+ */
 function entity_collection_admin_paths() {
   return array('entity-collection/*' => TRUE);
 }
@@ -587,6 +617,9 @@ function entity_collection_entity_delete($entity, $type) {
   }
 }
 
+/**
+ * Implements hook_references_dialog_search_attachables().
+ */
 function entity_collection_references_dialog_search_attachables() {
   // Return search views attachables for nodes.
   $attachables = array();
@@ -598,6 +631,9 @@ function entity_collection_references_dialog_search_attachables() {
   return $attachables;
 }
 
+/**
+ * Implements hook_flush_caches().
+ */
 function entity_collection_flush_caches() {
   return array('cache_entity_entity_collection');
 }
@@ -615,10 +651,12 @@ function _entity_collection_get_contexts(EntityCollection $entity_collection) {
     return $entity_collection->contexts;
   }
   $loaded_contexts = array();
-  // This hack is necessary if you don't create your own contextual administration.
-  // We can probably deal with this in a nice way, but what we actually want to do
-  // is to let the user create their administrative pages and fetch their contexts
-  // through page manager.
+  // This hack is necessary if you don't
+  // create your own contextual administration.
+  // We can probably deal with this in a nice way,
+  // but what we actually want to do
+  // is to let the user create their administrative pages
+  // and fetch their contexts through page manager.
   $contexts = array();
   if (isset($_GET['contexts'])) {
     $contexts = explode(':', check_plain($_GET['contexts']));
@@ -631,7 +669,8 @@ function _entity_collection_get_contexts(EntityCollection $entity_collection) {
 }
 
 /**
- * This form let's the user enter the contexts that are needed to view the entity collection.
+ * This form let's the user enter the contexts
+ * that are needed to view the entity collection.
  */
 function entity_collection_context_input_form($form, &$form_state, EntityCollection $entity_collection) {
   $form = array();
@@ -652,6 +691,9 @@ function entity_collection_context_input_form($form, &$form_state, EntityCollect
   return $form;
 }
 
+/**
+ * Submit handler for entity_collection_context_input_form().
+ */
 function entity_collection_context_input_form_submit($form, &$form_state) {
   $contexts = $form_state['values']['contexts'];
   foreach ($contexts as $key => $context) {

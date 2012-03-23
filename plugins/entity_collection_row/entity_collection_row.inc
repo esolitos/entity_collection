@@ -1,12 +1,36 @@
 <?php
+/**
+ * @file
+ * Definition of the API for rows plugins.
+ */
 
+/**
+ * Interface common to all row style plugins.
+ */
 interface EntityCollectionRowInterface {
+
+  /**
+   * Get options for all styles that can be chosen for this row.
+   * @param string $entity_type
+   * @param stdClass $entity
+   */
   public function getOptions($entity_type, $entity);
+
+  /**
+   * Build a row in an entity collection.
+   * @param EntityCollection $collection
+   * 	The entity collection in which the content is.
+   * @param EntityCollectionTreeNode $item
+   * 	The item to render.
+   * @param string $langcode
+   *  The language code to use.
+   */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL);
 }
+
 /**
-* Simple interface for storing entity_collections.
-*/
+ * An abstract class implementing some of the row interface.
+ */
 abstract class EntityCollectionRow implements EntityCollectionRowInterface {
 
   /**
@@ -21,6 +45,9 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
     return new $plugin['entity_collection_row']['class']();
   }
 
+  /**
+   * Get all row plugins.
+   */
   public static function getRows() {
     ctools_include('plugins');
     $plugins = ctools_get_plugins('entity_collection', 'plugins');
@@ -34,11 +61,11 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
     return $row_plugins;
   }
 
- /**
-  * Get all row styles formatted for #options
-  * @return array
-  *   An array of styles.
-  */
+  /**
+   * Get all row styles formatted for #options
+   * @return array
+   *   An array of styles.
+   */
   public static function getRowOptions() {
     ctools_include('plugins');
     $plugins = EntityCollectionRow::getRows();

@@ -1,3 +1,9 @@
+<?php
+/**
+ * @file
+ * Template for an entity collection.
+ */
+?>
 <div class="<?php print $classes; ?>">
 <?php print render($title_prefix); ?>
   <?php if ($show_title): ?>

@@ -1,7 +1,18 @@
 <?php
-class EntityCollectionRowPanelsMini extends EntityCollectionRow {
-  private $panels = array();
+/**
+ * @file
+ * Plugin to render rows with mini panels.
+ */
 
+/**
+ * Use a mini panel to render a row.
+ */
+class EntityCollectionRowPanelsMini extends EntityCollectionRow {
+  protected $panels = array();
+
+  /**
+   * @see EntityCollectionRowInterface::getOptions()
+   */
   public function getOptions($entity_type, $entity) {
     $mini_panels = panels_mini_load_all();
     $options = array();
@@ -13,6 +24,9 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
     return $options;
   }
 
+  /**
+   * @see EntityCollectionRowInterface::build()
+   */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
     if (!isset($panels[$item->style])) {
       $panels[$item->style] = panels_mini_load($item->style);

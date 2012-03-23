@@ -1,7 +1,11 @@
 <?php
+/**
+ * @file
+ * Representation of an Entity Collection entity.
+ */
 
 /**
- * This class is used to represent a Region.
+ * This class is used to represent an entity collection.
  */
 class EntityCollection extends Entity {
   // We provide the values here for reference.
@@ -9,14 +13,15 @@ class EntityCollection extends Entity {
   public $name;
   public $bid;
   public $title;
-  public $tree;
   public $cache;
   public $requiredcontexts = array();
   public $contexts = array();
 
+  /**
+   * Create an entity collection entity.
+   */
   public function __construct($values = array()) {
     parent::__construct($values, 'entity_collection');
-    $this->tree = new EntityCollectionTreeNode();
   }
 
   /**
@@ -60,9 +65,5 @@ class EntityCollection extends Entity {
     $rendered['#entity_collection'] = $this;
     $rendered['#theme'] = 'entity_collection';
     return $rendered;
-  }
-
-  public function getTree() {
-    return $this->tree;
   }
 }

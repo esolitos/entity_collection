@@ -1,6 +1,19 @@
 <?php
+/**
+ * @file
+ * Class that fixes some problems with ajax in the ctools_export_ui class.
+ */
 
+/**
+ * This extends the ctools_export_ui class to make ajax callbacks work in the
+ * edit form.
+ */
 class entity_collection_ui extends ctools_export_ui {
+
+  /**
+   * Include some ctools stuff required for drupal ajax to work properly.
+   * @see ctools_export_ui::edit_form()
+   */
   public function edit_form(&$form, &$form_state) {
     // This is needed in order to get the ajax working in the ctools form.
     ctools_include('plugins');

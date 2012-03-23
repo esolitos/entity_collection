@@ -25,11 +25,15 @@ function entity_collection_rules_action_info() {
         'label' => t('Loaded collection'),
       ),
     ),
-  	'group' => t('Entity collection'),
+    'group' => t('Entity collection'),
   );
   return $items;
 }
 
+/**
+ * Get the names of all entity collections,
+ * formatted for options.
+ */
 function entity_collection_get_names() {
   $items = array();
   foreach (entity_collection_load_all() as $name => $collection) {

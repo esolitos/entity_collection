@@ -1,10 +1,18 @@
 <?php
+/**
+ * @file
+ * Simple class for viewing a flat list of entities.
+ */
 
 /**
- * Simple interface for storing entity_collections.
+ * Simple class for viewing a flat list of entities.
  */
 class EntityCollectionStyleFlat extends EntityCollectionStyle {
 
+  /**
+   * Build the content in the entity collection.
+   * @see EntityCollectionStyle::build().
+   */
   public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL) {
     $content = array();
     // Get a flat list of everything. We don't care about
@@ -14,7 +22,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
     foreach ($list as $key => $item) {
       $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
       $content[$key] = array(
-        $data,
+        'item' => $data,
         '#weight' => $i,
       );
       $i++;

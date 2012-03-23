@@ -1,5 +1,12 @@
 <?php
+/**
+ * @file
+ * This file contains an implementation of a tree.
+ */
 
+/**
+ * This class is an implementation of a tree of entities.
+ */
 class EntityCollectionTreeNode {
   public $type;
   public $entity_id;
@@ -9,9 +16,20 @@ class EntityCollectionTreeNode {
   public $content;
   public $style;
   public $position = 0;
-  private $children = array();
+  protected $children = array();
   public $list = array();
 
+  /**
+   * Construct a tree node object.
+   * @param $type
+   *   The entity type
+   * @param $entity_id
+   *   The entity id.
+   * @param content
+   *   The entity object.
+   * @param style
+   *   The style to render with.
+   */
   public function __construct($type = NULL, $entity_id = NULL, $content = NULL, $style = NULL) {
     $this->type = $type;
     $this->root = $this;
@@ -50,12 +68,19 @@ class EntityCollectionTreeNode {
     return $child;
   }
 
+  /**
+   * Remove a child from the tree.
+   */
   public function removeChild(EntityCollectionTreeNode $child) {
     $key = $this->getNodeKey($child);
     unset($this->root->list[$key]);
     unset($this->children[$key]);
   }
 
+  /**
+   * Get a child by key.
+   * Use EntityCollcetionTreeNode::getChildKey() to get a key.
+   */
   public function getChild($key) {
     // Return the child if it exists.
     if (isset($this->children[$key])) {
@@ -73,6 +98,7 @@ class EntityCollectionTreeNode {
     }
     return FALSE;
   }
+
   /**
    * Return a flat list of the tree.
    * @return array<EntityCollectionTreeNode>
@@ -82,6 +108,9 @@ class EntityCollectionTreeNode {
     return $this->list;
   }
 
+  /**
+   * Get the last child in the tree.
+   */
   public function getLastChild() {
     return end($this->children);
   }
@@ -99,14 +128,23 @@ class EntityCollectionTreeNode {
     return $node->type . ':' . $node->entity_id;
   }
 
+  /**
+   * Get the key of the last child.
+   */
   public function getLastChildKey() {
     return end(array_keys($this->children));
   }
 
+  /**
+   * Truncate the tree.
+   */
   public function truncate() {
     $this->children = array();
   }
 
+  /**
+   * Get the children of the this node.
+   */
   public function getChildren() {
     return $this->children;
   }

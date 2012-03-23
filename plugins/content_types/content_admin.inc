@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Content admin plugin for entity collections.
+ */
 
 /**
  * Plugins are described by creating a $plugin array which will be used
@@ -14,7 +18,7 @@ $plugin = array(
 );
 
 /**
- * Render the custom content type.
+ * Render the entity collection content admin form.
  */
 function entity_collection_content_admin_content_type_render($subtype, $conf, $panel_args, $context) {
   if (empty($context) || empty($context->data)) {
@@ -32,7 +36,7 @@ function entity_collection_content_admin_content_type_render($subtype, $conf, $p
 }
 
 /**
- * Returns an edit form for custom type settings.
+ * Edit form for content admin.
  */
 function entity_collection_content_admin_content_type_edit_form($form, &$form_state) {
   $conf = $form_state['conf'];
@@ -40,7 +44,7 @@ function entity_collection_content_admin_content_type_edit_form($form, &$form_st
 }
 
 /**
- * Submit handler for the custom type settings form.
+ * Submit handler for the entity collection settings form.
  */
 function entity_collection_content_admin_content_type_edit_form_submit($form, &$form_state) {
   // Copy everything from our defaults.

@@ -37,11 +37,17 @@ function entity_collection_edit_form($form, &$form_state, $entity_collection) {
   return $form;
 }
 
+/**
+ * Form for deleting entity collections.
+ */
 function entity_collection_delete_form($form, &$form_state, $entity_collection) {
   $form_state['entity_collection'] = $entity_collection;
   return confirm_form($form, t('Are you sure you want to delete this entity collection?'), 'admin/structure/entity_collection');
 }
 
+/**
+ * Submit function for deleting entity collections.
+ */
 function entity_collection_delete_form_submit($form, &$form_state) {
   entity_delete('entity_collection', $form_state['entity_collection']->eid);
   $form_state['redirect'] = 'admin/structure/entity_collection';
@@ -56,7 +62,7 @@ function entity_collection_delete_form_submit($form, &$form_state) {
  */
 function entity_collection_form($form = array(), &$form_state = array()) {
   if (empty($form_state['entity_collection'])) {
-    $form_state['entity_collection'] = new EntityCollection;
+    $form_state['entity_collection'] = new EntityCollection();
     $form_state['entity_collection']->bundle = $form_state['bundle'];
   }
   else {
@@ -87,7 +93,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#title' => t('Style'),
     '#options' => EntityCollectionStyle::getStyleOptions(),
     '#default_value' => $entity_collection->style,
-    '#description' => t('Select the style you want to use for rendering this entity_collection here.')
+    '#description' => t('Select the style you want to use for rendering this entity_collection here.'),
   );
 
   $form['row'] = array(
@@ -95,7 +101,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#title' => t('Row'),
     '#options' => EntityCollectionRow::getRowOptions(),
     '#default_value' => $entity_collection->row,
-    '#description' => t('Select the style you want to use for rendering this entity_collection here.')
+    '#description' => t('Select the style you want to use for rendering this entity_collection here.'),
   );
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
   $form['settings'] = array(
@@ -139,6 +145,9 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   return $form;
 }
 
+/**
+ * Form for selecting contexts for an entity collection.
+ */
 function _entity_collection_context_form(&$form, &$form_state) {
   ctools_include('context-admin');
   ctools_include('plugins-admin');
@@ -162,12 +171,13 @@ function _entity_collection_context_form(&$form, &$form_state) {
 }
 
 /**
- * Validate our form.
+ * Validate an entity colleciton submitted by entity_collection_form.
  * @param array $form
  * @param array $form_state
  */
 function entity_collection_form_validate($form, &$form_state) {
-  // Fetch the entity_collection and populate it. Since this is very simple to do,
+  // Fetch the entity_collection and populate it.
+  // Since this is very simple to do,
   // let's just do it ourselves instead of using the entity api function.
   $entity_collection = &$form_state['entity_collection'];
   $entity_collection->name = $form_state['values']['name'];
@@ -179,7 +189,7 @@ function entity_collection_form_validate($form, &$form_state) {
 
 /**
  * Save the actual entity collection.
- * @param type $form
+ * @param array $form
  * @param array $form_state
  */
 function entity_collection_form_submit($form, &$form_state) {
@@ -207,7 +217,7 @@ function entity_collection_admin() {
   // Get all entities.
   $entity_collections = entity_load('entity_collection');
   $entity_collection_table = array();
-  $entity_collection = new EntityCollection;
+  $entity_collection = new EntityCollection();
   foreach ($entity_collections as $entity_collection) {
     $operations = l(t('Edit'), 'entity-collection/' . $entity_collection->name . '/edit');
     if (!$entity_collection->hasStatus(ENTITY_IN_CODE)) {
@@ -223,7 +233,7 @@ function entity_collection_admin() {
   if (count($entity_collection_table)) {
     return theme('table', array('rows' => $entity_collection_table, 'header' => array('Title', 'Type', 'Operations')));
   }
-  return t('You haven\'t created any entity_collections yet.');
+  return t("You haven't created any entity_collections yet.");
 }
 
 /**
@@ -279,17 +289,32 @@ function entity_collection_ajax_add($entity_collection) {
   return '';
 }
 
-function entity_collection_get_entity_type_options($entity_collection) {
+/**
+ * Get entity type options suitable for #options for element.
+ * @param EntityCollection $entity_collection
+ * @return
+ *   An array of options for all entity types.
+ */
+function entity_collection_get_entity_type_options(EntityCollection $entity_collection) {
   $info = entity_get_info();
   $options = array();
   foreach ($info as $name => $info) {
-  if (empty($entity_collection->settings['restrict']) || !empty($entity_collection->settings['allowed_bundles'][$name]))
-    $options[$name] = $info['label'];
+    if (empty($entity_collection->settings['restrict']) || !empty($entity_collection->settings['allowed_bundles'][$name])) {
+      $options[$name] = $info['label'];
+    }
   }
   return $options;
 }
 
-function entity_collection_content_form_content($entity_collection, &$form, $tree, $parent = 0, $depth = 0) {
+/**
+ * Show the content of the entity collection in a form.
+ * @param EntityCollection $entity_collection
+ * @param array $form
+ * @param EntityCollectionTreeNode $tree
+ * @param $parent
+ * @param $depth
+ */
+function entity_collection_content_form_content(EntityCollection $entity_collection, &$form, EntityCollectionTreeNode $tree, $parent = 0, $depth = 0) {
   $nodes = $tree->getChildren();
   $wrappers  = array();
   foreach ($nodes as $key => $child) {
@@ -311,7 +336,7 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
       '#value' => $child->type,
     );
     $form['content'][$key]['title'] = array(
-      '#markup' => check_plain($wrappers[$key]->label())
+      '#markup' => check_plain($wrappers[$key]->label()),
     );
     $form['content'][$key]['position'] = array(
       '#type' => 'textfield',
@@ -337,12 +362,14 @@ function entity_collection_content_form_content($entity_collection, &$form, $tre
       '#markup' => l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, array('query' => array('destination' => current_path()))),
     );
     if (count($child->getChildren())) {
-      entity_collection_content_form_content($entity_collection, $form, $child, $child->key, $depth+1);
+      entity_collection_content_form_content($entity_collection, $form, $child, $child->key, $depth + 1);
     }
     $i++;
   }
 }
-
+/**
+ * Submit function for the content form.
+ */
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $tree = entity_collection_content_build_tree($values['content']);
@@ -365,7 +392,8 @@ function entity_collection_content_build_tree($values) {
     if (empty($value['parent'])) {
       $tree->addChild($value['type'], $value['entity_id'], $entity, $value['style'], $value['key'], $value['position']);
     }
-    // If we have a parent and that parent is already inserted, add it to that node.
+    // If we have a parent and that parent is already inserted,
+    // add it to that node,
     elseif (!empty($value['parent']) && $parent = $tree->getChild($value['parent'])) {
       $parent->addChild($value['type'], $value['entity_id'], $entity, $value['style'], $value['key'], $value['position']);
     }
@@ -377,6 +405,9 @@ function entity_collection_content_build_tree($values) {
   return $tree;
 }
 
+/**
+ * Order all items in the order of position.
+ */
 function entity_collection_content_compare($a, $b) {
   return $a['position'] > $b['position'];
 }
@@ -419,6 +450,9 @@ function theme_entity_collection_content_form(&$variables) {
   return $output . drupal_render_children($variables['form']);
 }
 
+/**
+ * Delete a particular entity from a collection.
+ */
 function entity_collection_content_delete_form($form, &$form_state, $entity_collection, $entity_type, $eid) {
   $form_state['entity_collection'] = $entity_collection;
   $form_state['entity_type'] = $entity_type;
@@ -426,6 +460,9 @@ function entity_collection_content_delete_form($form, &$form_state, $entity_coll
   return confirm_form($form, t('Are you sure you want to delete this content from the entity collection?'), 'admin/structure/entity_collection');
 }
 
+/**
+ * Submit handler for entity_collection_content_delete_form.
+ */
 function entity_collection_content_delete_form_submit($form, &$form_state) {
   EntityCollectionStorage::getBundleStorage($form_state['entity_collection']->bundle)->delete(
     $form_state['entity_collection'],
@@ -449,8 +486,8 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
     '#options' => entity_collection_get_entity_type_options($entity_collection),
     '#title' => t('Type'),
   );
-  // We can't use the regular autocomplete, because we need to send the selected entity type
-  // and the search.
+  // We can't use the regular autocomplete,
+  // because we need to send the selected entity type and the search.
   $form['add_content']['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Search'),
@@ -466,11 +503,11 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
           'data' => array(
             'entity_collection' => array(
               $entity_collection->name => array(
-                'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE))
+                'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE)),
               ),
             ),
           ),
-          'type' => 'setting'
+          'type' => 'setting',
         ),
       ),
       'library' => array(
@@ -492,6 +529,9 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   return $form;
 }
 
+/**
+ * Add form for adding entities to collections.
+ */
 function entity_collection_content_add_form_submit($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
   $contexts = _entity_collection_get_contexts($entity_collection);

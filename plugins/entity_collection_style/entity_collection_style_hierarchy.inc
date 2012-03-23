@@ -1,19 +1,30 @@
 <?php
+/**
+ * @file
+ * A hiearchy style plugin.
+ */
 
 /**
  * This style can show groups of content in hierarchies.
  */
 class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
 
+  /**
+   * Build the hierarchy.
+   * @see EntityCollectionStyle::build().
+   */
   public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL) {
     $content = array();
     $this->renderTreeNode($content, $entity, $tree, $langcode);
     return $content;
   }
-  
-  private function renderTreeNode(&$content, $entity, EntityCollectionTreeNode $item, $langcode = NULL) {
+
+  /**
+   * Render the content of a tree as a tree using a template.
+   */
+  protected function renderTreeNode(&$content, $entity, EntityCollectionTreeNode $item, $langcode = NULL) {
     $element = array(
-    	'#children' => array(),
+      '#children' => array(),
       '#weight' => $item->position,
       '#theme' => 'entity_collection_style_hierarchy',
     );

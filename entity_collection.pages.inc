@@ -4,6 +4,9 @@
  * Page callbacks for entity_collections.
  */
 
+/**
+ * Render an entity collection page.
+ */
 function entity_collection_page(EntityCollection $entity_collection) {
   $contexts = $entity_collection->contexts = _entity_collection_get_contexts($entity_collection);
   if (count($contexts) != count($entity_collection->requiredcontexts)) {

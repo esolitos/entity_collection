@@ -1,5 +1,12 @@
 <?php
+/**
+ * @file
+ * Plugin definition for the ctools bundle export ui.
+ */
 
+/**
+ * Plugin definition.
+ */
 $plugin = array(
   'schema' => 'entity_collection_bundles',
   'access' => 'administer entity_collection types',
@@ -26,6 +33,9 @@ $plugin = array(
   ),
 );
 
+/**
+ * Form for adding/editing an entity collection bundle.
+ */
 function entity_collection_export_ui_form(&$form, &$form_state) {
   ctools_include('export');
   $bundle = $form_state['item'];
@@ -50,7 +60,7 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
   if (isset($form_state['values']['storage'])) {
     $storage = EntityCollectionStorage::getStorage($form_state['values']['storage']);
   }
-  elseif(isset($bundle->storage)) {
+  elseif (isset($bundle->storage)) {
     $storage = EntityCollectionStorage::getStorage($bundle->storage);
   }
   if (isset($storage) && method_exists($storage, 'bundleSettingsForm')) {
@@ -64,11 +74,16 @@ function entity_collection_export_ui_form(&$form, &$form_state) {
   return $form;
 }
 
-
+/**
+ * Get the storage settings from the bundle form.
+ */
 function entity_collection_export_ui_storage_settings(&$form, &$form_state) {
   return $form['storage_settings'];
 }
 
+/**
+ * Submit function for posting an entity collection bundle.
+ */
 function entity_collection_export_ui_form_submit(&$form, &$form_state) {
   $form_state['item']->label = $form_state['values']['label'];
   $form_state['item']->storage = $form_state['values']['storage'];

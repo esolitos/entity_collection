@@ -1,9 +1,8 @@
 <?php
-
 /**
  * @file
- * Plugin to handle the 'node' content type which allows individual nodes
- * to be embedded into a panel.
+ * Plugin to handle the 'entity_collection' content type which allows entity
+ * collections to be embedded into a panel.
  */
 
 /**
@@ -14,6 +13,9 @@ $plugin = array(
   'title' => t('Entity Collection'),
 );
 
+/**
+ * Returns all available entity collections as a content type.
+ */
 function entity_collection_entity_collection_content_type_content_types() {
   $types = array();
   $defaults = array(
@@ -36,7 +38,6 @@ function entity_collection_entity_collection_content_type_content_types() {
       $type['required context'] = array();
       foreach ($entity->requiredcontexts as $context) {
         $info = ctools_get_context($context['name']);
-        // TODO: allow an optional setting
         $type['required context'][] = new ctools_context_required($context['identifier'], $info['context name']);
       }
     }
@@ -46,12 +47,10 @@ function entity_collection_entity_collection_content_type_content_types() {
 }
 
 /**
- * Output function for the 'node' content type.
- *
- * Outputs a node based on the module and delta supplied in the configuration.
+ * Render an entity collection and it's content.
  */
 function entity_collection_entity_collection_content_type_render($subtype, $conf, $panel_args, $contexts) {
-  $content = new stdClass;
+  $content = new stdClass();
   $entity = entity_collection_load($conf['name']);
   if (!empty($entity)) {
     $entity->setContexts($contexts);
@@ -95,22 +94,6 @@ function entity_collection_ajax($entity_collection) {
 function entity_collection_entity_collection_content_type_edit_form($form, &$form_state) {
   $conf = $form_state['conf'];
   return $form;
-}
-
-/**
- * Validate the node selection.
- */
-function entity_collection_entity_collection_content_type_edit_form_validate(&$form, &$form_state) {
-
-}
-
-/**
- * Validate the node selection.
- */
-function entity_collection_entity_collection_content_type_edit_form_submit($form, &$form_state) {
-  //foreach (array('nid', 'links', 'leave_node_title', 'link_node_title', 'identifier', 'build_mode') as $key) {
-  //  $form_state['conf'][$key] = $form_state['values'][$key];
-  //}
 }
 
 /**
