@@ -163,6 +163,55 @@ function entity_collection_entity_info() {
   return $definition;
 }
 
+function entity_collection_entity_property_info() {
+  $info = array();
+  $properties = &$info['entity_collection']['properties'];
+  $properties['content'] = array(
+    'label' => t("Entity collection content"), 
+    'type' => 'list<entity>', 
+    'description' => t("The content in the entity collection"),
+    'getter callback' => 'entity_collection_content_property_get',
+    'setter callback' => 'entity_collection_content_property_set',
+  );
+  return $info;
+}
+
+function entity_collection_content_property_get($data, array $options, $name, $type, $info) {
+  if ((is_array($data) || (is_object($data) && $data instanceof ArrayAccess)) && isset($data[$name])) {
+    return $data[$name];
+  }
+  $content = entity_collection_load_content($data->bundle, $data)->getFlat();
+  $list = array();
+  foreach ($content as $tree_node) {
+    $list[] = entity_metadata_wrapper($tree_node->type, $tree_node->content);
+  }
+  return $list;
+}
+
+function entity_collection_content_property_set(&$data, $name, $value, $langcode, $type, $info) {
+  $tree = entity_collection_load_content($data->bundle, $data);
+  $items = array();
+  // Add new items and make sure the hierarchy gets stored.
+  foreach ($value as $item) {
+    $entity = $item->value();
+    $entity_type = $item->type();
+    $entity_id = entity_id($entity_type, $entity);
+    $key = $tree->getChildKey($entity_type, $entity_id);
+    $child = $tree->getChild($key);
+    if (empty($child)) {
+      $tree->addChild($entity_type, $entity_id, $entity);
+    }
+    $items[$key] = $item;
+  }
+  // Make sure items that doesn't exist anymore are removed.
+  foreach ($tree->getFlat() as $item) {
+    if (!isset($items[$item->key])) {
+      $tree->removeChild($item);
+    }
+  }
+  entity_collection_save_content($data, $tree);
+}
+
 /**
  * Fetch all bundles for a entity_collection.
  * @return array
@@ -428,8 +477,8 @@ function entity_collection_block_view($delta) {
  * @param RegioNode $tree
  *   The tree to save.
  */
-function entity_collection_save_content($name, $bundle, EntityCollectionTreeNode $tree) {
-  return EntityCollectionStorage::getBundleStorage($bundle)->save($name, $tree);
+function entity_collection_save_content(EntityCollection $entity_collection, EntityCollectionTreeNode $tree) {
+  return EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->save($entity_collection, $tree);
 }
 
 function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {

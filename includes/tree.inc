@@ -18,6 +18,9 @@ class EntityCollectionTreeNode {
     $this->entity_id = $entity_id;
     $this->content = $content;
     $this->style = $style;
+    if (isset($entity_id) && isset($type)) {
+      $this->key = $type . ':' . $entity_id;
+    }
   }
 
   /**
@@ -70,7 +73,11 @@ class EntityCollectionTreeNode {
     }
     return FALSE;
   }
-
+  /**
+   * Return a flat list of the tree.
+   * @return array<EntityCollectionTreeNode>
+   *   A list of tree nodes.
+   */
   public function getFlat() {
     return $this->list;
   }
