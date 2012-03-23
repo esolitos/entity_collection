@@ -96,7 +96,7 @@ function entity_collection_menu() {
     'page callback' => 'entity_collection_content_form_autocomplete',
     'page arguments' => array(2, 3, 4),
     'access callback' => 'entity_collection_access',
-    'access arguments' => array('add content to'),
+    'access arguments' => array('add content to', 2),
     'type' => MENU_CALLBACK,
     'file' => 'entity_collection.admin.inc',
   );
@@ -177,9 +177,6 @@ function entity_collection_entity_property_info() {
 }
 
 function entity_collection_content_property_get($data, array $options, $name, $type, $info) {
-  if ((is_array($data) || (is_object($data) && $data instanceof ArrayAccess)) && isset($data[$name])) {
-    return $data[$name];
-  }
   $content = entity_collection_load_content($data->bundle, $data)->getFlat();
   $list = array();
   foreach ($content as $tree_node) {

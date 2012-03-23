@@ -7,6 +7,9 @@
 class EntityCollectionStorageDB extends EntityCollectionStorage {
 
   public function save(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = array(), $position = 0, $depth = 0) {
+    if (isset($collection->contexts) && empty($contexts)) {
+      $contexts = $collection->contexts;
+    }
     $record = $this->getRecord($collection, $tree, $position, $contexts, $depth);
     $primary_keys = array();
     if ($record) {
@@ -93,6 +96,9 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->condition('name', $collection->name, '=')
       ->orderBy('depth')
       ->orderBy('position');
+    if (isset($collection->contexts)) {
+      $contexts = $collection->contexts;
+    }
     if (isset($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
