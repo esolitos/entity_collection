@@ -14,7 +14,7 @@ function entity_collection_rules_action_info() {
       'name' => array(
         'type' => 'text',
         'label' => t('Entity collection'),
-        'save' => TRUE,
+        'save' => FALSE,
         'options list' => 'entity_collection_get_names',
         'restriction' => 'input',
       ),
@@ -27,30 +27,7 @@ function entity_collection_rules_action_info() {
     ),
   	'group' => t('Entity collection'),
   );
-  $items['entity_collection_add_entity_context'] = array(
-    'label' => t('Add a context to an entity collection'),
-    'parameter' => array(
-      'name' => array(
-        'type' => 'entity_collection',
-        'label' => t('Entity collection'),
-        'save' => TRUE,
-       ),
-       'context' => array(
-         'type' => 'entity',
-         'label' => t('Context'),
-         'save' => TRUE,
-       ),
-    ),
-    'group' => t('Entity collection'),
-  ); 
   return $items;
-}
-
-function entity_collection_add_entity_context(EntityCollection $entity_collection, EntityMetadataWrapper $wrapper) {
-  $entity_collection->contexts = isset($entity_collection->contexts) ? 
-    $entity_collection->contexts : array();
-  ctools_include('context');
-  $entity_collection->contexts[] = ctools_context_create('entity:' . $wrapper->type(), $wrapper->value()); 
 }
 
 function entity_collection_get_names() {
