@@ -56,7 +56,7 @@ function entity_collection_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('entity_collection_delete_form', 1),
     'access callback' => 'entity_collection_access',
-    'access arguments' => array('delete', 1),
+    'access arguments' => array('manage content in', 1),
     'file' => 'entity_collection.admin.inc',
     'type' => MENU_CALLBACK,
   );
@@ -65,7 +65,7 @@ function entity_collection_menu() {
       'page callback' => 'entity_collection_ajax_add',
       'page arguments' => array(1),
       'access callback' => 'entity_collection_access',
-      'access arguments' => array('add', 1),
+      'access arguments' => array('add content to', 1),
       'file' => 'entity_collection.admin.inc',
       'type' => MENU_CALLBACK,
   );
@@ -95,8 +95,8 @@ function entity_collection_menu() {
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
     'page arguments' => array(2, 3, 4),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer entity_collections'),
+    'access callback' => 'entity_collection_access',
+    'access arguments' => array('add content to'),
     'type' => MENU_CALLBACK,
     'file' => 'entity_collection.admin.inc',
   );
@@ -104,8 +104,8 @@ function entity_collection_menu() {
   $items['entity_collection/ajax'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_ajax_callback',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer entity_collections'),
+    'access callback' => 'entity_collection_access',
+    'access arguments' => array('add content to'),
     'type' => MENU_CALLBACK,
     'file' => 'entity_collection.admin.inc',
   );
