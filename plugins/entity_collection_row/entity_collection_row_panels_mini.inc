@@ -32,19 +32,26 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
   /**
    * Get all available contexts.
    */
-  protected function getContexts($item) {
+  protected function getContexts($item, $panel) {
     ctools_include('context');
+    $contexts = array();
     $available_contexts = array();
-    $available_contexts[] = ctools_context_create('entity:' . $item->type, $item->content);
+    $available_contexts['entity:' . $item->type] = ctools_context_create('entity:' . $item->type, $item->content);
+    $available_contexts['entity_collection_item'] = ctools_context_create('entity_collection_item', $item);
     if (isset($this->entity_collection)) {
-      $available_contexts[] = ctools_context_create('entity:entity_collection', $this->entity_collection);
+      $available_contexts['entity:entity_collection'] = ctools_context_create('entity:entity_collection', $this->entity_collection);
       if (isset($this->entity_collection->contexts)) {
         foreach ($this->entity_collection->contexts as $context) {
-          $available_contexts[] = $context;
+          $available_contexts[$context->plugin] = $context;
         }
       }
     }
-    return $available_contexts;
+    foreach ($panel->requiredcontexts as $required) {
+      if (isset($available_contexts[$required['name']])) {
+        $contexts[] = $available_contexts[$required['name']];
+      }
+    }
+    return $contexts;
   }
 
   /**
@@ -56,7 +63,7 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
       $entity_types = array($entity_types);
     }
     $mini_panels = panels_mini_load_all();
-    $available_contexts = array();
+    $available_contexts = array('entity_collection_item');
     if (isset($this->entity_collection)) {
       $available_contexts[] = 'entity:entity_collection';
     }
@@ -92,7 +99,7 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
     }
     $panel = $panels[$item->style];
     if (isset($panel)) {
-      $context = ctools_context_match_required_contexts($panel->requiredcontexts, $this->getContexts($item));
+      $context = ctools_context_match_required_contexts($panel->requiredcontexts, $this->getContexts($item, $panel));
       $panel->context = $panel->display->context = ctools_context_load_contexts($panel, FALSE, $context);
       $panel->display->owner = $panel;
       $panel->display->owner->id = $panel->name;
