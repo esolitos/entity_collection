@@ -40,23 +40,20 @@ interface EntityCollectionStyleInterface {
 * Simple interface for storing entity_collections.
 */
 abstract class EntityCollectionStyle {
+  function __construct($entity_collection, $settings = array()) {
+    $this->entity_collection = $entity_collection;
+    $this->settings = $settings;
+  }
+
   /**
-   * Disable max depth by default.
-   * Enter description here ...
+   * Use a max depth of 0 by default (disabled).
    */
   public function getMaxDepth() {
     return 0;
   }
 
   /**
-   * Don't use grouping by default.
-   */
-  public function useGrouping() {
-    return FALSE;
-  }
-
-  /**
-   * Don't use reordering by default.
+   * Use reordering by default.
    */
   public function useReordering() {
     return TRUE;
@@ -72,7 +69,7 @@ abstract class EntityCollectionStyle {
   public static function getStyle(EntityCollection $collection) {
     ctools_include('plugins');
     $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->style);
-    return new $plugin['entity_collection_style']['class']();
+    return new $plugin['entity_collection_style']['class']($collection, isset($collection->settings['style_settings']) ? $collection->settings['style_settings'] : array());
   }
 
   /**

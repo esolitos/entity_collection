@@ -674,6 +674,9 @@ function _entity_collection_get_contexts(EntityCollection $entity_collection) {
 
 function _entity_collection_serialize_contexts(EntityCollection $entity_collection) {
   $serialized = array();
+  if (empty($entity_collection->contexts)) {
+    return 'none';
+  }
   foreach ($entity_collection->contexts as $context) {
     if (isset($context->argument)) {
       $serialized[] = $context->argument;

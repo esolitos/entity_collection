@@ -340,7 +340,7 @@ function entity_collection_get_entity_type_options(EntityCollection $entity_coll
   $info = entity_get_info();
   $options = array();
   foreach ($info as $name => $info) {
-    if (empty($entity_collection->settings['restrict']) || !empty($entity_collection->settings['allowed_bundles'][$name])) {
+    if (!empty($entity_collection->settings['allowed_bundles'][$name])) {
       $options[$name] = $info['label'];
     }
   }
@@ -362,6 +362,8 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
     $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
   }
   $i = 0;
+  $style = EntityCollectionStyle::getStyle($entity_collection);
+  $form['#style'] = $style;
   foreach ($nodes as $key => $child) {
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
@@ -385,6 +387,11 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       '#size' => 3,
       '#default_value' => $child->position,
     );
+    // Make sure the depth is always 0 if we don't allow depth.
+    if (!$style->getMaxDepth()) {
+      $parent = NULL;
+      $depth = 0;
+    }
     $form['content'][$key]['parent'] = array(
       '#type' => 'hidden',
       '#default_value' => $parent,
@@ -472,9 +479,9 @@ function theme_entity_collection_content_form(&$variables) {
       $delete = drupal_render($form['content'][$key]['delete']);
       $position = drupal_render($form['content'][$key]['position']);
       $style = drupal_render($form['content'][$key]['style']);
+      $rendered_key = drupal_render($form['content'][$key]['key']);
       $parent = drupal_render($form['content'][$key]['parent']);
       $depth = drupal_render($form['content'][$key]['depth']);
-      $rendered_key = drupal_render($form['content'][$key]['key']);
       $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
       $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $style, $delete));
     }
@@ -484,8 +491,11 @@ function theme_entity_collection_content_form(&$variables) {
       'rows' => $rows,
       'attributes' => array('id' => 'entity_collection-table'),
     ));
-    drupal_add_tabledrag('entity_collection-table', 'match', 'parent', 'entity_collection-parent', 'entity_collection-parent', 'key', FALSE);
-    drupal_add_tabledrag('entity_collection-table', 'depth', 'group', 'depth', NULL, NULL, FALSE);
+    if ($form['#style']->getMaxDepth()) {
+
+      drupal_add_tabledrag('entity_collection-table', 'match', 'parent', 'entity_collection-parent', 'entity_collection-parent', 'key', FALSE, $form['#style']->getMaxDepth());
+      drupal_add_tabledrag('entity_collection-table', 'depth', 'group', 'depth', NULL, NULL, FALSE, $form['#style']->getMaxDepth());
+    }
     drupal_add_tabledrag('entity_collection-table', 'order', 'sibling', 'position');
   }
   return $output . drupal_render_children($variables['form']);
@@ -618,12 +628,15 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
 function entity_collection_content_form_autocomplete(EntityCollection $entity_collection, $entity_type, $contexts = '', $string = '') {
   // Let's limit this to nodes for now.
   $info = entity_get_info($entity_type);
-  // Convert contexts from URL to real ones.
-  $contexts = explode(':', $contexts);
   $loaded_contexts = array();
-  ctools_include('context');
-  foreach ($contexts as $i => $context) {
-    $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
+
+  if ($contexts != 'none') {
+    // Convert contexts from URL to real ones.
+    $contexts = explode(':', $contexts);
+    ctools_include('context');
+    foreach ($contexts as $i => $context) {
+      $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
+    }
   }
   if (isset($info['entity keys']['label'])) {
     $label_property = $info['entity keys']['label'];

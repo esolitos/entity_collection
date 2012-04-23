@@ -38,10 +38,17 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
     $content[] = $element;
   }
 
+  /**
+   * Return the depth setting.
+   */
+  public function getMaxDepth() {
+    return $this->settings['max_depth'];
+  }
+
   public function settingsForm(&$form) {
     $depth_options = array();
     for ($i = 1; $i <= 10; $i++) {
-      $depth_options[] = $i;
+      $depth_options[$i] = $i;
     }
     $form['max_depth'] = array(
       '#type' => 'select',
