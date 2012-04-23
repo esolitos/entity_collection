@@ -526,6 +526,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
           'data' => array(
             'entity_collection' => array(
               $entity_collection->name => array(
+                'contexts' => _entity_collection_serialize_contexts($entity_collection),
                 'path' => url('entity_collection/autocomplete/' . $entity_collection->name, array('absolute' => TRUE)),
               ),
             ),
@@ -550,6 +551,23 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
     '#value' => t('Add content'),
   );
   return $form;
+}
+
+/**
+ * Validate that the new entry is permitted.
+ */
+function entity_collection_content_add_form_validate($form, &$form_state) {
+  $entity_collection = $form_state['entity_collection'];
+  list($type, $value) = explode(':', $form_state['values']['content_select']);
+  $entity = entity_load_single($type, $value);
+  list($entity_id,,$bundle) = entity_extract_ids($type, $entity);
+  if (!in_array($bundle, $entity_collection->settings['allowed_bundles'][$type])) {
+    form_set_error('content_select', t('The selected entitiy is not allowed in this collection'));
+  }
+  $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection);
+  if ($content->getChild($form_state['values']['content_select'])) {
+    form_set_error('content_select', t('This item already exists in the collection'));
+  }
 }
 
 /**
@@ -579,9 +597,16 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
  * Autocomplete for entity collection content form.
  * @param type $string
  */
-function entity_collection_content_form_autocomplete(EntityCollection $entity_collection, $entity_type, $string = '') {
+function entity_collection_content_form_autocomplete(EntityCollection $entity_collection, $entity_type, $contexts = '', $string = '') {
   // Let's limit this to nodes for now.
   $info = entity_get_info($entity_type);
+  // Convert contexts from URL to real ones.
+  $contexts = explode(':', $contexts);
+  $loaded_contexts = array();
+  ctools_include('context');
+  foreach ($contexts as $i => $context) {
+    $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
+  }
   if (isset($info['entity keys']['label'])) {
     $label_property = $info['entity keys']['label'];
   }
@@ -608,13 +633,14 @@ function entity_collection_content_form_autocomplete(EntityCollection $entity_co
     ->propertyCondition($label_property, db_like($string) . '%', 'LIKE')
     ->range(0, 10)
     ->execute();
-
+  $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $loaded_contexts);
   if (isset($result[$entity_type])) {
     $entities = entity_load($entity_type, array_keys($result[$entity_type]));
     foreach ($entities as $entity) {
-      if (entity_access('view', $entity_type, $entity)) {
-        list($id) = entity_extract_ids($entity_type, $entity);
-        $matches[$entity_type . ':' . $id] = check_plain(entity_label($entity_type, $entity));
+      list($id) = entity_extract_ids($entity_type, $entity);
+      $key = $entity_type . ':' . $id;
+      if (entity_access('view', $entity_type, $entity) && !$content->getChild($key)) {
+        $matches[$key] = check_plain(entity_label($entity_type, $entity));
       }
     }
   }

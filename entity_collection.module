@@ -95,7 +95,7 @@ function entity_collection_menu() {
       'type' => MENU_LOCAL_ACTION,
     );
   }
-  $items['entity_collection/autocomplete/%entity_collection/%/%'] = array(
+  $items['entity_collection/autocomplete/%entity_collection/%/%/%'] = array(
     'title' => 'entity_collection autocomplete',
     'page callback' => 'entity_collection_content_form_autocomplete',
     'page arguments' => array(2, 3, 4),
@@ -668,7 +668,18 @@ function _entity_collection_get_contexts(EntityCollection $entity_collection) {
   foreach ($contexts as $i => &$context) {
     $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
   }
+  $entity_collection->contexts = $loaded_contexts;
   return $loaded_contexts;
+}
+
+function _entity_collection_serialize_contexts(EntityCollection $entity_collection) {
+  $serialized = array();
+  foreach ($entity_collection->contexts as $context) {
+    if (isset($context->argument)) {
+      $serialized[] = $context->argument;
+    }
+  }
+  return implode(':', $serialized);
 }
 
 /**

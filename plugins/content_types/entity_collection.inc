@@ -70,13 +70,12 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
         'contexts' => implode(':', $serialized),
       );
     }
-    if (module_exists('references_dialog')) {
-      $content->admin_links = references_dialog_get_views_search_links($conf['name']);
-      $content->admin_links[] = references_dialog_link(array('href' => 'node/add/ns-article', 'title' => t('Add article')));
-    }
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query);
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
 
+  }
+  if (empty($content) && user_access("add content to {$entity->type} entity collections")) {
+    $content = t('No content has been added yet');
   }
   return $content;
 }
