@@ -95,6 +95,10 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#options' => EntityCollectionStyle::getStyleOptions(),
     '#default_value' => isset($entity_collection->style) ? $entity_collection->style : NULL,
     '#description' => t('Select the style you want to use for rendering this entity collection here.'),
+    '#ajax' => array(
+      'callback' => 'entity_collection_form_settings',
+      'wrapper' => 'collection-settings',
+    ),
   );
 
   $form['row'] = array(
@@ -105,40 +109,47 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#default_value' => isset($entity_collection->row) ? $entity_collection->row : NULL,
     '#description' => t('Select the style you want to use for rendering this entity collection here.'),
     '#ajax' => array(
-      'callback' => 'entity_collection_form_row_settings',
-      'wrapper' => 'row-settings',
+      'callback' => 'entity_collection_form_settings',
+      'wrapper' => 'collection-settings',
     ),
   );
+  $form['settings'] = array(
+    '#tree' => TRUE,
+    '#type' => 'vertical_tabs',
+    '#prefix' => '<div id="collection-settings">',
+    '#suffix' => '</div>'
+  );
+  // Allow for potential row settings.
   if (isset($form_state['values']['row'])) {
     $entity_collection->row = $form_state['values']['row'];
   }
   $row = EntityCollectionRow::getRow($entity_collection);
-  $form['settings'] = array(
-    '#tree' => TRUE,
-  );
   $form['settings']['row_settings'] = array(
-    '#type' => 'item',
+    '#type' => 'fieldset',
+    '#title' => t('Row settings'),
     '#tree' => TRUE,
-    '#prefix' => '<div id="row-settings">',
-    '#suffix' => '</div>',
   );
   if (isset($row) && method_exists($row, 'settingsForm')) {
     $row->settingsForm($form['settings']['row_settings']);
   }
-  field_attach_form('entity_collection', $entity_collection, $form, $form_state);
-  $form['settings']['restrict'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Restrict content'),
-    '#description' => t('Restrict the type of content in this collection to certain entity types and bundles.'),
-    '#default_value' => isset($entity_collection->settings['restrict']) ? $entity_collection->settings['restrict'] : FALSE,
+
+  // Allow for potential style settings.
+  if (isset($form_state['values']['style'])) {
+    $entity_collection->style = $form_state['values']['style'];
+  }
+  $style = EntityCollectionStyle::getStyle($entity_collection);
+  $form['settings']['style_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Style settings'),
+    '#tree' => TRUE,
   );
+  if (isset($style) && method_exists($style, 'settingsForm')) {
+    $style->settingsForm($form['settings']['style_settings']);
+  }
+  // Content restriction.
   $form['settings']['allowed_bundles'] = array(
-    '#type' => 'container',
-    '#states' => array(
-      'visible' => array(
-       'input[name="settings[restrict]"]' => array('checked' => TRUE),
-      ),
-    ),
+    '#type' => 'fieldset',
+    '#title' => t('Allowed bundles'),
     '#tree' => TRUE,
   );
 
@@ -159,13 +170,17 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   if (method_exists($storage, 'entitySettingsForm')) {
     $storage->settingsForm($entity_collection, $form['settings'], $form_state);
   }
+
+  // Attach the field form.
+  field_attach_form('entity_collection', $entity_collection, $form, $form_state);
+
   $form['#validate'][] = 'entity_collection_form_validate';
   $form['#submit'][] = 'entity_collection_form_submit';
   return $form;
 }
 
-function entity_collection_form_row_settings(&$form) {
-  return $form['settings']['row_settings'];
+function entity_collection_form_settings(&$form) {
+  return $form['settings'];
 }
 
 /**
@@ -218,9 +233,10 @@ function entity_collection_form_validate($form, &$form_state) {
 function entity_collection_form_submit($form, &$form_state) {
   ctools_include('cache');
   $entity_collection = $form_state['entity_collection'];
-  $entity_collection->settings['restrict'] = $form_state['values']['settings']['restrict'];
   $entity_collection->settings['row_settings'] = isset($form_state['values']['settings']['row_settings']) ?
     $form_state['values']['settings']['row_settings'] : array();
+  $entity_collection->settings['style_settings'] = isset($form_state['values']['settings']['style_settings']) ?
+    $form_state['values']['settings']['style_settings'] : array();
   foreach ($form_state['values']['settings']['allowed_bundles'] as $entity_name => $allowed) {
     $entity_collection->settings['allowed_bundles'][$entity_name] = array();
     foreach ($allowed as $bundle => $allowed) {

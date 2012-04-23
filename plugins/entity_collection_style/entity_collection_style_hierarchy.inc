@@ -37,6 +37,18 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
     }
     $content[] = $element;
   }
+
+  public function settingsForm(&$form) {
+    $depth_options = array();
+    for ($i = 1; $i <= 10; $i++) {
+      $depth_options[] = $i;
+    }
+    $form['max_depth'] = array(
+      '#type' => 'select',
+      '#options' => $depth_options,
+      '#title' => t('Max depth'),
+    );
+  }
 }
 
 /**
