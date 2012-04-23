@@ -49,9 +49,14 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
    */
   public static function getRow(EntityCollection $collection) {
     ctools_include('plugins');
-    $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->row);
-    return new $plugin['entity_collection_row']['class']($collection,
-      isset($collection->settings['row_settings']) ? $collection->settings['row_settings'] : NULL);
+    if (isset($collection->row)) {
+      $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->row);
+      if (isset($plugin)) {
+        return new $plugin['entity_collection_row']['class']($collection,
+          isset($collection->settings['row_settings']) ? $collection->settings['row_settings'] : NULL);
+      }
+    }
+    return NULL;
   }
 
   /**
