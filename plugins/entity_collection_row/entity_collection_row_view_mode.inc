@@ -12,7 +12,7 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
   /**
    * @see EntityCollectionRowInterface::getOptions()
    */
-  public function getOptions($entity_type, $entity) {
+  public function getOptions($entity_type) {
     $entity_info = entity_get_info($entity_type);
     $options = array();
     foreach ($entity_info['view modes'] as $mode => $info) {

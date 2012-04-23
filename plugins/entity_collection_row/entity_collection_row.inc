@@ -11,10 +11,9 @@ interface EntityCollectionRowInterface {
 
   /**
    * Get options for all styles that can be chosen for this row.
-   * @param string $entity_type
-   * @param stdClass $entity
+   * @param string $entity_types
    */
-  public function getOptions($entity_type, $entity);
+  public function getOptions($entity_type);
 
   /**
    * Build a row in an entity collection.
@@ -32,7 +31,16 @@ interface EntityCollectionRowInterface {
  * An abstract class implementing some of the row interface.
  */
 abstract class EntityCollectionRow implements EntityCollectionRowInterface {
+  protected $entity_collection;
 
+  /**
+   * Construct an entity collection row object
+   * @param type $entity_collection
+   */
+  public function __construct($entity_collection = NULL, $settings = array()) {
+    $this->entity_collection = $entity_collection;
+    $this->settings = $settings;
+  }
   /**
    * Get the EntityCollectionRow style attached to this collection.
    * @param EntityCollection $collection
@@ -42,7 +50,8 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
   public static function getRow(EntityCollection $collection) {
     ctools_include('plugins');
     $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->row);
-    return new $plugin['entity_collection_row']['class']();
+    return new $plugin['entity_collection_row']['class']($collection,
+      isset($collection->settings['row_settings']) ? $collection->settings['row_settings'] : NULL);
   }
 
   /**
