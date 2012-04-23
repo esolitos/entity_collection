@@ -124,7 +124,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       if (!empty($value->parent)) {
         $node = $tree->getChild($value->parent);
       }
-      else {
+      if (empty($node)) {
         $node = $tree;
       }
       if (!empty($bundle->settings['store_entity'])) {
