@@ -24,16 +24,16 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
    */
   protected function renderTreeNode(&$content, $entity, EntityCollectionTreeNode $item, $langcode = NULL) {
     $element = array(
-      '#children' => array(),
+      '#collection_children' => array(),
       '#weight' => $item->position,
-      '#theme' => 'entity_collection_style_hierarchy',
+      '#theme' => 'entity_collection_style_hierarchy'
     );
     if (isset($item->content)) {
       $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
-      $element['#parent'] = $data;
+      $element['#collection_parent'] = $data;
     }
     foreach ($item->getChildren() as $key => $child) {
-      $this->renderTreeNode($element['#children'], $entity, $child, $langcode);
+      $this->renderTreeNode($element['#collection_children'], $entity, $child, $langcode);
     }
     $content[] = $element;
   }
@@ -43,6 +43,6 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
  * Preprocess function for this plugin.
  */
 function template_preprocess_entity_collection_style_hierarchy(&$variables) {
-  $variables['parent'] = isset($variables['element']['#parent']) ? $variables['element']['#parent'] : 0;
-  $variables['children'] = $variables['element']['#children'];
+  $variables['parent'] = isset($variables['element']['#collection_parent']) ? $variables['element']['#collection_parent'] : 0;
+  $variables['children'] = $variables['element']['#collection_children'];
 }

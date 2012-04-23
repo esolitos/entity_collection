@@ -379,6 +379,7 @@ function entity_collection_entity_collection_plugins() {
     'theme' => array(
       'template' => 'entity_collection_style_hierarchy',
       'render element' => 'element',
+      'file' => 'plugins/entity_collection_style/entity_collection_style_hierarchy.inc',
     ),
     'entity_collection_style' => array(
       'parent' => 'EntityCollectionStyle',
