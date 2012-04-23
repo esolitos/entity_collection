@@ -109,13 +109,14 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->condition('name', $collection->name, '=')
       ->orderBy('depth')
       ->orderBy('position');
-    if (isset($collection->contexts)) {
+    if (!isset($contexts) && isset($collection->contexts)) {
       $contexts = $collection->contexts;
     }
     if (isset($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $result = $query->execute();
+    $q = (string)$query;
     $tree = new EntityCollectionTreeNode();
     $bundle = entity_collection_bundle_load($collection->bundle);
     foreach ($result as $value) {
