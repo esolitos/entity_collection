@@ -118,6 +118,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   );
   $form['settings']['row_settings'] = array(
     '#type' => 'item',
+    '#tree' => TRUE,
     '#prefix' => '<div id="row-settings">',
     '#suffix' => '</div>',
   );
@@ -218,7 +219,8 @@ function entity_collection_form_submit($form, &$form_state) {
   ctools_include('cache');
   $entity_collection = $form_state['entity_collection'];
   $entity_collection->settings['restrict'] = $form_state['values']['settings']['restrict'];
-  $entity_collection->settings['row_settings'] = $form_state['values']['settings']['row_settings'];
+  $entity_collection->settings['row_settings'] = isset($form_state['values']['settings']['row_settings']) ?
+    $form_state['values']['settings']['row_settings'] : array();
   foreach ($form_state['values']['settings']['allowed_bundles'] as $entity_name => $allowed) {
     $entity_collection->settings['allowed_bundles'][$entity_name] = array();
     foreach ($allowed as $bundle => $allowed) {
