@@ -564,6 +564,8 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
     if (isset($entities[$value])) {
       $entity = $entities[$value];
       $item = new EntityCollectionTreeNode($type, $value, $entity);
+      // Add a style for this item.
+      $item->style = current(EntityCollectionRow::getRow($entity_collection)->getOptions($item->type));
       if (isset($_GET['contexts'])) {
         $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
       }
@@ -589,12 +591,20 @@ function entity_collection_content_form_autocomplete(EntityCollection $entity_co
   }
   $matches = array();
   $types = entity_collection_get_entity_type_options($entity_collection);
+  $allowed_bundles = $entity_collection->settings['allowed_bundles'];
+  $bundles = array();
+  foreach ($allowed_bundles[$entity_type] as $bundle => $enabled) {
+    if ($enabled) {
+      $bundles[] = $bundle;
+    }
+  }
   // Don't output any results if we get an invalid input.
   if (!isset($types[$entity_type])) {
     drupal_json_output(array());
   }
   $query = new EntityFieldQuery();
   $result = $query->entityCondition('entity_type', $entity_type)
+    ->entityCondition('bundle', $allowed_bundles[$entity_type])
     ->propertyCondition($label_property, db_like($string) . '%', 'LIKE')
     ->range(0, 10)
     ->execute();
