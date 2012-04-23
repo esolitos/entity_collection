@@ -610,13 +610,13 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
     if (isset($entities[$value])) {
       $entity = $entities[$value];
       $item = new EntityCollectionTreeNode($type, $value, $entity);
-      // Add a style for this item.
-      $item->style = current(EntityCollectionRow::getRow($entity_collection)->getOptions($item->type));
       if (isset($_GET['contexts'])) {
         $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
       }
+      entity_collection_pre_add_item($entity_collection, $item);
       EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
         ->appendItem($entity_collection, $item, $contexts);
+      entity_collection_post_add_item($entity_collection, $item);
     }
   }
 }

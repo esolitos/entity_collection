@@ -10,10 +10,25 @@
 interface EntityCollectionRowInterface {
 
   /**
-   * Get options for all styles that can be chosen for this row.
+   * Get options for all styles that can be chosen for a particular row.
    * @param string $entity_types
    */
   public function getOptions($entity_type);
+
+  /**
+   * Get all available options.
+   */
+  public function getAllOptions();
+
+  /**
+   * Indicate if we allow one style per row or not.
+   */
+  public function useStylePerRow();
+
+  /**
+   * Act before a row is inserted.
+   */
+  public function itemPreAdd(EntityCollectionTreeNode $item);
 
   /**
    * Build a row in an entity collection.
@@ -39,8 +54,30 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
    */
   public function __construct($entity_collection = NULL, $settings = array()) {
     $this->entity_collection = $entity_collection;
-    $this->settings = $settings;
+    $this->settings = $settings + $this->defaultSettings();
   }
+
+  /**
+   * Indicate if we allow one style per row or not.
+   */
+  public function useStylePerRow() {
+    return $this->settings['style_per_row'];
+  }
+
+  public function defaultSettings() {
+    return array('style_per_row' => TRUE, 'default_style' => NULL);
+  }
+
+  /**
+   * Act when a new row is inserted.
+   */
+  public function itemPreAdd(EntityCollectionTreeNode $item) {
+    // Add a default style if style per row is not enabled.
+    if (isset($this->settings['default_style']) && (!$this->settings['style_per_row'] || !isset($item->style))) {
+      $item->style = $this->settings['default_style'][$item->type];
+    }
+  }
+
   /**
    * Get the EntityCollectionRow style attached to this collection.
    * @param EntityCollection $collection
@@ -73,6 +110,30 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
       }
     }
     return $row_plugins;
+  }
+
+  public function settingsForm(&$form) {
+    $form['style_per_row'] = array(
+      '#title' => t('Style per row'),
+      '#type' => 'checkbox',
+      '#description' => t('Let the user select a different style for each row.'),
+      '#default_value' => $this->settings['style_per_row'],
+    );
+    $options = $this->getAllOptions();
+    $form['default_style'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Default style'),
+      '#description' => t('The default style will be used for new entries.'),
+      '#tree' => TRUE,
+    );
+    foreach ($options as $type => $type_options) {
+      $form['default_style'][$type] = array(
+        '#title' => $type,
+        '#type' => 'select',
+        '#options' => $type_options,
+        '#default_value' => $this->settings['default_style'],
+      );
+    }
   }
 
   /**

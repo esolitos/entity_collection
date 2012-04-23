@@ -257,6 +257,28 @@ function entity_collection_context_property_set(&$data, $name, $value, $langcode
 }
 
 /**
+ * Triggers hooks to act before an item is added to an entity collection.
+ */
+function entity_collection_pre_add_item($entity_collection, $item) {
+  module_invoke_all('entity_collection_pre_add_item', $entity_collection, $item);
+}
+
+/**
+ * Triggers hooks for acting after an item is added to an entity collection.
+ */
+function entity_collection_post_add_item($entity_collection, $item) {
+  module_invoke_all('entity_collection_post_add_item', $entity_collection, $item);
+}
+
+/**
+ * Implements hook_entity_collection_pre_add_item().
+ */
+function entity_collection_entity_collection_pre_add_item($entity_collection, $item) {
+  // Load the current row plugin and let it act on the event.
+  EntityCollectionRow::getRow($entity_collection)->itemPreAdd($item);
+}
+
+/**
  * Fetch all bundles for a entity_collection.
  * @return array
  *   An array of all available bundles.

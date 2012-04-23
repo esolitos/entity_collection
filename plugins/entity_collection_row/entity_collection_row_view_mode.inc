@@ -10,6 +10,22 @@
 class EntityCollectionRowViewMode extends EntityCollectionRow {
 
   /**
+   * @see EntityCollectionRowInterface::getAllOptions().
+   */
+  public function getAllOptions() {
+    $options = array();
+    foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
+      if (count($bundles)) {
+        $entity_info = entity_get_info($type);
+        foreach ($entity_info['view modes'] as $mode => $info) {
+          $options[$type][$mode] = $info['label'];
+        }
+      }
+    }
+    return $options;
+  }
+
+  /**
    * @see EntityCollectionRowInterface::getOptions()
    */
   public function getOptions($entity_type) {

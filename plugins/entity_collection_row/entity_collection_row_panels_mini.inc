@@ -29,6 +29,14 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
     }
     return $panels;
   }
+
+  /**
+   * Mini panels cannot be used without letting the user choose per panel.
+   */
+  public function useStylePerRow() {
+    return TRUE;
+  }
+
   /**
    * Get all available contexts.
    */
@@ -56,19 +64,17 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
 
   /**
    * Get all available options.
-   * @param arry $entity_types
    */
-  public function getAllOptions($entity_types) {
-    if (!is_array($entity_types)) {
-      $entity_types = array($entity_types);
+  public function getAllOptions() {
+    foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
+      if (count($bundles)) {
+        $available_contexts[] = 'entity:' . $type;
+      }
     }
     $mini_panels = panels_mini_load_all();
     $available_contexts = array('entity_collection_item');
     if (isset($this->entity_collection)) {
       $available_contexts[] = 'entity:entity_collection';
-    }
-    foreach ($entity_types as $type) {
-      $available_contexts[] = 'entity:' . $type;
     }
     foreach ($this->entity_collection->requiredcontexts as $context) {
       $available_contexts[] = $context['name'];
@@ -115,14 +121,9 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
    */
   public function settingsForm(&$form) {
     $types = array();
-    foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
-      if (count($bundles)) {
-        $types[] = $type;
-      }
-    }
     $form['allowed_panels'] = array(
       '#type' => 'checkboxes',
-      '#options' => $this->getAllOptions($types),
+      '#options' => $this->getAllOptions(),
       '#default_value' => isset($this->settings['allowed_panels']) ? $this->settings['allowed_panels'] : array(),
       '#title' => t('Allowed mini panels'),
     );
