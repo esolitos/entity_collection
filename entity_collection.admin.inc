@@ -363,7 +363,9 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   }
   $i = 0;
   $style = EntityCollectionStyle::getStyle($entity_collection);
+  $row = EntityCollectionRow::getRow($entity_collection);
   $form['#style'] = $style;
+  $form['#row'] = $row;
   foreach ($nodes as $key => $child) {
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
@@ -400,11 +402,13 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       '#type' => 'hidden',
       '#default_value' => $depth,
     );
-    $form['content'][$key]['style'] = array(
-      '#type' => 'select',
-      '#default_value' => $child->style,
-      '#options' => EntityCollectionRow::getRow($entity_collection)->getOptions($child->type, $child->content),
-    );
+    if ($row->useStylePerRow()) {
+      $form['content'][$key]['style'] = array(
+        '#type' => 'select',
+        '#default_value' => $child->style,
+        '#options' => $row->getOptions($child->type, $child->content),
+      );
+    }
     $form['content'][$key]['delete'] = array(
       '#type' => 'markup',
       '#markup' => l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, array('query' => array('destination' => current_path()))),
@@ -420,7 +424,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
  */
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
-  $tree = entity_collection_content_build_tree($values['content']);
+  $tree = entity_collection_content_build_tree($form_state['entity_collection'], $values['content']);
   if (isset($_GET['contexts'])) {
     $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
   }
@@ -430,12 +434,16 @@ function entity_collection_content_form_submit($form, &$form_state) {
 /**
  * Build a tree from from a submitted form.
  */
-function entity_collection_content_build_tree($values) {
+function entity_collection_content_build_tree($entity_collection, $values) {
   $tree = new EntityCollectionTreeNode();
   uasort($values, 'entity_collection_content_compare');
   while (!empty($values)) {
     $value = array_shift($values);
     $entity = current(entity_load($value['type'], array($value['entity_id'])));
+    if (!isset($value['style'])) {
+      $row_plugin = EntityCollectionRow::getRow($entity_collection);
+      $value['style'] = $row_plugin->getDefaultStyle($value['type'], $entity);
+    }
     // If the we have no parent, we can insert the item on the root.
     if (empty($value['parent'])) {
       $tree->addChild($value['type'], $value['entity_id'], $entity, $value['style'], $value['key'], $value['position']);
@@ -483,9 +491,18 @@ function theme_entity_collection_content_form(&$variables) {
       $parent = drupal_render($form['content'][$key]['parent']);
       $depth = drupal_render($form['content'][$key]['depth']);
       $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-      $rows[] = array('class' => array('draggable'), 'data' => array($indentation . $title . $parent . $depth . $rendered_key, $position, $style, $delete));
+      $data = array($indentation . $title . $parent . $depth . $rendered_key, $position);
+      if ($form['#row']->useStylePerRow()) {
+        $data[] = $style;
+      }
+      $data[] = $delete;
+      $rows[] = array('class' => array('draggable'), 'data' => $data);
     }
-    $header = array(t('Title'), t('Position'), t('Style'), t('Operations'));
+    $header = array(t('Title'), t('Position'));
+    if ($form['#row']->useStylePerRow()) {
+      $header[] = t('Style');
+    }
+    $header[] = t('Operations');
     $output = theme('table', array(
       'header' => $header,
       'rows' => $rows,

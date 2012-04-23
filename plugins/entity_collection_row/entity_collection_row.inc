@@ -31,6 +31,11 @@ interface EntityCollectionRowInterface {
   public function itemPreAdd(EntityCollectionTreeNode $item);
 
   /**
+   * Get a style for a particular entity.
+   */
+  public function getDefaultStyle($entity_type, $entity);
+
+  /**
    * Build a row in an entity collection.
    * @param EntityCollection $collection
    * 	The entity collection in which the content is.
@@ -66,6 +71,13 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
 
   public function defaultSettings() {
     return array('style_per_row' => TRUE, 'default_style' => NULL);
+  }
+
+  public function getDefaultStyle($entity_type, $entity) {
+    if (isset($this->settings['default_style'][$entity_type])) {
+      return $this->settings['default_style'][$entity_type];
+    }
+    return '';
   }
 
   /**
