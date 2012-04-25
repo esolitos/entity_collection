@@ -532,11 +532,7 @@ function entity_collection_content_delete_form($form, &$form_state, $entity_coll
  * Submit handler for entity_collection_content_delete_form.
  */
 function entity_collection_content_delete_form_submit($form, &$form_state) {
-  EntityCollectionStorage::getBundleStorage($form_state['entity_collection']->bundle)->delete(
-    $form_state['entity_collection'],
-    $form_state['entity_type'],
-    array($form_state['eid'])
-  );
+  entity_collection_content_delete($form_state['entity_collection'], $form_state['entity_type'], array($form_state['eid']));
 }
 
 /**
@@ -559,6 +555,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   $form['add_content']['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Search'),
+    '#required' => TRUE,
     '#maxlength' => 60,
     '#description' => t('Type in the name of the content you want to add here.'),
     '#attributes' => array('class' => array('form-autocomplete')),
@@ -630,10 +627,7 @@ function entity_collection_content_add_form_submit($form, &$form_state) {
       if (isset($_GET['contexts'])) {
         $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
       }
-      entity_collection_pre_add_item($entity_collection, $item);
-      EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
-        ->appendItem($entity_collection, $item, $contexts);
-      entity_collection_post_add_item($entity_collection, $item);
+      entity_collection_append_item($entity_collection, $item, $contexts);
     }
   }
 }

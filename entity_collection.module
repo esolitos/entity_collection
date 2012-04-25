@@ -139,6 +139,7 @@ function entity_collection_entity_info() {
       'label' => t('Entity Collection'),
       'entity class' => 'EntityCollection',
       'controller class' => 'EntityAPIControllerExportable',
+      'rules controller class' => 'EntityCollectionRulesController',
       'fieldable' => TRUE,
       'exportable' => TRUE,
       'view modes' => array(
@@ -178,7 +179,18 @@ function entity_collection_entity_property_info() {
     'type' => 'list<entity>',
     'description' => t("The content in the entity collection"),
     'getter callback' => 'entity_collection_content_property_get',
-    'setter callback' => 'entity_collection_content_property_set',
+  );
+  $properties['last_item'] = array(
+    'label' => t("Entity collection content: last item"),
+    'type' => 'entity',
+    'description' => t("The last item in the collection"),
+    'getter callback' => 'entity_collection_last_item_property_get',
+  );
+  $properties['content_count'] = array(
+    'label' => t('Items in collection'),
+    'type' => 'integer',
+    'description' => t('The total number of items in the collection.'),
+    'getter callback' => 'entity_collection_content_count_property_get',
   );
   $properties['contexts'] = array(
     'label' => t("Contexts"),
@@ -188,6 +200,51 @@ function entity_collection_entity_property_info() {
     'setter callback' => 'entity_collection_context_property_set',
   );
   return $info;
+}
+
+/**
+ * Append an item to an entity collection.
+ * @param EntityCollection $entity_collection
+ * @param EntityCollectionTreeNode $item
+ * @param array $contexts
+ */
+function entity_collection_append_item(EntityCollection $entity_collection, EntityCollectionTreeNode $item, $contexts = NULL) {
+  entity_collection_content_pre_insert($entity_collection, $item);
+  EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
+    ->appendItem($entity_collection, $item, $contexts);
+  entity_collection_content_insert($entity_collection, $item);
+}
+
+/**
+ * Delete content in an Entity collection.
+ * @param EntityCollection $entity_collection
+ * @param type $entity_type
+ * @param type $entity_ids
+ */
+function entity_collection_content_delete(EntityCollection $entity_collection, $entity_type, $entity_ids) {
+  $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
+  $storage->delete($entity_collection, $entity_type, $entity_ids);
+  module_invoke_all('entity_collection_content_delete', $entity_collection, $entity_type, $entity_ids);
+}
+
+/**
+ * Getter function for number of items in the collection.
+ */
+function entity_collection_content_count_property_get($data, array $options, $name, $type, $info) {
+  $content = entity_collection_load_content($data->bundle, $data)->getFlat();
+  return count($content);
+}
+
+/**
+ * Getter function for the last item in the collection.
+ */
+function entity_collection_last_item_property_get($data, array $options, $name, $type, $info) {
+  $content = entity_collection_load_content($data->bundle, $data)->getFlat();
+  $item = end($content);
+  if ($item) {
+    return entity_metadata_wrapper($item->type, $item->content);
+  }
+  return FALSE;
 }
 
 /**
@@ -203,33 +260,6 @@ function entity_collection_content_property_get($data, array $options, $name, $t
 }
 
 /**
- * Setter function for the content property on entity collections.
- */
-function entity_collection_content_property_set(&$data, $name, $value, $langcode, $type, $info) {
-  $tree = entity_collection_load_content($data->bundle, $data);
-  $items = array();
-  // Add new items and make sure the hierarchy gets stored.
-  foreach ($value as $item) {
-    $entity = $item->value();
-    $entity_type = $item->type();
-    $entity_id = entity_id($entity_type, $entity);
-    $key = $tree->getChildKey($entity_type, $entity_id);
-    $child = $tree->getChild($key);
-    if (empty($child)) {
-      $tree->addChild($entity_type, $entity_id, $entity);
-    }
-    $items[$key] = $item;
-  }
-  // Make sure items that doesn't exist anymore are removed.
-  foreach ($tree->getFlat() as $item) {
-    if (!isset($items[$item->key])) {
-      $tree->removeChild($item);
-    }
-  }
-  entity_collection_save_content($data, $tree);
-}
-
-/**
  * Getter callback for the context property on entity collections.
  */
 function entity_collection_context_property_get($data, array $options, $name, $type, $info) {
@@ -239,7 +269,7 @@ function entity_collection_context_property_get($data, array $options, $name, $t
   }
   $contexts = array();
   foreach ($data->contexts as $context) {
-    list(,$entity_type) = explode(':', $context->type);
+    list(,$entity_type) = explode(':', $context->plugin);
     $contexts[] = entity_metadata_wrapper($entity_type, $context->data);
   }
   return $contexts;
@@ -259,23 +289,44 @@ function entity_collection_context_property_set(&$data, $name, $value, $langcode
 /**
  * Triggers hooks to act before an item is added to an entity collection.
  */
-function entity_collection_pre_add_item($entity_collection, $item) {
-  module_invoke_all('entity_collection_pre_add_item', $entity_collection, $item);
+function entity_collection_content_pre_insert($entity_collection, $item) {
+  module_invoke_all('entity_collection_content_pre_insert', $entity_collection, $item);
 }
 
 /**
  * Triggers hooks for acting after an item is added to an entity collection.
  */
-function entity_collection_post_add_item($entity_collection, $item) {
-  module_invoke_all('entity_collection_post_add_item', $entity_collection, $item);
+function entity_collection_content_insert($entity_collection, $item) {
+  module_invoke_all('entity_collection_content_insert_event', $entity_collection, $item);
 }
 
 /**
- * Implements hook_entity_collection_pre_add_item().
+ * Implements hook_entity_collection_content_pre_insert().
  */
-function entity_collection_entity_collection_pre_add_item($entity_collection, $item) {
+function entity_collection_entity_collection_content_pre_insert($entity_collection, $item) {
   // Load the current row plugin and let it act on the event.
   EntityCollectionRow::getRow($entity_collection)->itemPreAdd($item);
+}
+
+/**
+ * Implements hook_entity_collection_content_delete().
+ */
+function entity_collection_entity_collection_content_delete($entity_collection, $entity_type, $entity_ids) {
+  if (module_exists('rules')) {
+    $data = entity_metadata_wrapper("list<$entity_type>", $entity_ids);
+    rules_invoke_all('entity_collection_content_delete_event', $entity_collection, $data);
+  }
+}
+
+/**
+ * Implements hook_entity_content_insert().
+ */
+function entity_collection_entity_collection_content_insert($entity_collection, $item) {
+  // Load the current row plugin and let it act on the event.
+  if (module_exists('rules')) {
+    $wrapper = entity_metadata_wrapper($item->type, $item->content);
+    rules_invoke_all('entity_collection_content_insert', $entity_collection, $wrapper);
+  }
 }
 
 /**
@@ -560,13 +611,6 @@ function entity_collection_block_view($delta) {
  */
 function entity_collection_save_content(EntityCollection $entity_collection, EntityCollectionTreeNode $tree) {
   return EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->save($entity_collection, $tree);
-}
-
-/**
- * Append an item to an entity collection.
- */
-function entity_collection_append_item($name, $bundle, EntityCollectionTreeNode $item) {
-  return EntityCollectionStorage::getBundleStorage($bundle)->appendItem($name, $item);
 }
 
 /**
