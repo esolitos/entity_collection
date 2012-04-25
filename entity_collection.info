@@ -14,3 +14,5 @@ files[] = plugins/entity_collection_row/entity_collection_row_view_mode.inc
 files[] = plugins/entity_collection_row/entity_collection_row_panels_mini.inc
 files[] = includes/tree.inc
 files[] = includes/entity_collection.inc
+files[] = entity_collection.rules.inc
+files[] = includes/entity_collection_query.inc

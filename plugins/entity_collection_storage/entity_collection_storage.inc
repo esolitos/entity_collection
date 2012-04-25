@@ -58,6 +58,14 @@ interface EntityCollectionStorageInterface {
    */
   public function drop(EntityCollection $collection);
 
+  /**
+   * Execute a EntityCollectionQuery and return the matching
+   * EntityCollections.
+   * @param EntityCollectionQuery $query
+   *  The query to execute.
+   */
+  public function executeQuery(EntityCollectionQuery $query);
+
 }
 
 /**

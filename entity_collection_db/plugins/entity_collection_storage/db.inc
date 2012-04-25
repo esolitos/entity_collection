@@ -99,6 +99,38 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
   }
 
   /**
+   * Execute an EntityCollectionQuery
+   * @param EntityCollectionQuery a query to execute.
+   */
+  public function executeQuery(EntityCollectionQuery $query) {
+    $db_query = db_select('entity_collection_storage', 'ecs')
+      ->fields('ecs', array('name'));
+    $bundle_conditions = $query->getBundleConditions();
+    $entity_conditions = $query->getEntityConditions();
+    $collection_conditions = $query->getCollectionConditions();
+    $contexts = $query->getContexts();
+    if (!empty($bundle_conditions)) {
+      $db_query->innerJoin('entity_collection_collections', 'ec', 'ec.name = ecs.name');
+      foreach ($bundle_conditions as $condition) {
+        $db_query->condition('ec.bundle', $condition['value'], $condition['operator']);
+      }
+    }
+    if (!empty($contexts)) {
+      $db_query->condition('ecs.contexts', $this->serializeContexts($contexts));
+    }
+    foreach ($entity_conditions as $condition) {
+      $and_condition = db_and()
+        ->condition('ecs.entity_type', $condition['entity_type'], '=')
+        ->condition('ecs.eid', $condition['entity_ids'], $condition['operator']);
+      $db_query->condition($and_condition);
+    }
+    foreach ($collection_conditions as $condition) {
+      $db_query->condition('ecs.name', $condition['value'], $condition['operator']);
+    }
+    return $db_query->execute()->fetchCol();
+  }
+
+  /**
    * Retreive a entity_collection.
    * @param string $name
    */
@@ -116,7 +148,6 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $result = $query->execute();
-    $q = (string)$query;
     $tree = new EntityCollectionTreeNode();
     $bundle = entity_collection_bundle_load($collection->bundle);
     foreach ($result as $value) {
