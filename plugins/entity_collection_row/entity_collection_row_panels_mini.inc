@@ -63,6 +63,16 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
   }
 
   /**
+   * Act when a new row is inserted.
+   */
+  public function itemPreAdd(EntityCollectionTreeNode $item) {
+    // Add a default style if style per row is not enabled.
+    if (!isset($item->style)) {
+      $item->style = current(array_keys($this->getOptions($item->type)));
+    }
+  }
+
+  /**
    * Get all available options.
    */
   public function getAllOptions() {
