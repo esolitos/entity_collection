@@ -16,7 +16,7 @@ class EntityCollectionTreeNode {
   public $content;
   public $style;
   public $position = 0;
-  protected $children = array();
+  public $children = array();
   public $list = array();
 
   /**
@@ -81,13 +81,14 @@ class EntityCollectionTreeNode {
    * Get a child by key.
    * Use EntityCollcetionTreeNode::getChildKey() to get a key.
    */
-  public function getChild($key) {
+  public function getChild($key, $deep_search = TRUE) {
     // Return the child if it exists.
     if (isset($this->children[$key])) {
       return $this->children[$key];
     }
-    // Return FALSE if this branch has no children.
-    if (!count($this->children)) {
+    // Return FALSE if this branch has no children
+    // or if we don't want to travserse the tree.
+    if (!$deep_search || !count($this->children)) {
       return FALSE;
     }
     foreach ($this->children as $node) {
