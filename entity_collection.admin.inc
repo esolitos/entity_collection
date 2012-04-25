@@ -167,7 +167,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     );
   }
   $storage = EntityCollectionStorage::getBundleStorage($entity_collection->bundle);
-  if (method_exists($storage, 'entitySettingsForm')) {
+  if (!empty($storage) && method_exists($storage, 'entitySettingsForm')) {
     $storage->settingsForm($entity_collection, $form['settings'], $form_state);
   }
 

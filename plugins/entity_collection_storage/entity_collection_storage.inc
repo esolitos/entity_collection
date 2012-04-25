@@ -95,7 +95,10 @@ abstract class EntityCollectionStorage implements EntityCollectionStorageInterfa
   public static function getStorage($name) {
     ctools_include('plugins');
     $plugin = ctools_get_plugins('entity_collection', 'plugins', $name);
-    return new $plugin['entity_collection_storage']['class']();
+    if (isset($plugin['entity_collection_storage']['class'])) {
+      return new $plugin['entity_collection_storage']['class']();
+    }
+    return FALSE;
   }
 
   /**
