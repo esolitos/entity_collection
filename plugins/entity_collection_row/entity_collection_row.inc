@@ -59,6 +59,9 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
    */
   public function __construct($entity_collection = NULL, $settings = array()) {
     $this->entity_collection = $entity_collection;
+    if (!isset($settings)) {
+      $settings = array();
+    }
     $this->settings = $settings + $this->defaultSettings();
   }
 

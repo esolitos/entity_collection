@@ -68,8 +68,15 @@ abstract class EntityCollectionStyle {
    */
   public static function getStyle(EntityCollection $collection) {
     ctools_include('plugins');
+    if (!isset($collection->style)) {
+      return FALSE;
+
+    }
     $plugin = ctools_get_plugins('entity_collection', 'plugins', $collection->style);
-    return new $plugin['entity_collection_style']['class']($collection, isset($collection->settings['style_settings']) ? $collection->settings['style_settings'] : array());
+    if (isset($plugin['entity_collection_style']['class'])) {
+      return new $plugin['entity_collection_style']['class']($collection, isset($collection->settings['style_settings']) ? $collection->settings['style_settings'] : array());
+    }
+    return FALSE;
   }
 
   /**
