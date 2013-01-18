@@ -233,6 +233,12 @@ function entity_collection_form_validate($form, &$form_state) {
 function entity_collection_form_submit($form, &$form_state) {
   ctools_include('cache');
   $entity_collection = $form_state['entity_collection'];
+  // Transfer any required context from the cached version,
+  // since that is handled by CTools.
+  $cached_entity_collection = ctools_cache_get('entity_collection_cache_object', $entity_collection->name);
+  if (isset($cached_entity_collection)) {
+     $entity_collection->requiredcontexts = $cached_entity_collection->requiredcontexts;
+  }
   $entity_collection->settings['row_settings'] = isset($form_state['values']['settings']['row_settings']) ?
     $form_state['values']['settings']['row_settings'] : array();
   $entity_collection->settings['style_settings'] = isset($form_state['values']['settings']['style_settings']) ?
