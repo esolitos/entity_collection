@@ -377,6 +377,8 @@ function entity_collection_bundle_exists($name) {
 /**
  * Load a entity_collection by name
  * @param string $name the name of the entity_collection.
+ * @return EntityCollection
+ *   A loaded entity collection.
  */
 function entity_collection_load($name) {
   $entity_collections = &drupal_static(__FUNCTION__, array());
