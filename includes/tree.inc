@@ -151,6 +151,14 @@ class EntityCollectionTreeNode {
   }
 
   /**
+   * Get the total count of items in this tree.
+   * @return the total number of items in this tree.
+   */
+  function totalCount() {
+    return count($this->list);
+  }
+
+  /**
    * Return this node as an array.
    */
   public function toArray() {
