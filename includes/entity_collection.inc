@@ -14,6 +14,7 @@ class EntityCollection extends Entity {
   public $bid;
   public $title;
   public $cache;
+  protected $tree;
   public $requiredcontexts = array();
   public $contexts = array();
 
@@ -42,6 +43,17 @@ class EntityCollection extends Entity {
   public function setContexts($contexts) {
     $this->contexts = $contexts;
   }
+  /**
+   * Get the entity collection tree.
+   * @return EntityCollectionTreeNode
+   *   The tree for this entity collection.
+   */
+  public function getTree($reset = FALSE) {
+    if (!isset($this->tree) || $reset) {
+      $this->tree = EntityCollectionStorage::getBundleStorage($this->bundle)->retrieve($this, $this->contexts);
+    }
+    return $this->tree;
+  }
 
   /**
    * Build content.
@@ -53,7 +65,7 @@ class EntityCollection extends Entity {
    *  An array that can be used with Drupals rendering system.
    */
   public function buildContent($view_mode = 'default', $langcode = NULL) {
-    $tree = EntityCollectionStorage::getBundleStorage($this->bundle)->retrieve($this, $this->contexts);
+    $tree = $this->getTree();
     $content = array();
     $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree);
     if (isset($content['entity_collection'])) {
