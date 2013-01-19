@@ -62,11 +62,13 @@ function entity_collection_ief_url_options(EntityCollection $entity_collection) 
   foreach ($entity_collection->settings['allowed_bundles'] as $entity_type => $bundles) {
     if (isset($controllers[$entity_type])) {
       foreach ($bundles as $bundle) {
-        $url_options = array('query' => array());
-        if (!empty($entity_collection->contexts)) {
-          $url_options['query']['contexts'] = _entity_collection_serialize_contexts($entity_collection);
+        if (entity_access('create', $entity_type, $entity)) {
+          $url_options = array('query' => array());
+          if (!empty($entity_collection->contexts)) {
+            $url_options['query']['contexts'] = _entity_collection_serialize_contexts($entity_collection);
+          }
+          $options[url("entity_collection/add/{$entity_collection->name}/$entity_type/$bundle/nojs", $url_options)] = $entity_info[$entity_type]['bundles'][$bundle]['label'];
         }
-        $options[url("entity_collection/add/{$entity_collection->name}/$entity_type/$bundle/nojs", $url_options)] = $entity_info[$entity_type]['bundles'][$bundle]['label'];
       }
     }
   }
