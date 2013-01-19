@@ -55,23 +55,6 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   $entity = entity_collection_load($conf['name']);
   if (!empty($entity)) {
     $entity->setContexts($contexts);
-    $content->subject = $entity->title;
-    if (user_access("manage content in {$entity->type} entity collections") && !empty($conf['editable'])) {
-      if (isset($_GET['edit-collection']) && $_GET['edit-collection'] == $entity->eid) {
-        module_load_include('admin.inc', 'entity_collection');
-        $content->content['edit']['#markup'] = l(t('Show content'), current_path());
-        $content->content['content'] = drupal_get_form('entity_collection_content_form', $entity, current_path());
-        if (!empty($conf['add_form']) && user_access("add content to {$entity->type} entity collections")) {
-          $content->content['add_form'] = drupal_get_form('entity_collection_content_add_form', $entity, TRUE);
-        }
-      }
-      else {
-        $content->content['edit']['#markup'] = l(t('Manage content'), current_path(), array('query' => array('edit-collection' => $entity->eid)));
-      }
-    }
-    if (!isset($content->content['content'])) {
-      $content->content['content'] = $entity->buildContent();
-    }
     $query = array();
     $serialized = array();
     if (is_array($contexts)) {
@@ -82,15 +65,40 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
         'contexts' => implode(':', $serialized),
       );
     }
-    $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query);
-    $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
+    $content->subject = $entity->title;
+    if (user_access("manage content in {$entity->type} entity collections")) {
+      $query = array();
+      $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
+      if (isset($_GET['edit-collection']) && $_GET['edit-collection'] == $entity->eid && !empty($conf['editable'])) {
+        module_load_include('admin.inc', 'entity_collection');
+        $content->content['edit']['#markup'] = l(t('Show content'), current_path());
+        $content->content['content'] = drupal_get_form('entity_collection_content_form', $entity, current_path());
+        if (!empty($conf['add_form']) && user_access("add content to {$entity->type} entity collections")) {
+          $content->content['add_form'] = drupal_get_form('entity_collection_content_add_form', $entity, TRUE);
+        }
+      }
+      if (!empty($conf['editable'])) {
+        $content->admin_links[] = array('href' => current_path(), 'title' => t('Manage content'), 'query' => array('edit-collection' => $entity->eid));
+      }
+      else {
+        $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Manage content'), 'query' => $query);
+      }
+      // Ugly hack to fix problems with contextual links.
+      if (module_exists('contextual') && variable_get('theme_default', '') == 'bartik') {
+        $content->content['break'] = array(
+          '#markup' => '<br />',
+        );
+      }
+    }
+    if (!isset($content->content['content'])) {
+      $content->content['content'] = $entity->buildContent();
+    }
     if (user_access("add content to {$entity->type} entity collections")) {
       if(!$entity->getTree()->totalCount()) {
         $content->content['content'] = t('No content has been added yet');
       }
     }
   }
-
   return $content;
 }
 
