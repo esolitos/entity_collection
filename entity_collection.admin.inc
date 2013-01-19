@@ -311,13 +311,10 @@ function entity_collection_content_form($form, &$form_state, $entity_collection,
   $form['#tree'] = TRUE;
   entity_collection_content_form_content($entity_collection, $form, $tree);
   if (isset($form['content'])) {
-    $form['order_save'] = array(
+    $form['save'] = array(
       '#type' => 'submit',
-      '#value' => t('Save order'),
+      '#value' => t('Save changes'),
     );
-  }
-  if (isset($_GET['context'])) {
-    $form['reference']['#ajax_parameters'] = array('contexts' => $_GET['contexts']);
   }
   return $form;
 }
