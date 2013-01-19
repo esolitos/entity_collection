@@ -563,7 +563,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   }
   $form['add_content'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Add content'),
+    '#title' => t('Add existing content'),
   );
   if ($collapsed) {
     $form['add_content'] += array(
