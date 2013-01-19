@@ -556,6 +556,7 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   $form_state['entity_collection'] = $entity_collection;
   $form['#attributes'] = array('class' => array($entity_collection->name));
   if (module_exists('inline_entity_form')) {
+    module_load_include('ief.inc', 'entity_collection');
     $form = entity_collection_ief_create_form($form, $entity_collection);
   }
   $form['add_content'] = array(
