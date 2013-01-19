@@ -124,7 +124,6 @@ function entity_collection_ief_add(EntityCollection $entity_collection, $entity_
   if (!$js) {
     return drupal_get_form('entity_collection_ief_form', $entity_collection, $entity_type, $entity_bundle);
   }
-  $entity_info = entity_get_info($entity_type);
   ctools_include('modal');
   ctools_include('ajax');
   $form_state = array(
