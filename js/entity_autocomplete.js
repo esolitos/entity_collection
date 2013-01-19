@@ -1,5 +1,5 @@
 (function ($) {
-  Drupal.behaviors.entitycollectionAdmin = {
+  Drupal.behaviors.entityCollectionAutocomplete = {
     attach: function (context, settings) {
       var acdb = [];
       var entity_collection_forms = Drupal.settings.entity_collection;
