@@ -22,9 +22,10 @@ function entity_collection_entity_collection_content_type_content_types() {
     'description' => t('An entity collection.'),
     'category' => array(t('Entity collections'), -9),
     'defaults' => array(
-      'name' => '',
-      'type' => '',
-      'title' => '',
+      'name' => NULL,
+      'type' => NULL,
+      'editable' => FALSE,
+      'add_form' => FALSE,
     ),
   );
   // Get all entities.
@@ -55,11 +56,22 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
   if (!empty($entity)) {
     $entity->setContexts($contexts);
     $content->subject = $entity->title;
-    if (module_exists('references_dialog')) {
-      $content->content['#attached'] = references_dialog_attached();
-      $content->content['#attached']['js'][] = references_dialog_js_settings($conf['name'], array('callback_path' => 'entity-collection/' . $entity->name . '/ajax/add', 'refresh' => TRUE));
+    if (user_access("manage content in {$entity->type} entity collections") && !empty($conf['editable'])) {
+      if (isset($_GET['edit-collection']) && $_GET['edit-collection'] == $entity->eid) {
+        module_load_include('admin.inc', 'entity_collection');
+        $content->content['edit']['#markup'] = l(t('Show content'), current_path());
+        $content->content['content'] = drupal_get_form('entity_collection_content_form', $entity, current_path());
+        if (!empty($conf['add_form']) && user_access("add content to {$entity->type} entity collections")) {
+          $content->content['add_form'] = drupal_get_form('entity_collection_content_add_form', $entity, TRUE);
+        }
+      }
+      else {
+        $content->content['edit']['#markup'] = l(t('Manage content'), current_path(), array('query' => array('edit-collection' => $entity->eid)));
+      }
     }
-    $content->content['content'] = $entity->buildContent();
+    if (!isset($content->content['content'])) {
+      $content->content['content'] = $entity->buildContent();
+    }
     $query = array();
     $serialized = array();
     if (is_array($contexts)) {
@@ -72,19 +84,14 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
     }
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/content', 'title' => t('Content'), 'query' => $query);
     $content->admin_links[] = array('href' => 'entity-collection/' . $entity->name . '/edit', 'title' => t('Edit'), 'query' => $query + drupal_get_destination());
+    if (user_access("add content to {$entity->type} entity collections")) {
+      if(!$entity->getTree()->totalCount()) {
+        $content->content['content'] = t('No content has been added yet');
+      }
+    }
+  }
 
-  }
-  if (empty($content) && user_access("add content to {$entity->type} entity collections")) {
-    $content = t('No content has been added yet');
-  }
   return $content;
-}
-
-/**
- * Ajax callback for adding things into an entity collection.
- */
-function entity_collection_ajax($entity_collection) {
-  $data = $_POST['data'];
 }
 
 /**
@@ -92,7 +99,29 @@ function entity_collection_ajax($entity_collection) {
  */
 function entity_collection_entity_collection_content_type_edit_form($form, &$form_state) {
   $conf = $form_state['conf'];
+  $form['editable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Make this entity collection editable in place'),
+    '#default_value' => !empty($conf['editable']),
+  );
+  $form['add_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show form for adding content when editing'),
+    '#dependency' => array(
+      'edit-editable' => array(TRUE),
+    ),
+    '#default_value' => !empty($conf['add_form']),
+  );
   return $form;
+}
+
+function entity_collection_entity_collection_content_type_edit_form_submit($form, &$form_state) {
+  // Copy everything from our defaults.
+  foreach (array_keys($form_state['subtype']['defaults']) as $key) {
+    if (isset($form_state['values'][$key])) {
+      $form_state['conf'][$key] = $form_state['values'][$key];
+    }
+  }
 }
 
 /**

@@ -303,8 +303,11 @@ function entity_collection_content_admin($entity_collection) {
  * Manage the content of a entity_collection.
  * This is a simple and included admin-side form.
  */
-function entity_collection_content_form($form, &$form_state, $entity_collection) {
+function entity_collection_content_form($form, &$form_state, $entity_collection, $redirect = FALSE) {
   $form_state['entity_collection'] = $entity_collection;
+  if ($redirect) {
+    $form['#redirect'] = url($redirect);
+  }
   $contexts = $form_state['contexts'] = _entity_collection_get_contexts($entity_collection);
   $tree = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $contexts);
   $form['#tree'] = TRUE;
@@ -431,7 +434,10 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $tree = entity_collection_content_build_tree($form_state['entity_collection'], $values['content']);
-  if (isset($_GET['contexts'])) {
+  if (isset($form['#redirect'])) {
+    $form_state['redirect'] = $form['#redirect'];
+  }
+  elseif (isset($_GET['contexts'])) {
     $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $_GET['contexts'])));
   }
   EntityCollectionStorage::getBundleStorage($form_state['entity_collection']->bundle)->save($form_state['entity_collection'], $tree, $form_state['contexts']);
@@ -544,13 +550,19 @@ function entity_collection_content_delete_form_submit($form, &$form_state) {
 /**
  * A form for adding content to an entity collection.
  */
-function entity_collection_content_add_form($form, &$form_state, $entity_collection) {
+function entity_collection_content_add_form($form, &$form_state, $entity_collection, $collapsed = FALSE) {
   $form_state['entity_collection'] = $entity_collection;
   $form['#attributes'] = array('class' => array($entity_collection->name));
   $form['add_content'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add content'),
   );
+  if ($collapsed) {
+    $form['add_content'] += array(
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+  }
   $form['add_content']['entity_type'] = array(
     '#type' => 'select',
     '#options' => entity_collection_get_entity_type_options($entity_collection),
