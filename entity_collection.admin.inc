@@ -374,6 +374,14 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   $form['#style'] = $style;
   $form['#row'] = $row;
   foreach ($nodes as $key => $child) {
+    $dest = drupal_get_destination();
+    $query = array('query' => drupal_get_destination());
+    $links = array(
+      l(t('Remove from collection'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, $query),
+    );
+    if ($edit_path = entity_collection_edit_path($child->type, $child->content)) {
+      $links[] = l(t('Edit'), $edit_path, $query);
+    }
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
@@ -416,9 +424,9 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
         '#options' => $row->getOptions($child->type, $child->content),
       );
     }
-    $form['content'][$key]['delete'] = array(
+    $form['content'][$key]['operations'] = array(
       '#type' => 'markup',
-      '#markup' => l(t('Delete'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, array('query' => array('destination' => current_path()))),
+      '#markup' => implode(' | ', $links),
     );
     if (count($child->getChildren())) {
       entity_collection_content_form_content($entity_collection, $form, $child, $child->key, $depth + 1);
@@ -494,7 +502,7 @@ function theme_entity_collection_content_form(&$variables) {
       $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
       $form['content'][$key]['position']['#attributes']['class'] = array('position');
       $title = drupal_render($form['content'][$key]['title']);
-      $delete = drupal_render($form['content'][$key]['delete']);
+      $operations = drupal_render($form['content'][$key]['operations']);
       $position = drupal_render($form['content'][$key]['position']);
       $style = drupal_render($form['content'][$key]['style']);
       $rendered_key = drupal_render($form['content'][$key]['key']);
@@ -505,7 +513,7 @@ function theme_entity_collection_content_form(&$variables) {
       if ($form['#row']->useStylePerRow()) {
         $data[] = $style;
       }
-      $data[] = $delete;
+      $data[] = $operations;
       $rows[] = array('class' => array('draggable'), 'data' => $data);
     }
     $header = array(t('Title'), t('Position'));
