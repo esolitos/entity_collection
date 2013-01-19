@@ -113,8 +113,47 @@ function entity_collection_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'entity_collection.admin.inc',
   );
-
+  // Modal dialog for adding new entities directly to an entity collection.
+  if (module_exists('inline_entity_form')) {
+    $items['entity_collection/add/%entity_collection/%/%/%ctools_js'] = array(
+      'title' => 'Add new item to collection',
+      'page callback' => 'entity_collection_ief_add',
+      'file' => 'entity_collection.ief.inc',
+      'access callback' => 'entity_collection_ief_access',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array(2,3,4),
+      'page arguments' => array(2,3,4,5),
+    );
+  }
   return $items;
+}
+
+function entity_collection_edit_path($entity_type, $entity) {
+  $paths = drupal_static(__FUNCTION__, NULL);
+  list($id,,$bundle) = entity_extract_ids($entity_type, $entity);
+  if (!isset($paths)) {
+    $paths = module_invoke_all('entity_collection_edit_paths');
+  }
+  if (!isset($paths[$entity_type])) {
+    return FALSE;
+  }
+  return str_replace(array('[bundle]', '[id]'), array($bundle, $id), $paths[$entity_type]);
+}
+
+function entity_collection_entity_collection_edit_paths() {
+  return array(
+    'node' => 'node/[id]/edit',
+    'taxonomy_term' => 'taxonomy/term/[id]/edit',
+    'file' => 'file/[id]/edit',
+    'user' => 'user/[id]/edit',
+  );
+}
+
+function entity_collection_ief_access($entity_collection, $entity_type, $entity_bundle) {
+  return entity_collection_access('add content to', $entity_collection) &&
+         entity_access('create', $entity_type, $entity_bundle) &&
+         (empty($entity_collection->settings['allowed_bundles']) ||
+         in_array($entity_bundle, $entity_collection->settings['allowed_bundles'][$entity_type]));
 }
 
 /**

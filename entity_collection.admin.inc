@@ -559,6 +559,9 @@ function entity_collection_content_delete_form_submit($form, &$form_state) {
 function entity_collection_content_add_form($form, &$form_state, $entity_collection, $collapsed = FALSE) {
   $form_state['entity_collection'] = $entity_collection;
   $form['#attributes'] = array('class' => array($entity_collection->name));
+  if (module_exists('inline_entity_form')) {
+    $form = entity_collection_ief_create_form($form, $entity_collection);
+  }
   $form['add_content'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add content'),
@@ -579,7 +582,6 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
   $form['add_content']['content_select'] = array(
     '#type' => 'textfield',
     '#title' => t('Search'),
-    '#required' => TRUE,
     '#maxlength' => 60,
     '#description' => t('Type in the name of the content you want to add here.'),
     '#attributes' => array('class' => array('form-autocomplete')),
