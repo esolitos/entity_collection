@@ -9,7 +9,6 @@
  * Form callback for the entity_collection add form.
  */
 function entity_collection_add_form($form, &$form_state, $bundle) {
-  $form = array();
   $form_state['bundle'] = $bundle;
   $form = entity_collection_form($form, $form_state);
   $form['actions'] = array('#type' => 'actions');
@@ -25,7 +24,6 @@ function entity_collection_add_form($form, &$form_state, $bundle) {
  * Form callback for the entity_collection edit form.
  */
 function entity_collection_edit_form($form, &$form_state, $entity_collection) {
-  $form = array();
   $form_state['entity_collection'] = $entity_collection;
   $form = entity_collection_form($form, $form_state);
   $form['actions'] = array('#type' => 'actions');
