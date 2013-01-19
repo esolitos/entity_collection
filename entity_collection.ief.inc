@@ -121,18 +121,28 @@ function entity_collection_ief_create_form($form, EntityCollection $entity_colle
  *   If we are going to use with JS or not. JSON will be returned if it's true.
  */
 function entity_collection_ief_add(EntityCollection $entity_collection, $entity_type, $entity_bundle, $js) {
-  $form = drupal_get_form('entity_collection_ief_form', $entity_collection, $entity_type, $entity_bundle);
   if (!$js) {
-    return $form;
+    return drupal_get_form('entity_collection_ief_form', $entity_collection, $entity_type, $entity_bundle);
   }
   $entity_info = entity_get_info($entity_type);
   ctools_include('modal');
   ctools_include('ajax');
-  $commands = array();
-  $commands[] = ctools_modal_command_display($entity_info['bundles'][$entity_bundle]['label'], $form);
-  $commands[] = ctools_modal_command_loading();
-  if (!empty($_GET['dismiss'])) {
+  $form_state = array(
+    'ajax' => TRUE,
+    'title' => 'My title',
+    'build_info' => array(
+      'args' => array(
+        $entity_collection,
+        $entity_type,
+        $entity_bundle,
+      ),
+    ),
+  );
+  $commands = ctools_modal_form_wrapper('entity_collection_ief_form', $form_state);
+  if (!empty($form_state['executed'])) {
+    $commands = array();
     $commands[] = ctools_modal_command_dismiss();
+    $commands[] = ctools_ajax_command_reload();
   }
   print ajax_render($commands);
   exit();
