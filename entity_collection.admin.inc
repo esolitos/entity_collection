@@ -376,12 +376,11 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   foreach ($nodes as $key => $child) {
     $dest = drupal_get_destination();
     $query = array('query' => drupal_get_destination());
-    $links = array(
-      l(t('Remove from collection'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, $query),
-    );
+    $links = array();
     if ($edit_path = entity_collection_edit_path($child->type, $child->content)) {
       $links[] = l(t('Edit'), $edit_path, $query);
     }
+    $links[] = l(t('Remove from collection'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, $query);
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
