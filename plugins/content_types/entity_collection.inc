@@ -130,12 +130,8 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
   );
   $form['limitation'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Display a specified number of items'),
-    '#states' => array(
-      // Hide the settings when the limit checkbox is disabled.
-      'invisible' => array(
-       ':input[name="limit"]' => array('checked' => FALSE),
-      ),
+    '#dependency' => array(
+      'edit-limit' => array(TRUE),
     ),
   );
   $form['limitation']['length'] = array(
