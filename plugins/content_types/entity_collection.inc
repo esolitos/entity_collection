@@ -125,7 +125,6 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
   $form['limit'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display a specified number of items'),
-    // If any of the limitations are set, we want to show the fieldset below.
     '#default_value' => $conf['length'] + $conf['offset'] != 0,
   );
   $form['limitation'] = array(
@@ -155,6 +154,11 @@ function entity_collection_entity_collection_content_type_edit_form_submit($form
     if (isset($form_state['values'][$key])) {
       $form_state['conf'][$key] = $form_state['values'][$key];
     }
+  }
+  // Reset limitation if limit isn't checked.
+  if (empty($form_state['values']['limit'])) {
+    $form_state['conf']['length'] = $form_state['subtype']['defaults']['length'];
+    $form_state['conf']['offset'] = $form_state['subtype']['defaults']['offset'];
   }
 }
 
