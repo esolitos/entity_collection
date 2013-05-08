@@ -28,6 +28,7 @@ function entity_collection_entity_collection_content_type_content_types() {
       'add_form' => FALSE,
       'length' => 0,
       'offset' => 0,
+      'rendering' => 0,
     ),
   );
   // Get all entities.
@@ -145,6 +146,21 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
     '#description' => t('The number of items to skip. For example, if this field is 3, the first 3 items will be skipped and not displayed.'),
     '#default_value' => $conf['offset'],
   );
+  $form['minipanel'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Render items with a mini panel'),
+    '#default_value' => !empty($conf['rendering']),
+  );
+  $form['rendering'] = array(
+    '#type' => 'select',
+    '#options' => array_merge(array(
+      0 => t(' - None - '),
+    ), entity_collection_entity_collection_all_rendering_options($conf)),
+    '#default_value' => isset($conf['rendering']) ? $conf['rendering'] : array(),
+    '#dependency' => array(
+      'edit-minipanel' => array(TRUE),
+    ),
+  );
   return $form;
 }
 
@@ -160,6 +176,10 @@ function entity_collection_entity_collection_content_type_edit_form_submit($form
     $form_state['conf']['length'] = $form_state['subtype']['defaults']['length'];
     $form_state['conf']['offset'] = $form_state['subtype']['defaults']['offset'];
   }
+  // Reset rendering if minipanel isn't checked.
+  if (empty($form_state['values']['minipanel'])) {
+    $form_state['conf']['rendering'] = $form_state['subtype']['defaults']['rendering'];
+  }
 }
 
 /**
@@ -167,4 +187,39 @@ function entity_collection_entity_collection_content_type_edit_form_submit($form
  */
 function entity_collection_entity_collection_content_type_admin_title($subtype, $conf) {
   return t('Entity collection: @var', array('@var' => $conf['name']));
+}
+
+/**
+  * Get all available rendering options (mini-panels).
+  */
+function entity_collection_entity_collection_all_rendering_options($conf) {
+  $entity_collection = entity_collection_load($conf['name']);
+  foreach ($entity_collection->settings['allowed_bundles'] as $type => $bundles) {
+    if (count($bundles)) {
+      $available_contexts[] = 'entity:' . $type;
+    }
+  }
+  $mini_panels = panels_mini_load_all();
+  $available_contexts = array('entity_collection_item');
+  if (isset($entity_collection)) {
+    $available_contexts[] = 'entity:entity_collection';
+  }
+  foreach ($entity_collection->requiredcontexts as $context) {
+    $available_contexts[] = $context['name'];
+  }
+  $options = array();
+
+  foreach ($mini_panels as $name => $mini_panel) {
+    if (count($mini_panel->requiredcontexts) >= 1) {
+      $applicable = TRUE;
+      foreach ($mini_panel->requiredcontexts as $requiredcontext) {
+        if (!in_array($requiredcontext['name'], $available_contexts)) {
+          $applicable = FALSE;
+          break;
+        }
+      }
+      $options[$name] = $mini_panel->admin_title;
+    }
+  }
+  return $options;
 }
