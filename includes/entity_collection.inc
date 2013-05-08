@@ -64,10 +64,10 @@ class EntityCollection extends Entity {
    * @return array
    *  An array that can be used with Drupals rendering system.
    */
-  public function buildContent($view_mode = 'default', $langcode = NULL) {
+  public function buildContent($view_mode = 'default', $langcode = NULL, $settings = array()) {
     $tree = $this->getTree();
     $content = array();
-    $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree);
+    $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree, $langcode, $settings);
     if (isset($content['entity_collection'])) {
       foreach ($content['entity_collection'] as &$row) {
         $row[]['#entity_collection'] = $this;

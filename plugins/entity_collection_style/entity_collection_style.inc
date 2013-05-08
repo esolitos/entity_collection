@@ -34,7 +34,7 @@ interface EntityCollectionStyleInterface {
    * @param $langcode
    *   The language code to use.
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL);
+  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL, $settings = array());
 }
 /**
 * Simple interface for storing entity_collections.

@@ -26,6 +26,8 @@ function entity_collection_entity_collection_content_type_content_types() {
       'type' => NULL,
       'editable' => FALSE,
       'add_form' => FALSE,
+      'length' => 0,
+      'offset' => 0,
     ),
   );
   // Get all entities.
@@ -91,7 +93,7 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
       }
     }
     if (!isset($content->content['content'])) {
-      $content->content['content'] = $entity->buildContent();
+      $content->content['content'] = $entity->buildContent('default', NULL, $conf);
     }
     if (user_access("add content to {$entity->type} entity collections")) {
       if(!$entity->getTree()->totalCount()) {
@@ -119,6 +121,34 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
       'edit-editable' => array(TRUE),
     ),
     '#default_value' => !empty($conf['add_form']),
+  );
+  $form['limit'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display a specified number of items'),
+    // If any of the limitations are set, we want to show the fieldset below.
+    '#default_value' => $conf['length'] + $conf['offset'] != 0,
+  );
+  $form['limitation'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Display a specified number of items'),
+    '#states' => array(
+      // Hide the settings when the limit checkbox is disabled.
+      'invisible' => array(
+       ':input[name="limit"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
+  $form['limitation']['length'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Items to display'),
+    '#description' => t('The number of items to display. Enter 0 for no limit.'),
+    '#default_value' => $conf['length'],
+  );
+  $form['limitation']['offset'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Offset'),
+    '#description' => t('The number of items to skip. For example, if this field is 3, the first 3 items will be skipped and not displayed.'),
+    '#default_value' => $conf['offset'],
   );
   return $form;
 }
