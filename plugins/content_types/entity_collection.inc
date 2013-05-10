@@ -26,9 +26,7 @@ function entity_collection_entity_collection_content_type_content_types() {
       'type' => NULL,
       'editable' => FALSE,
       'add_form' => FALSE,
-      'length' => 0,
-      'offset' => 0,
-      'rendering' => 0,
+      'style_settings' => array(),
     ),
   );
   // Get all entities.
@@ -94,7 +92,7 @@ function entity_collection_entity_collection_content_type_render($subtype, $conf
       }
     }
     if (!isset($content->content['content'])) {
-      $content->content['content'] = $entity->buildContent('default', NULL, $conf);
+      $content->content['content'] = $entity->buildContent('default', NULL, $conf['style_settings']);
     }
     if (user_access("add content to {$entity->type} entity collections")) {
       if(!$entity->getTree()->totalCount()) {
@@ -123,62 +121,29 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
     ),
     '#default_value' => !empty($conf['add_form']),
   );
-  $form['limit'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Display a specified number of items'),
-    '#default_value' => $conf['length'] + $conf['offset'] != 0,
-  );
-  $form['limitation'] = array(
+  $entity_collection = entity_collection_load($conf['name']);
+  $style = EntityCollectionStyle::getStyle($entity_collection);
+  $form['settings']['style_settings'] = array(
     '#type' => 'fieldset',
-    '#dependency' => array(
-      'edit-limit' => array(TRUE),
-    ),
+    '#title' => t('Style settings'),
+    '#tree' => TRUE,
   );
-  $form['limitation']['length'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Items to display'),
-    '#description' => t('The number of items to display. Enter 0 for no limit.'),
-    '#default_value' => $conf['length'],
-  );
-  $form['limitation']['offset'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Offset'),
-    '#description' => t('The number of items to skip. For example, if this field is 3, the first 3 items will be skipped and not displayed.'),
-    '#default_value' => $conf['offset'],
-  );
-  $form['minipanel'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Render items with a mini panel'),
-    '#default_value' => !empty($conf['rendering']),
-  );
-  $form['rendering'] = array(
-    '#type' => 'select',
-    '#options' => array_merge(array(
-      0 => t(' - None - '),
-    ), entity_collection_entity_collection_all_rendering_options($conf)),
-    '#default_value' => isset($conf['rendering']) ? $conf['rendering'] : array(),
-    '#dependency' => array(
-      'edit-minipanel' => array(TRUE),
-    ),
-  );
+  if (isset($style) && method_exists($style, 'settingsForm')) {
+    $style->settingsForm($form['settings']['style_settings'], $conf['style_settings']);
+  }
+
   return $form;
 }
 
 function entity_collection_entity_collection_content_type_edit_form_submit($form, &$form_state) {
+  $entity_collection = entity_collection_load($form_state['conf']['name']);
+  $style = EntityCollectionStyle::getStyle($entity_collection);
+  $style->formSettingsSubmit($form_state['values']['settings']['style_settings']);
   // Copy everything from our defaults.
   foreach (array_keys($form_state['subtype']['defaults']) as $key) {
     if (isset($form_state['values'][$key])) {
       $form_state['conf'][$key] = $form_state['values'][$key];
     }
-  }
-  // Reset limitation if limit isn't checked.
-  if (empty($form_state['values']['limit'])) {
-    $form_state['conf']['length'] = $form_state['subtype']['defaults']['length'];
-    $form_state['conf']['offset'] = $form_state['subtype']['defaults']['offset'];
-  }
-  // Reset rendering if minipanel isn't checked.
-  if (empty($form_state['values']['minipanel'])) {
-    $form_state['conf']['rendering'] = $form_state['subtype']['defaults']['rendering'];
   }
 }
 
@@ -187,39 +152,4 @@ function entity_collection_entity_collection_content_type_edit_form_submit($form
  */
 function entity_collection_entity_collection_content_type_admin_title($subtype, $conf) {
   return t('Entity collection: @var', array('@var' => $conf['name']));
-}
-
-/**
-  * Get all available rendering options (mini-panels).
-  */
-function entity_collection_entity_collection_all_rendering_options($conf) {
-  $entity_collection = entity_collection_load($conf['name']);
-  foreach ($entity_collection->settings['allowed_bundles'] as $type => $bundles) {
-    if (count($bundles)) {
-      $available_contexts[] = 'entity:' . $type;
-    }
-  }
-  $mini_panels = panels_mini_load_all();
-  $available_contexts = array('entity_collection_item');
-  if (isset($entity_collection)) {
-    $available_contexts[] = 'entity:entity_collection';
-  }
-  foreach ($entity_collection->requiredcontexts as $context) {
-    $available_contexts[] = $context['name'];
-  }
-  $options = array();
-
-  foreach ($mini_panels as $name => $mini_panel) {
-    if (count($mini_panel->requiredcontexts) >= 1) {
-      $applicable = TRUE;
-      foreach ($mini_panel->requiredcontexts as $requiredcontext) {
-        if (!in_array($requiredcontext['name'], $available_contexts)) {
-          $applicable = FALSE;
-          break;
-        }
-      }
-      $options[$name] = $mini_panel->admin_title;
-    }
-  }
-  return $options;
 }

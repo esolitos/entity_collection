@@ -105,8 +105,21 @@ class EntityCollectionTreeNode {
    * @return array<EntityCollectionTreeNode>
    *   A list of tree nodes.
    */
-  public function getFlat() {
-    return $this->list;
+  public function getFlat($offset = 0, $length = NULL) {
+    return array_slice($this->list, $offset, $length == 0 ? NULL : $length);
+  }
+
+  /**
+   * Slice away items in tree to the offset and length provided.
+   * @return array<EntityCollectionTreeNode>
+   */
+  public function splice($offset = 0, $length = NULL) {
+    $clone = clone $this;
+    $marked_remove = array_diff_key($this->list, $this->getFlat($offset, $length));
+    foreach($marked_remove as $child) {
+      $clone->removeChild($child);
+    }
+    return $clone;
   }
 
   /**

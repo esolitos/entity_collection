@@ -34,7 +34,7 @@ interface EntityCollectionStyleInterface {
    * @param $langcode
    *   The language code to use.
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL, $settings = array());
+  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL);
 }
 /**
 * Simple interface for storing entity_collections.
@@ -108,4 +108,14 @@ abstract class EntityCollectionStyle {
     }
     return $options;
   }
+
+  /**
+   * Give the option to add a settings form for the style plugin.
+   */
+  public function settingsForm(&$form, $settings = array()) {}
+
+  /**
+   * Give the possibility to process the settings after submit.
+   */
+  public function formSettingsSubmit(&$settings) {}
 }

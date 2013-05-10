@@ -490,6 +490,15 @@ function entity_collection_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+  $info['entity_collection_style_limit'] = array(
+    'title' => t('Limited list'),
+    'entity_collection_style' => array(
+      'parent' => 'EntityCollectionStyle',
+      'class' => 'EntityCollectionStyleLimit',
+      'file' => 'entity_collection_style_limit.inc',
+      'path' => $path,
+    ),
+  );
   $info['entity_collection_style_hierarchy'] = array(
     'title' => t('Hierarchy'),
     'theme' => array(

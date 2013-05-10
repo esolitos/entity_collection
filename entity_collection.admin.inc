@@ -231,6 +231,9 @@ function entity_collection_form_validate($form, &$form_state) {
 function entity_collection_form_submit($form, &$form_state) {
   ctools_include('cache');
   $entity_collection = $form_state['entity_collection'];
+  // Let the style plugin postprocess the new style settings.
+  $style = EntityCollectionStyle::getStyle($entity_collection);
+  $style->formSettingsSubmit($form_state['values']['settings']['style_settings']);
   // Transfer any required context from the cached version,
   // since that is handled by CTools.
   $cached_entity_collection = ctools_cache_get('entity_collection_cache_object', $entity_collection->name);
