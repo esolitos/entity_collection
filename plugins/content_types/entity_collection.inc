@@ -138,7 +138,7 @@ function entity_collection_entity_collection_content_type_edit_form($form, &$for
 function entity_collection_entity_collection_content_type_edit_form_submit($form, &$form_state) {
   $entity_collection = entity_collection_load($form_state['conf']['name']);
   $style = EntityCollectionStyle::getStyle($entity_collection);
-  $style->formSettingsSubmit($form_state['values']['settings']['style_settings']);
+  $style->formSettingsSubmit($form_state['values']['style_settings']);
   // Copy everything from our defaults.
   foreach (array_keys($form_state['subtype']['defaults']) as $key) {
     if (isset($form_state['values'][$key])) {

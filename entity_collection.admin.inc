@@ -138,7 +138,7 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   $style = EntityCollectionStyle::getStyle($entity_collection);
   $form['settings']['style_settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Style settings'),
+    '#title' => t('Default style settings'),
     '#tree' => TRUE,
   );
   if (isset($style) && method_exists($style, 'settingsForm')) {
