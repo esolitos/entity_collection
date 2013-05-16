@@ -42,6 +42,13 @@ class EntityCollectionTreeNode {
   }
 
   /**
+   * Clone the tree node object.
+   */
+  public function __clone() {
+    $this->root = $this;
+  }
+
+  /**
    * Add a child to this node. This is a helper for addChildNode.
    * @param string $name
    * @param stdClass $content
@@ -114,12 +121,13 @@ class EntityCollectionTreeNode {
    * @return array<EntityCollectionTreeNode>
    */
   public function splice($offset = 0, $length = NULL) {
-    $clone = clone $this;
     $marked_remove = array_diff_key($this->list, $this->getFlat($offset, $length));
     foreach($marked_remove as $child) {
-      $clone->removeChild($child);
+      $this->removeChild($child);
+      $key = $this->getNodeKey($child);
+      unset($this->list[$key]);
     }
-    return $clone;
+    return $this;
   }
 
   /**
@@ -128,6 +136,7 @@ class EntityCollectionTreeNode {
   public function getLastChild() {
     return end($this->children);
   }
+
   /**
    * Get a child key based on entity type and entity id.
    */

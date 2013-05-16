@@ -25,8 +25,10 @@ class EntityCollectionStyleLimit extends EntityCollectionStyle {
     if ($settings['rendering']) {
       $minipanel = panels_mini_load($settings['rendering']);
       if (isset($minipanel)) {
-        $clone = $tree->splice($settings['limitation']['offset'], $settings['limitation']['length']);
-        $contexts = array('entity_collection_item' => ctools_context_create('entity_collection_item', $clone));
+        $tree = clone $tree;
+        $tree->entity_id = $entity->name;
+        $tree->splice($settings['limitation']['offset'], $settings['limitation']['length']);
+        $contexts = array('entity_collection_item' => ctools_context_create('entity_collection_item', $tree));
         $context = ctools_context_match_required_contexts($minipanel->requiredcontexts, $contexts);
         $minipanel->context = $minipanel->display->context = ctools_context_load_contexts($minipanel, FALSE, $context);
         $minipanel->display->owner = $minipanel;
