@@ -141,6 +141,12 @@ class EntityCollectionStyleLimit extends EntityCollectionStyle {
       $settings['limitation']['length'] = 0;
       $settings['limitation']['offset'] = 0;
     }
+    if (empty($settings['limitation']['length'])) {
+      $settings['limitation']['length'] = 0;
+    }
+    if (empty($settings['limitation']['offset'])) {
+      $settings['limitation']['offset'] = 0;
+    }
     // Reset rendering if minipanel isn't checked.
     if (empty($settings['minipanel'])) {
       $settings['rendering'] = 0;

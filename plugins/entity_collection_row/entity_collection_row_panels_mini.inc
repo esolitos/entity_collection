@@ -76,13 +76,26 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
    * Get all available options.
    */
   public function getAllOptions() {
-    foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
-      if (count($bundles)) {
-        $available_contexts[] = 'entity:' . $type;
+    if (isset($this->entity_collection)) {
+      $available_contexts = array();
+      foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
+        if (count($bundles)) {
+          $available_contexts[] = 'entity:' . $type;
+        }
+      }
+    }
+    else {
+      $allowed_bundles = entity_collection_load_all();
+      $available_contexts = array('entity:node');
+      foreach($allowed_bundles as $collection) {
+        foreach ($collection->settings['allowed_bundles'] as $type => $bundles) {
+          if (count($bundles)) {
+            $available_contexts[] = 'entity:' . $type;
+          }
+        }
       }
     }
     $mini_panels = panels_mini_load_all();
-    $available_contexts = array('entity_collection_item');
     if (isset($this->entity_collection)) {
       $available_contexts[] = 'entity:entity_collection';
     }
@@ -100,7 +113,9 @@ class EntityCollectionRowPanelsMini extends EntityCollectionRow {
             break;
           }
         }
-        $options[$name] = $mini_panel->admin_title;
+        if ($applicable) {
+          $options[$name] = $mini_panel->admin_title;
+        }
       }
     }
     return $options;
