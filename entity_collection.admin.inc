@@ -14,7 +14,7 @@ function entity_collection_add_form($form, &$form_state, $bundle) {
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save entity_collection'),
+    '#value' => t('Save entity collection'),
     '#weight' => 40,
   );
   return $form;
@@ -281,7 +281,7 @@ function entity_collection_admin() {
   if (count($entity_collection_table)) {
     return theme('table', array('rows' => $entity_collection_table, 'header' => array('Title', 'Type', 'Operations')));
   }
-  return t("You haven't created any entity_collections yet.");
+  return t("You haven't created any entity collections yet.");
 }
 
 /**
