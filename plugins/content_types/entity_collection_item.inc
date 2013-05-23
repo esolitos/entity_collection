@@ -29,7 +29,7 @@ function entity_collection_entity_collection_item_content_type_render($subtype, 
   }
   $tree = $context->data;
   $entity_collection = entity_collection_load($tree->entity_id);
-  $item = array_shift($entity_collection->getTree()->getFlat($conf['delta'], 1));
+  $item = array_shift($tree->getFlat($conf['delta'], 1));
   if (isset($item) && isset($conf['row_settings']['style'])) {
     $item->style = $conf['row_settings']['style'];
   }
