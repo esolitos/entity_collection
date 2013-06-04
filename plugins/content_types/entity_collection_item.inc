@@ -43,7 +43,7 @@ function entity_collection_entity_collection_item_content_type_render($subtype, 
     $row = new $plugin['entity_collection_row']['class'](NULL, array());
   }
   // Build the content with the style.
-  if (isset($row) && method_exists($row, 'build')) {
+  if (isset($row, $item) && method_exists($row, 'build')) {
     $content->content = $row->build($entity_collection, $item, NULL);
   }
 
