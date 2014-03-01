@@ -509,10 +509,11 @@ function entity_collection_entity_collection_plugins() {
     'entity_collection_style' => array(
       'parent' => 'EntityCollectionStyle',
       'class' => 'EntityCollectionStyleHierarchy',
-      'file' => 'entity_collection_style_hiearchy.inc',
+      'file' => 'entity_collection_style_hierarchy.inc',
       'path' => $path,
     ),
   );
+  $path = drupal_get_path('module', 'entity_collection') . '/plugins/entity_collection_row';
   $info['entity_collection_row_view_mode'] = array(
     'title' => t('View mode'),
     'entity_collection_row' => array(
