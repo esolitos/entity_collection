@@ -614,7 +614,7 @@ function template_preprocess_entity_collection(&$variables) {
  */
 function entity_collection_access($op, $entity_collection, $account = NULL) {
   if (isset($entity_collection)) {
-    return user_access("$op {$entity_collection->bundle} collections", $account);
+    return user_access("$op {$entity_collection->bundle} entity collections", $account);
   }
 }
 
