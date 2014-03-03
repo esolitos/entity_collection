@@ -727,13 +727,19 @@ function entity_collection_entity_delete($entity, $type) {
   if (!empty($collections)) {
     list($id) = entity_extract_ids($type, $entity);
     foreach ($collections as $collection) {
-      EntityCollectionStorage::getBundleStorage($collection->bundle)->delete($collection, $type, array($id));
+      $storage = EntityCollectionStorage::getBundleStorage($collection->bundle);
+      if($storage) {
+        $storage->delete($collection, $type, array($id));
+      }
     }
   }
   // Remove any data attached to this entity collection.
   if ($type == 'entity_collection') {
-    EntityCollectionStorage::getBundleStorage($entity->bundle)->drop($entity);
-    field_attach_delete($type, $entity);
+    $storge = EntityCollectionStorage::getBundleStorage($entity->bundle);
+    if ($storage) {
+      $storage->drop($entity);
+      field_attach_delete($type, $entity);
+    }
   }
 }
 
