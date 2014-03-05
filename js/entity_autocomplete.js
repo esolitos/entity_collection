@@ -25,7 +25,6 @@
           if (contexts) {
             uri += '/' + contexts;
           }
-          console.log(uri);
           if (!acdb[uri]) {
             acdb[uri] = new Drupal.ACDB(uri);
           }
