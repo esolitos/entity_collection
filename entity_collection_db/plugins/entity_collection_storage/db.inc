@@ -155,6 +155,9 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       if (!empty($value->parent)) {
         $node = $tree->getChild($value->parent);
       }
+      if (!empty($value->style)) {
+        $value->style = unserialize($value->style);
+      }
       if (empty($node)) {
         $node = $tree;
       }

@@ -18,6 +18,17 @@ function entity_collection_db_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+
+  $info['entity_collection_storage_db_limit'] = array(
+    'title' => t('Database storage with limit'),
+    'entity_collection_storage' => array(
+      'parent' => 'EntityCollectionStorageDB',
+      'class' => 'EntityCollectionStorageLimitDB',
+      'file' => 'db_limit.inc',
+      'path' => $path,
+    ),
+  );
+  
   return $info;
 }
 

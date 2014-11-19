@@ -60,9 +60,9 @@ function entity_collection_db_schema() {
         'description' => 'The parent, if any.',
       ),
       'style' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'blob',
         'description' => 'The styles to be used to render this row',
+        'serialize' => TRUE,
       ),
       'contexts' => array(
         'type' => 'varchar',
@@ -78,4 +78,62 @@ function entity_collection_db_schema() {
     ),
   );
   return $schema;
+}
+
+/**
+ * Updates the table to store the style as a serialized object.
+ */
+function entity_collection_db_update_7200(&$sandbox)
+{
+
+  if (!isset($sandbox['progress']))
+  {
+    // If the table has not been updated yet
+    if (  !db_field_exists('entity_collection_storage', 'old_style') ) {
+      $old_style_spec = array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'The styles to be used to render this row',
+      );
+      $new_style_spec = $old_style_spec;
+      $new_style_spec['type'] = 'blob';
+      $new_style_spec['serialize'] = TRUE;
+  
+      db_change_field('entity_collection_storage', 'style', 'old_style', $old_style_spec);
+      db_add_field('entity_collection_storage', 'style', $new_style_spec);
+    }
+    
+    $sandbox['progress'] = 0;
+    $sandbox['current_rsid'] = 0;
+    $sandbox['max'] = db_query('SELECT COUNT(rsid) FROM entity_collection_storage')->fetchField();
+  }
+
+  $items = db_select('entity_collection_storage', 'c')
+    ->fields('c')
+    ->condition('rsid', $sandbox['current_rsid'], '>')
+    ->range(0, 5)
+    ->orderBy('rsid', 'ASC')
+    ->execute();
+
+  foreach ($items as $item) {
+    $fields = array(
+      'style' => serialize($item->old_style),
+    );
+    
+    db_update('entity_collection_storage')
+      ->fields($fields)
+      ->condition('rsid', $item->rsid)
+      ->execute();
+
+    $sandbox['progress']++;
+    $sandbox['current_rsid'] = $item->rsid;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  if ( $sandbox['#finished'] === 1 ) {
+    db_drop_field('entity_collection_storage', 'old_style');
+  }
+
+  return;
 }
