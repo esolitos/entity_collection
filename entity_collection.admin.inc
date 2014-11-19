@@ -417,11 +417,11 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       '#default_value' => $depth,
     );
     if ($row->useStylePerRow()) {
-      $form['content'][$key]['style'] = array(
-        '#type' => 'select',
-        '#default_value' => $child->style,
-        '#options' => $row->getOptions($child->type, $child->content),
-      );
+      $row_options = $row->getOptions($child->type, $child->content);
+      foreach ($row_options as $option_key => $option_form_item) {
+        $form['content'][$key]['style'][$option_key] = $option_form_item;
+        $form['content'][$key]['style'][$option_key]['#default_value'] = $child->style[$option_key];
+      }
     }
     $form['content'][$key]['operations'] = array(
       '#type' => 'markup',

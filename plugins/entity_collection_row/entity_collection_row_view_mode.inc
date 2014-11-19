@@ -34,7 +34,13 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
     foreach ($entity_info['view modes'] as $mode => $info) {
       $options[$mode] = $info['label'];
     }
-    return $options;
+    
+    return array(
+      'view_mode' => array(
+        '#type' => 'select',
+        '#options' => $options,
+      ),
+    );
   }
 
   /**
@@ -42,7 +48,7 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
    */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
     if ($item->type != 'entity_collection') {
-      return entity_view($item->type, array($item->entity_id => $item->content), $item->style, $langcode);
+      return entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode);
     }
   }
 }

@@ -513,6 +513,16 @@ function entity_collection_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+  $info['entity_collection_style_grid'] = array(
+    'title' => t('Limited grid'),
+    'entity_collection_style' => array(
+      'parent' => 'EntityCollectionStyle',
+      'class' => 'EntityCollectionStyleGrid',
+      'file' => 'entity_collection_style_grid.inc',
+      'path' => $path,
+    ),
+  );
+  
   $path = drupal_get_path('module', 'entity_collection') . '/plugins/entity_collection_row';
   $info['entity_collection_row_view_mode'] = array(
     'title' => t('View mode'),
@@ -520,6 +530,15 @@ function entity_collection_entity_collection_plugins() {
       'parent' => 'EntityCollectionRow',
       'class' => 'EntityCollectionRowViewMode',
       'file' => 'entity_collection_row_view_mode.inc',
+      'path' => $path,
+    ),
+  );
+  $info['entity_collection_row_view_options'] = array(
+    'title' => t('View Options'),
+    'entity_collection_row' => array(
+      'parent' => 'EntityCollectionRow',
+      'class' => 'EntityCollectionRowOptions',
+      'file' => 'entity_collection_row_options.inc',
       'path' => $path,
     ),
   );
@@ -534,6 +553,7 @@ function entity_collection_entity_collection_plugins() {
       ),
     );
   }
+
   return $info;
 }
 
