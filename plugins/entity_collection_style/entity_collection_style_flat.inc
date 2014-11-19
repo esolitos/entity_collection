@@ -13,7 +13,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
    * Build the content in the entity collection.
    * @see EntityCollectionStyle::build().
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL) {
+  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL) {
     $content = array();
     // Get a flat list of everything. We don't care about
     // grouping, we just want a flat array, sorted properly.

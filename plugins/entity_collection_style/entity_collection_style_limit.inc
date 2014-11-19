@@ -13,7 +13,7 @@ class EntityCollectionStyleLimit extends EntityCollectionStyle {
    * Build the limited list.
    * @see EntityCollectionStyle::build().
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL, $settings = array()) {
+  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL, $settings = array()) {
     $content = array();
     // Override defaults with minipanel settings.
     $settings = array_merge(array('limitation' => array(

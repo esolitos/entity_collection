@@ -13,7 +13,7 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
    * Build the hierarchy.
    * @see EntityCollectionStyle::build().
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL) {
+  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL) {
     $content = array();
     $this->renderTreeNode($content, $entity, $tree, $langcode);
     return $content;

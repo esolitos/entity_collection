@@ -30,11 +30,11 @@ interface EntityCollectionStyleInterface {
    * @param EntityCollection $entity
    *   The entity in which the content belongs.
    * @param EntityCollectionTreeNode $tree
-   *   The tree to build
+   *   The tree to build, passed for reference in case some persistance is needed.
    * @param $langcode
    *   The language code to use.
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode $tree, $langcode = NULL);
+  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL);
 }
 /**
 * Simple interface for storing entity_collections.
