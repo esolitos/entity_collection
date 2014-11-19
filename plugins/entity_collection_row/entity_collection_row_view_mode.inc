@@ -38,6 +38,7 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
     return array(
       'view_mode' => array(
         '#type' => 'select',
+        '#title' => t('View Mode'),
         '#options' => $options,
       ),
     );

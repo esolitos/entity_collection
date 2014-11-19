@@ -30,15 +30,8 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
    * @param string $entity_types
    */
   public function getOptions($entity_type) {
-    $options = $this->getBaseOptions();
-    $options['view_mode'] = array(
-      '#type' => 'select',
-      '#title' => t('View Mode'),
-      // '#description' => t('Select the Entity\'s view mode.'),
-      '#options' => $this->getAllowedViewModes($entity_type),
-      '#default_value' => -1,
-    );
-    
+    $options = $this->getBaseOptions($entity_type);
+
     $context = $this->getAlterContext();
     drupal_alter('entity_collection_row_options', $options, $context);
 
@@ -53,13 +46,6 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
       if (count($bundles)) {
         $options[$type] = $this->getBaseOptions();
-        $options[$type]['view_mode'] = array(
-          '#type' => 'select',
-          '#title' => t('View Mode'),
-          // '#description' => t('Select the Entity\'s view mode.'),
-          '#options' => $this->getAllowedViewModes($type),
-          '#default_value' => -1,
-        );
       }
     }
 
@@ -189,13 +175,12 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
   /**
    *
    */
-  private function getBaseOptions() {
+  private function getBaseOptions($entity_type) {
     $form_items = array();
 
     $form_items['box_decoration'] = array(
       '#type' => 'select',
       '#title' => t('Box Decoration'),
-      // '#description' => t('Decorations the wrapper element.'),
       '#options' => array(
         0 => t("None"),
         'bg_info' => t("Info"),
@@ -207,7 +192,6 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     $form_items['title_font_weight'] = array(
       '#type' => 'select',
       '#title' => t('Title Font weight'),
-      // '#description' => t('Selects the weight of the Title font'),
       '#options' => array(
         0 => t("Normal"),
         'bold' => t("Bold"),
@@ -218,7 +202,6 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     $form_items['title_font_size'] = array(
       '#type' => 'select',
       '#title' => t('Title Font size'),
-      // '#description' => t('Selects the size of the Title font'),
       '#options' => array(
         0 => t("Normal"),
         'xlarge' => t("Extra Large"),
@@ -231,12 +214,18 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     $form_items['title_decoration'] = array(
       '#type' => 'select',
       '#title' => t('Title Decoration'),
-      // '#description' => t('Select the decoration to apply to the title font'),
       '#options' => array(
         0 => t("None"),
         'highlight' => t("Highlight"),
         'underline' => t("Underline"),
       ),
+      '#default_value' => -1,
+    );
+    
+    $form_items['view_mode'] = array(
+      '#type' => 'select',
+      '#title' => t('View Mode'),
+      '#options' => $this->getAllowedViewModes($entity_type),
       '#default_value' => -1,
     );
 

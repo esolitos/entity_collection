@@ -503,28 +503,52 @@ function theme_entity_collection_content_form(&$variables) {
       $title = drupal_render($form['content'][$key]['title']);
       $operations = drupal_render($form['content'][$key]['operations']);
       $position = drupal_render($form['content'][$key]['position']);
-      $style = drupal_render($form['content'][$key]['style']);
-      $rendered_key = drupal_render($form['content'][$key]['key']);
-      $parent = drupal_render($form['content'][$key]['parent']);
-      $depth = drupal_render($form['content'][$key]['depth']);
-      $indentation = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-      $data = array($indentation . $title . $parent . $depth . $rendered_key, $position);
-      if ($form['#row']->useStylePerRow()) {
-        $data[] = $style;
+
+      $style = array();
+      $style_opts = element_children($form['content'][$key]['style']);
+      foreach ($form['content'][$key]['style'] as $option => $item) {
+        if (in_array($option, $style_opts)) {
+          $fname = $item['#title'];
+          unset($item['#title']);
+          if($item['#type'] != 'value') {
+            $style[$fname] = drupal_render($item);  
+          }
+          
+        }
       }
+      $form['content'][$key]['style']['#printed'] = TRUE;
+
+      $rendered_key = drupal_render($form['content'][$key]['key']);
+      $parent       = drupal_render($form['content'][$key]['parent']);
+      $depth        = drupal_render($form['content'][$key]['depth']);
+      $indentation  = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
+      $data         = array(
+        $indentation . $title . $parent . $depth . $rendered_key,
+        $position,
+      );
+
+      if ($form['#row']->useStylePerRow()) {
+        foreach ($style as $key => $value) {
+          $data[] = $value;
+        }
+      }
+
       $data[] = $operations;
       $rows[] = array('class' => array('draggable'), 'data' => $data);
     }
     $header = array(t('Title'), t('Position'));
+
     if ($form['#row']->useStylePerRow()) {
-      $header[] = t('Style');
+      foreach ($style as $name => $value) {
+        $header[] = $name;
+      }
     }
     $header[] = t('Operations');
     $output = theme('table', array(
-      'header' => $header,
-      'rows' => $rows,
-      'attributes' => array('id' => 'entity_collection-table'),
-    ));
+        'header' => $header,
+        'rows' => $rows,
+        'attributes' => array('id' => 'entity_collection-table'),
+      ));
     if ($form['#style']->getMaxDepth()) {
 
       drupal_add_tabledrag('entity_collection-table', 'match', 'parent', 'entity_collection-parent', 'entity_collection-parent', 'key', FALSE, $form['#style']->getMaxDepth());
