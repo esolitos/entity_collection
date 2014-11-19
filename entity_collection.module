@@ -735,7 +735,7 @@ function entity_collection_entity_delete($entity, $type) {
   }
   // Remove any data attached to this entity collection.
   if ($type == 'entity_collection') {
-    $storge = EntityCollectionStorage::getBundleStorage($entity->bundle);
+    $storage = EntityCollectionStorage::getBundleStorage($entity->bundle);
     if ($storage) {
       $storage->drop($entity);
       field_attach_delete($type, $entity);
