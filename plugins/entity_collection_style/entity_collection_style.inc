@@ -39,7 +39,7 @@ interface EntityCollectionStyleInterface {
 /**
 * Simple interface for storing entity_collections.
 */
-abstract class EntityCollectionStyle {
+abstract class EntityCollectionStyle implements EntityCollectionStyleInterface {
   function __construct($entity_collection, $settings = array()) {
     $this->entity_collection = $entity_collection;
     $this->settings = $settings;
@@ -57,6 +57,13 @@ abstract class EntityCollectionStyle {
    */
   public function useReordering() {
     return TRUE;
+  }
+  
+  /**
+   * Do not use grouping by default.
+   */
+  public function useGrouping(){
+    return FALSE;
   }
 
   /**
