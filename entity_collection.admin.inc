@@ -682,33 +682,40 @@ function entity_collection_content_form_autocomplete(EntityCollection $entity_co
   if ($entity_type == 'user') {
     $label_property = 'name';
   }
+  // If we don't have a lable to search into, just return an empty result.
   $matches = array();
-  $types = entity_collection_get_entity_type_options($entity_collection);
-  $allowed_bundles = $entity_collection->settings['allowed_bundles'];
-  $bundles = array();
-  foreach ($allowed_bundles[$entity_type] as $bundle => $enabled) {
-    if ($enabled) {
-      $bundles[] = $bundle;
+  if ( !empty($label_property) ) {
+    $types = entity_collection_get_entity_type_options($entity_collection);
+    $allowed_bundles = $entity_collection->settings['allowed_bundles'];
+    $bundles = array();
+    foreach ($allowed_bundles[$entity_type] as $bundle => $enabled) {
+      if ($enabled) {
+        $bundles[] = $bundle;
+      }
     }
-  }
-  // Don't output any results if we get an invalid input.
-  if (!isset($types[$entity_type])) {
-    drupal_json_output(array());
-  }
-  $query = new EntityFieldQuery();
-  $result = $query->entityCondition('entity_type', $entity_type)
-    ->entityCondition('bundle', $allowed_bundles[$entity_type])
-    ->propertyCondition($label_property, db_like($string) . '%', 'LIKE')
-    ->range(0, 10)
-    ->execute();
-  $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $loaded_contexts);
-  if (isset($result[$entity_type])) {
-    $entities = entity_load($entity_type, array_keys($result[$entity_type]));
-    foreach ($entities as $entity) {
-      list($id) = entity_extract_ids($entity_type, $entity);
-      $key = $entity_type . ':' . $id;
-      if (entity_access('view', $entity_type, $entity) && !$content->getChild($key)) {
-        $matches[$key] = check_plain(entity_label($entity_type, $entity));
+    // Don't output any results if we get an invalid input.
+    if (!isset($types[$entity_type])) {
+      drupal_json_output(array());
+    }
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', $entity_type)
+      ->propertyCondition($label_property, db_like($string) . '%', 'LIKE');
+
+    if ( isset($info['bundle keys']) ) {
+      $query->entityCondition('bundle', $allowed_bundles[$entity_type]);
+    }
+  
+    $result = $query->range(0, 10)->execute();
+  
+    $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $loaded_contexts);
+    if (isset($result[$entity_type])) {
+      $entities = entity_load($entity_type, array_keys($result[$entity_type]));
+      foreach ($entities as $entity) {
+        list($id) = entity_extract_ids($entity_type, $entity);
+        $key = $entity_type . ':' . $id;
+        if (entity_access('view', $entity_type, $entity) && !$content->getChild($key)) {
+          $matches[$key] = check_plain(entity_label($entity_type, $entity));
+        }
       }
     }
   }
