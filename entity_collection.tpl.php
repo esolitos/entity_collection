@@ -11,10 +11,6 @@
   <?php endif; ?>
   <?php print render($title_suffix); ?>
   <?php foreach ($collection as $item): ?>
-	<div class="container">
-      <div class="item">
-        <?php print render($item); ?>
-      </div>
-    </div>
+      <?php print render($item); ?>
   <?php endforeach; ?>
 </div>

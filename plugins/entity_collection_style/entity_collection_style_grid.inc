@@ -60,17 +60,18 @@ class EntityCollectionStyleGrid extends EntityCollectionStyle {
         $extra_classes[] = 'last-column';
       }
 
+      $extra_classes[] = variable_get('grid-item-prefix', 'span') . $settings['grid']['options'][$i];
+
       $content[$key] = array(
         'item' => $data,
         '#weight' => $i,
-        'grid' => variable_get('grid-item-prefix', 'span') . $settings['grid']['options'][$i],
-        'classes' => implode(' ', $extra_classes),
+        'classes' => $extra_classes,
+        '#theme' => 'entity_collection_style_grid'
       );
       $i++;
     }
 
     $tree->processed_offset += $settings['limit'];
-
     return $content;
   }
 
@@ -145,3 +146,10 @@ function _entity_collection_grid_item_options() {
   return $options;
 }
 
+/**
+ * Preprocess function for this plugin.
+ */
+function template_preprocess_entity_collection_style_grid(&$variables) {
+  $variables['item'] = $variables['element']['item'];
+  $variables['classes_array'] = $variables['element']['classes'];
+}
