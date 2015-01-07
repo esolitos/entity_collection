@@ -69,7 +69,7 @@ class EntityCollectionStorageLimitDB extends EntityCollectionStorageDB {
     $query->condition('name', $name);
     
     if($result = $query->execute()->fetchField()) {
-      return  !is_array($result) ? unserialize($result) : $result;
+      return  (@unserialize($string) !== false) ? unserialize($result) : $result;
     }
 
   }
