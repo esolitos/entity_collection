@@ -89,7 +89,7 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
   public function itemPreAdd(EntityCollectionTreeNode $item) {
     // Add a default style if style per row is not enabled.
     if (isset($this->settings['default_style']) && (!$this->settings['style_per_row'] || !isset($item->style))) {
-      $item->style = $this->settings['default_style'][$item->type];
+      $item->style['view_mode'] = $this->settings['default_style'][$item->type];
     }
   }
 
