@@ -79,7 +79,7 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
         // '#access' => user_access(''),
       );
       foreach ($entity_options as $opt_name => $options) {
-        $val = empty($settings[$entity_type][$opt_name]) ? -1 : $settings[$entity_type][$opt_name];
+        $val = empty($settings['default_style'][$entity_type][$opt_name]) ? -1 : $settings['default_style'][$entity_type][$opt_name];
         $form[$entity_type][$opt_name] = $options;
         $form[$entity_type][$opt_name]['#default_value'] = $val;
       }
