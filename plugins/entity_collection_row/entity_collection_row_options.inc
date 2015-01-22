@@ -45,7 +45,7 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     $options = array();
     foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
       if (count($bundles)) {
-        $options[$type] = $this->getBaseOptions();
+        $options[$type] = $this->getBaseOptions($type);
       }
     }
 
