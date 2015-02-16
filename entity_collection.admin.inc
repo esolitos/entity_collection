@@ -495,18 +495,24 @@ function theme_entity_collection_content_form(&$variables) {
   $rows = array();
   $output = '';
   if (isset($form['content'])) {
+    // TODO: Render the entity using a custom view mode!
     foreach (element_children($form['content']) as $key) {
-      $form['content'][$key]['parent']['#attributes']['class'] = array('entity_collection-parent');
-      $form['content'][$key]['key']['#attributes']['class'] = array('key');
-      $form['content'][$key]['depth']['#attributes']['class'] = array('depth');
-      $form['content'][$key]['position']['#attributes']['class'] = array('position');
-      $title = drupal_render($form['content'][$key]['title']);
-      $operations = drupal_render($form['content'][$key]['operations']);
-      $position = drupal_render($form['content'][$key]['position']);
+      $current =& $form['content'][$key];
+
+      $current['parent']['#attributes']['class'] = array('entity_collection-parent');
+      $current['key']['#attributes']['class'] = array('key');
+      $current['depth']['#attributes']['class'] = array('depth');
+      $current['position']['#attributes']['class'] = array('position');
+
+      $title = drupal_render($current['title']);
+      $operations = drupal_render($current['operations']);
+      $position = drupal_render($current['position']);
+
+      $entity_info_themed = theme('entity_collection_entity_info', array('entity' => $current['#content']));
 
       $style = array();
-      $style_opts = element_children($form['content'][$key]['style']);
-      foreach ($form['content'][$key]['style'] as $option => $item) {
+      $style_opts = element_children($current['style']);
+      foreach ($current['style'] as $option => $item) {
         if (in_array($option, $style_opts)) {
           $fname = $item['#title'];
           unset($item['#title']);
@@ -516,27 +522,41 @@ function theme_entity_collection_content_form(&$variables) {
           
         }
       }
-      $form['content'][$key]['style']['#printed'] = TRUE;
+      $current['style']['#printed'] = TRUE;
 
-      $rendered_key = drupal_render($form['content'][$key]['key']);
-      $parent       = drupal_render($form['content'][$key]['parent']);
-      $depth        = drupal_render($form['content'][$key]['depth']);
-      $indentation  = $form['content'][$key]['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $form['content'][$key]['depth']['#default_value'])) : '';
-      $data         = array(
+      $rendered_key = drupal_render($current['key']);
+      $parent       = drupal_render($current['parent']);
+      $depth        = drupal_render($current['depth']);
+      $indentation  = $current['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $current['depth']['#default_value'])) : '';
+
+      $this_row['data'] = array(
         $indentation . $title . $parent . $depth . $rendered_key,
         $position,
+        $entity_info_themed,
       );
-
       if ($form['#row']->useStylePerRow()) {
         foreach ($style as $key => $value) {
-          $data[] = $value;
+          $this_row['data'][] = $value;
         }
       }
 
-      $data[] = $operations;
-      $rows[] = array('class' => array('draggable'), 'data' => $data);
+      $this_row['data'][] = $operations;
+      $this_row['class'] = array(
+        'draggable',
+        $current['#content']->type.'-entity',
+      );
+
+      // Add a class if the entity is published (if the entity does support it)
+      if ( isset($current['#content']->content->status) ) {
+        $this_row['class'][] = ($current['#content']->content->status) ? 'published' : 'not-published';
+      }
+      else if ( isset($current['#content']->content->published) ) {
+        $this_row['class'][] = ($current['#content']->content->published) ? 'published' : 'not-published';
+      }
+
+      $rows[] = $this_row;
     }
-    $header = array(t('Title'), t('Position'));
+    $header = array(t('Title'), t('Position'), t('Info'));
 
     if ($form['#row']->useStylePerRow()) {
       foreach ($style as $name => $value) {

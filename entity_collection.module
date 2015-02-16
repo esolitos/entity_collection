@@ -615,6 +615,10 @@ function entity_collection_theme() {
   $theme['entity_collection_content_form'] = array(
     'render element' => 'form',
   );
+  $theme['entity_collection_entity_info'] = array(
+    'function' => '_entity_collection_theme_entity_info',
+    'variables' => array( 'entity' => NULL, ),
+  );
   $theme['entity_collection'] = array(
     'template' => 'entity_collection',
     'render element' => 'element',
@@ -870,4 +874,32 @@ function entity_collection_context_input_form_submit($form, &$form_state) {
   }
   $contexts = implode(':', $contexts);
   $form_state['redirect'] = array(current_path(), array('query' => array('contexts' => $contexts)));
+}
+
+function _entity_collection_theme_entity_info($vars)
+{
+  $entity = $vars['entity']->content;
+  $entity_type = $vars['entity']->type;
+  $entity_info = entity_get_info($entity_type);
+  $entity_properties = entity_get_property_info($entity_type);
+
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  
+  $bundle_label = _entity_collection_get_bundle_label($bundle, $entity_info);
+    
+  $themed_content =  "<strong class='entity-bundle'>{$bundle_label}</strong>";
+
+  if ( $entity_type == 'node' ) {
+    $status_text = ($entity->status) ? 'Published' : 'Not published';
+    $status_class = ($entity->status) ? 'published' : 'not-published';
+    $themed_content .= "<br><span class='node-{$status_class}'>".t($status_text)."</span>";
+  }
+  
+  return $themed_content;
+}
+
+
+function _entity_collection_get_bundle_label($bundle, $entity_info)
+{
+  return $entity_info['bundles'][$bundle]['label'];
 }
