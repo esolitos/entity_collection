@@ -16,9 +16,18 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
     $options = array();
     foreach ($this->entity_collection->settings['allowed_bundles'] as $type => $bundles) {
       if (count($bundles)) {
+        $options[$type] = array(
+          'view_mode' => array(
+            '#type' => 'select',
+            '#title' => t('View mode'),
+            '#options' => array(),
+            '#default_value' => -1,
+          ),
+        );
+        
         $entity_info = entity_get_info($type);
         foreach ($entity_info['view modes'] as $mode => $info) {
-          $options[$type][$mode] = $info['label'];
+          $options[$type]['view_mode']['#options'][$mode] = $info['label'];
         }
       }
     }
@@ -34,7 +43,7 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
     foreach ($entity_info['view modes'] as $mode => $info) {
       $options[$mode] = $info['label'];
     }
-    
+
     return array(
       'view_mode' => array(
         '#type' => 'select',
@@ -49,7 +58,8 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
    */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
     if ($item->type != 'entity_collection') {
-      return entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode);
+      $style = ($this->useStylePerRow()) ? $item->style : $this->getDefaultStyle($item->type, $item->content);
+      return entity_view($item->type, array($item->entity_id => $item->content), $style['view_mode'], $langcode);
     }
   }
 }

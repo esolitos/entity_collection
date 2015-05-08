@@ -73,14 +73,17 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
   }
 
   public function defaultSettings() {
-    return array('style_per_row' => TRUE, 'default_style' => NULL);
+    return array(
+      'style_per_row' => TRUE,
+      'default_style' => array()
+    );
   }
 
   public function getDefaultStyle($entity_type, $entity) {
     if (isset($this->settings['default_style'][$entity_type])) {
       return $this->settings['default_style'][$entity_type];
     }
-    return '';
+    return array();
   }
 
   /**
@@ -88,7 +91,7 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
    */
   public function itemPreAdd(EntityCollectionTreeNode $item) {
     // Add a default style if style per row is not enabled.
-    if (isset($this->settings['default_style']) && (!$this->settings['style_per_row'] || !isset($item->style))) {
+    if (isset($this->settings['default_style'][$item->type]) && (!$this->settings['style_per_row'] || !isset($item->style))) {
       $item->style['view_mode'] = $this->settings['default_style'][$item->type];
     }
   }
@@ -128,26 +131,36 @@ abstract class EntityCollectionRow implements EntityCollectionRowInterface {
   }
 
   public function settingsForm(&$form) {
+    $settings = $this->settings;
+    $options = $this->getAllOptions();
+
     $form['style_per_row'] = array(
       '#title' => t('Style per row'),
       '#type' => 'checkbox',
       '#description' => t('Let the user select a different style for each row.'),
       '#default_value' => $this->settings['style_per_row'],
     );
-    $options = $this->getAllOptions();
     $form['default_style'] = array(
       '#type' => 'fieldset',
       '#title' => t('Default style'),
       '#description' => t('The default style will be used for new entries.'),
       '#tree' => TRUE,
     );
-    foreach ($options as $type => $type_options) {
-      $form['default_style'][$type] = array(
-        '#title' => $type,
-        '#type' => 'select',
-        '#options' => $type_options,
-        '#default_value' => $this->settings['default_style'],
+
+    foreach ($options as $entity_type => $type_options) {
+      $entity_type_name = ucwords(str_replace('_',' ',$entity_type));
+      $form['default_style'][$entity_type] = array(
+        '#type' => 'fieldset',
+        '#title' => $entity_type_name,
+        // '#description' => t('Options for Entity Type: <strong>@type</strong>', array('@type' => $entity_type_name)),
+        '#collapsible' => (count($type_options) > 1),
+        '#collapsed' => (count($type_options) <= 1),
       );
+      foreach ($type_options as $key => $form_item) {
+        $form['default_style'][$entity_type][$key] = $form_item;
+        $default = isset($settings['default_style'][$entity_type][$key]) ? $settings['default_style'][$entity_type][$key] : FALSE;
+        $form['default_style'][$entity_type][$key]['#default_value'] = $default;
+      }
     }
   }
 
