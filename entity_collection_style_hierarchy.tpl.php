@@ -4,15 +4,19 @@
  * This is the template file for the hierarchy style plugin.
  */
 ?>
-<div class="group">
-  <?php if (!empty($parent)): ?>
-    <div class="parent">
-      <?php print render($parent) ?>
-    </div>
-  <?php endif; ?>
-  <?php if (!empty($children)): ?>
-    <div class="children">
-      <?php print render($children) ?>
-    </div>
-  <?php endif; ?>
+<?php if( empty($parent) ): ?>
+<div class="root">
+  <?php print render($children) ?>
 </div>
+
+<?php elseif ( empty($children) ): ?>
+<div class="item leaf">
+  <?php print render($parent) ?>
+</div>
+
+<?php else: ?>
+<div class="item group">
+    <div class="parent"><?php print render($parent) ?></div>
+    <div class="children"><?php print render($children) ?></div>
+</div>
+<?php endif ?>

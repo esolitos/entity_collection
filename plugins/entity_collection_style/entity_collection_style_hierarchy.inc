@@ -53,6 +53,7 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
     $form['max_depth'] = array(
       '#type' => 'select',
       '#options' => $depth_options,
+      '#default_value' => isset($settings['max_depth']) ? $settings['max_depth'] : 0,
       '#title' => t('Max depth'),
     );
   }

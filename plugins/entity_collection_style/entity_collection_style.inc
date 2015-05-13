@@ -26,6 +26,18 @@ interface EntityCollectionStyleInterface {
   public function useReordering();
 
   /**
+   * Indicates if this style uses a limit on the items
+   */
+  public function useBreakpoint();
+
+  /**
+   * Indicates if this style uses a limit on the items
+   * @return int
+   *   An integer indicating the number of items to show before the break
+   */
+  public function getBreakpoint();
+
+  /**
    * Build the entity collection content.
    * @param EntityCollection $entity
    *   The entity in which the content belongs.
@@ -62,9 +74,24 @@ abstract class EntityCollectionStyle implements EntityCollectionStyleInterface {
   /**
    * Do not use grouping by default.
    */
-  public function useGrouping(){
+  public function useGrouping() {
     return FALSE;
   }
+
+  /**
+   * Do not use Breakpoint by default
+   */
+  public function useBreakpoint() {
+    return FALSE;
+  }
+
+  /**
+   * Return the default empty value
+   */
+  public function getBreakpoint() {
+    return 0;
+  }
+  
 
   /**
    * Get a style plugin for a particular collection.
