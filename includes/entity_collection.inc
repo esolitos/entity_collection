@@ -42,6 +42,9 @@ class EntityCollection extends Entity {
    */
   public function setContexts($contexts) {
     $this->contexts = $contexts;
+    // Reset cache and content if the context are changing
+    $this->cache = NULL;
+    $this->tree = NULL;
   }
   /**
    * Get the entity collection tree.
