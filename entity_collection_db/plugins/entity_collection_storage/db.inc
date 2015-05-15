@@ -21,7 +21,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $primary_keys = array();
     if ($record) {
       if ($this->itemExists($collection, $record->eid, $record->entity_type, $contexts)) {
-        $primary_keys = array('eid', 'name');
+        $primary_keys = $this->getPrimaryKeys();
       }
       drupal_write_record('entity_collection_storage', $record, $primary_keys);
     }
@@ -188,6 +188,9 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
    * Serialize contexts so that they form a materialized path as a string.
    */
   protected function serializeContexts($contexts) {
+    if (empty($contexts)) {
+      return '';
+    }
     $serialized = array();
     foreach ($contexts as $context) {
       if (isset($context->argument)) {
@@ -198,6 +201,14 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
   }
 
   /**
+   * Gets the primary keys used to identify an item in the collections
+   */
+  public function getPrimaryKeys() {
+    return array('eid', 'name', 'contexts');
+  }
+  
+
+  /**
    * @see EntityCollectionStorageInterface::delete().
    */
   public function delete(EntityCollection $collection, $entity_type, array $entries, $contexts = NULL) {
@@ -205,7 +216,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->condition('name', $collection->name)
       ->condition('entity_type', $entity_type)
       ->condition('eid', $entries);
-    if (isset($contexts)) {
+    if (!empty($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $query->execute();

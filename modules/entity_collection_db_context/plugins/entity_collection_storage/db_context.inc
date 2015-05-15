@@ -16,6 +16,9 @@ class EntityCollectionStorageDBContext extends EntityCollectionStorageDB {
   }
 
   protected function serializeContexts($contexts) {
+    if (empty($contexts)) {
+      return '';
+    }
     $serialized = array();
     foreach ($contexts as $context) {
       if (isset($context->argument)) {
