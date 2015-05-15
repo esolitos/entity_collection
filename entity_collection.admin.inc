@@ -313,12 +313,26 @@ function entity_collection_content_form($form, &$form_state, $entity_collection,
   $tree = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection, $contexts);
   $form['#tree'] = TRUE;
   entity_collection_content_form_content($entity_collection, $form, $tree);
+
+  $form['style_uses_breakpoint'] = array(
+    '#type' => 'value',
+    '#value' => EntityCollectionStyle::getStyle($entity_collection)->useBreakpoint(),
+  );
+  
   if (isset($form['content'])) {
     $form['save'] = array(
       '#type' => 'submit',
       '#value' => t('Save changes'),
     );
   }
+  else {
+    $form['empty_content'] = array(
+      '#prefix' => '<strong>',
+      '#suffix' => '</strong>',
+      '#markup'=> t('This Entity Collection is empty.'),
+    );
+  }
+
   return $form;
 }
 
@@ -363,19 +377,33 @@ function entity_collection_get_entity_type_options(EntityCollection $entity_coll
  * @param $depth
  */
 function entity_collection_content_form_content(EntityCollection $entity_collection, &$form, EntityCollectionTreeNode $tree, $parent = 0, $depth = 0) {
-  $nodes = $tree->getChildren();
-  $wrappers  = array();
-  foreach ($nodes as $key => $child) {
-    $wrappers[$key] = entity_metadata_wrapper($child->type, $child->content);
-  }
+  $items = $tree->getChildren();
+  $query = array('query' => drupal_get_destination());
+
   $i = 0;
+  $break_at = FALSE;
   $style = EntityCollectionStyle::getStyle($entity_collection);
   $row = EntityCollectionRow::getRow($entity_collection);
   $form['#style'] = $style;
   $form['#row'] = $row;
-  foreach ($nodes as $key => $child) {
-    $dest = drupal_get_destination();
-    $query = array('query' => drupal_get_destination());
+
+  if ( $style->useBreakpoint() ) {
+    $break_at = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->getBreakpoint($entity_collection, $entity_collection->contexts);
+    if ( $break_at === FALSE ) {
+      $break_at = $style->getBreakpoint();
+    }
+    if ( $break_at > count($items) ) {
+      $break_at = count($items);
+    }
+  }
+  foreach ($items as $key => $child) {
+    if ( $break_at !== FALSE && $break_at == $i ) {
+      $form['content']['breakpoint'] = array();
+       entity_collection_content_form_get_break($form['content']['breakpoint'], $child->position, $child->style);
+    }
+    $i++;
+
+    $entity_wrapper = entity_metadata_wrapper($child->type, $child->content);
     $links = array();
     if ($edit_path = entity_collection_edit_path($child->type, $child->content)) {
       $links[] = l(t('Edit'), $edit_path, $query);
@@ -395,7 +423,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       '#value' => $child->type,
     );
     $form['content'][$key]['title'] = array(
-      '#markup' => check_plain($wrappers[$key]->label()),
+      '#markup' => check_plain($entity_wrapper->label()),
     );
     $form['content'][$key]['position'] = array(
       '#type' => 'textfield',
@@ -417,7 +445,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       '#default_value' => $depth,
     );
     if ($row->useStylePerRow()) {
-      $row_options = $row->getOptions($child->type, $child->content);
+      $row_options = $row->getOptions($child->type);
       foreach ($row_options as $option_key => $option_form_item) {
         $form['content'][$key]['style'][$option_key] = $option_form_item;
         $form['content'][$key]['style'][$option_key]['#default_value'] = $child->style[$option_key];
@@ -430,14 +458,86 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
     if (count($child->getChildren())) {
       entity_collection_content_form_content($entity_collection, $form, $child, $child->key, $depth + 1);
     }
-    $i++;
   }
+}
+
+function entity_collection_content_form_validate($form, &$form_state) {
+  $values = &$form_state['values'];
+
+  if ($values['style_uses_breakpoint']) {
+    $items = &$values['content'];
+    
+    if ( $items['breakpoint']['depth'] != 0 ) {
+      form_error($form['content']['breakpoint'], t('Breakpoint should never be nested!'));
+      return;
+    }
+
+    // Calculate the real position of the breakpoint!
+    $base_position = FALSE;
+    array_walk($items, function(&$value, $key) use (&$base_position){
+      if ( $value['depth'] == 0 ) {
+        if($base_position === FALSE)
+          $base_position = $value['position'];
+        elseif ( $value['position'] < $base_position )
+          $base_position = $value['position'];
+      }
+    });
+
+    $values['breakpoint_position'] = $items['breakpoint']['position'] - $base_position;
+    unset($items['breakpoint']);
+  }
+}
+/**
+ * 
+ */
+function entity_collection_content_form_get_break(&$destination, $position, $style_items) {
+  $destination = array (
+    '#content' => NULL,
+    'title' => array (
+      '#markup' => 'Breakpoint',
+    ),
+    'position' => array (
+      '#type' => 'textfield',
+      '#title' => 'Position',
+      '#default_value' => $position,
+    ),
+    'parent' => array (
+      '#type' => 'hidden',
+      '#default_value' => 0,
+    ),
+    'depth' => array (
+      '#type' => 'hidden',
+      '#default_value' => 0,
+    ),
+    'style' => array(),
+    'operations' => array('#markup' => ''),
+  );
+  
+  foreach ($style_items as $key => $value) {
+    $destination['style'][$key] = array(
+      '#type' => 'hidden',
+      '#title' => $key,
+    );
+  }
+  return $destination;
+}
+
+/**
+ * TODO: For now store the breakpoint as variable, but there has to be a better solution!
+ */
+function entity_collection_content_save_breakpoint($collection, $value='') {
+  
 }
 /**
  * Submit function for the content form.
  */
 function entity_collection_content_form_submit($form, &$form_state) {
   $values = $form_state['values'];
+
+  if ( EntityCollectionStyle::getStyle($form_state['entity_collection'])->useBreakpoint() ) {
+    EntityCollectionStorage::getBundleStorage($form_state['entity_collection']->bundle)->saveBreakpoint($form_state['entity_collection'], $values['breakpoint_position'], $form_state['contexts']);
+  }
+
   $tree = entity_collection_content_build_tree($form_state['entity_collection'], $values['content']);
   if (isset($form['#redirect'])) {
     $form_state['redirect'] = $form['#redirect'];
@@ -494,6 +594,7 @@ function theme_entity_collection_content_form(&$variables) {
   $form = &$variables['form'];
   $rows = array();
   $output = '';
+
   if (isset($form['content'])) {
     // TODO: Render the entity using a custom view mode!
     foreach (element_children($form['content']) as $key) {
@@ -511,23 +612,25 @@ function theme_entity_collection_content_form(&$variables) {
       $entity_info_themed = theme('entity_collection_entity_info', array('entity' => $current['#content']));
 
       $style = array();
-      $style_opts = element_children($current['style']);
-      foreach ($current['style'] as $option => $item) {
-        if (in_array($option, $style_opts)) {
-          $fname = $item['#title'];
-          unset($item['#title']);
-          if($item['#type'] != 'value') {
-            $style[$fname] = drupal_render($item);  
-          }
+      if ( !empty($current['style']) ) {
+        $style_opts = element_children($current['style']);
+        foreach ($current['style'] as $option => $item) {
+          if (in_array($option, $style_opts)) {
+            $fname = $item['#title'];
+            unset($item['#title']);
+            if($item['#type'] != 'value') {
+              $style[$fname] = drupal_render($item);  
+            }
           
+          }
         }
+        $current['style']['#printed'] = TRUE;
       }
-      $current['style']['#printed'] = TRUE;
 
       $rendered_key = drupal_render($current['key']);
       $parent       = drupal_render($current['parent']);
       $depth        = drupal_render($current['depth']);
-      $indentation  = $current['depth']['#default_value'] > 0 ? theme('indentation', array('size' => $current['depth']['#default_value'])) : '';
+      $indentation  = !empty($current['depth']['#default_value']) ? theme('indentation', array('size' => $current['depth']['#default_value'])) : '';
 
       $this_row['data'] = array(
         $indentation . $title . $parent . $depth . $rendered_key,
@@ -541,10 +644,10 @@ function theme_entity_collection_content_form(&$variables) {
       }
 
       $this_row['data'][] = $operations;
-      $this_row['class'] = array(
-        'draggable',
-        $current['#content']->type.'-entity',
-      );
+      $this_row['class'][] = 'draggable';
+      if ( !empty($current['#content']->type) ) {
+        $this_row['class'][] = $current['#content']->type.'-entity';
+      }
 
       // Add a class if the entity is published (if the entity does support it)
       if ( isset($current['#content']->content->status) ) {

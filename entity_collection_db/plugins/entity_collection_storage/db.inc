@@ -231,4 +231,29 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->condition('name', $collection->name)
       ->execute();
   }
+  
+  public function saveBreakpoint(EntityCollection $collection, $breakpoint_value, $contexts = array()) {
+    $context_hash = $this->serializeContexts($contexts);
+    $breakpoints = $this->_loadAllBreapoints($collection, $contexts);
+    $breakpoints[$context_hash] = $breakpoint_value;
+    $this->_saveAllBreapoints($collection, $breakpoints);
+  }
+
+  public function getBreakpoint(EntityCollection $collection, $contexts = array()) {
+    $context_hash = $this->serializeContexts($contexts);
+    $breakpoints = $this->_loadAllBreapoints($collection, $contexts);
+
+    return isset($breakpoints[$context_hash]) ? $breakpoints[$context_hash] : FALSE;
+  }
+  
+  private function _loadAllBreapoints(EntityCollection $collection) {
+    $var_name = "entity_collection_breakpoints_{$collection->eid}";
+    return variable_get($var_name, array());
+  }
+  
+  private function _saveAllBreapoints(EntityCollection $collection, $breakpoints = array()) {
+    $var_name = "entity_collection_breakpoints_{$collection->eid}";
+    variable_set($var_name, $breakpoints);
+  }
+
 }

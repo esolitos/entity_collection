@@ -513,6 +513,20 @@ function entity_collection_entity_collection_plugins() {
       'path' => $path,
     ),
   );
+  $info['entity_collection_style_hierarchy_limited'] = array(
+    'title' => t('Hierarchy Limited'),
+    'theme' => array(
+      'template' => 'entity_collection_style_hierarchy',
+      'render element' => 'element',
+      'file' => 'plugins/entity_collection_style/entity_collection_style_hierarchy_limited.inc',
+    ),
+    'entity_collection_style' => array(
+      'parent' => 'EntityCollectionStyleHierarchy',
+      'class' => 'EntityCollectionStyleHierarchyLimited',
+      'file' => 'entity_collection_style_hierarchy_limited.inc',
+      'path' => $path,
+    ),
+  );
   $info['entity_collection_style_grid'] = array(
     'title' => t('Limited grid'),
     'theme' => array(

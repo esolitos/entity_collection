@@ -117,9 +117,13 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
       $item->content->collection_style = $item->style;
       $item->content->collection_grid = $item->grid_settings;
 
+      $build = entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode);
+      $build[$item->type][$item->entity_id]['#attributes']['class'] =
+        $this->getWrapperClasses($style, $item->type, FALSE);
+
       return array(
-        '#prefix' => '<div ' . $classes . '>',
-        '#markup' => drupal_render(entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode)),
+        '#prefix' => '<div class="' . $classes . '">',
+        '#markup' => drupal_render($build),
         '#suffix' => '</div>',
       );
     }
@@ -155,7 +159,7 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
 
   /********************** Private Functions **********************/
 
-  private function getWrapperClasses($options, $entity_type) {
+  private function getWrapperClasses($options, $entity_type, $html=TRUE) {
     array_walk($options,
     function (&$item, $key) {
         if (!empty($item) && (bool)$item != FALSE) {
@@ -169,7 +173,7 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     }
     );
     $classes_array = array_filter($options);
-    return 'class="' . implode(' ', $classes_array) . '"';
+    return ($html) ? implode(' ',$classes_array) : array_values($classes_array);
   }
 
   /**

@@ -144,6 +144,18 @@ abstract class EntityCollectionStyle implements EntityCollectionStyleInterface {
   }
 
   /**
+   * Create the context for the drupal_alter functions
+   */
+  public function getAlterContext(){
+    return array(
+      'style_class' => __CLASS__,
+      'max_depth' => $this->getMaxDepth(),
+      'use_reordering' => $this->useReordering(),
+      'use_grouping' => $this->useGrouping(),
+    );
+  }
+
+  /**
    * Give the option to add a settings form for the style plugin.
    */
   public function settingsForm(&$form, $settings = array()) {}
@@ -152,4 +164,5 @@ abstract class EntityCollectionStyle implements EntityCollectionStyleInterface {
    * Give the possibility to process the settings after submit.
    */
   public function formSettingsSubmit(&$settings) {}
+
 }
