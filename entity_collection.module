@@ -821,8 +821,13 @@ function _entity_collection_get_contexts(EntityCollection $entity_collection) {
     $contexts = explode(':', check_plain($_GET['contexts']));
   }
   // Convert arguments to CTools Contexts.
-  foreach ($contexts as $i => &$context) {
-    $loaded_contexts[] = ctools_context_create($entity_collection->requiredcontexts[$i]['name'], $context);
+  $required_context = reset($entity_collection->requiredcontexts);
+  foreach ($contexts as &$context) {
+    $new_context = ctools_context_create($required_context['name'], $context);
+    $required_context = next($entity_collection->requiredcontexts);
+    // Only return the context if it's actually loaded!
+    if ( $new_context && is_a($new_context, 'ctools_context') )
+      $loaded_contexts[] = $new_context;
   }
   $entity_collection->contexts = $loaded_contexts;
   return $loaded_contexts;
@@ -851,10 +856,15 @@ function entity_collection_context_input_form($form, &$form_state, EntityCollect
   $form['contexts'] = array(
     '#tree' => TRUE,
   );
-  foreach ($entity_collection->requiredcontexts as $context) {
+
+  foreach ($entity_collection->requiredcontexts as $i => $context) {
     $plugin = ctools_get_context($context['name']);
     if (isset($plugin['placeholder form'])) {
-      $form['contexts'][$context['id']] = array('#title' => $context['identifier']) + $plugin['placeholder form'];
+      $plugin_default = array(
+        '#title' => $context['identifier'],
+        '#required' => TRUE,
+      );
+      $form['contexts'][$i] = $plugin_default + $plugin['placeholder form'];
     }
   }
   $form['save'] = array(
@@ -878,24 +888,28 @@ function entity_collection_context_input_form_submit($form, &$form_state) {
 
 function _entity_collection_theme_entity_info($vars)
 {
-  $entity = $vars['entity']->content;
-  $entity_type = $vars['entity']->type;
-  $entity_info = entity_get_info($entity_type);
-  $entity_properties = entity_get_property_info($entity_type);
+  if ( !empty($vars['entity']) ) {
+    $entity = $vars['entity']->content;
+    $entity_type = $vars['entity']->type;
+    $entity_info = entity_get_info($entity_type);
+    $entity_properties = entity_get_property_info($entity_type);
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+    list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   
-  $bundle_label = _entity_collection_get_bundle_label($bundle, $entity_info);
+    $bundle_label = _entity_collection_get_bundle_label($bundle, $entity_info);
     
-  $themed_content =  "<strong class='entity-bundle'>{$bundle_label}</strong>";
+    $themed_content =  "<strong class='entity-bundle'>{$bundle_label}</strong>";
 
-  if ( $entity_type == 'node' ) {
-    $status_text = ($entity->status) ? 'Published' : 'Not published';
-    $status_class = ($entity->status) ? 'published' : 'not-published';
-    $themed_content .= "<br><span class='node-{$status_class}'>".t($status_text)."</span>";
+    if ( $entity_type == 'node' ) {
+      $status_text = ($entity->status) ? 'Published' : 'Not published';
+      $status_class = ($entity->status) ? 'published' : 'not-published';
+      $themed_content .= "<br><span class='node-{$status_class}'>".t($status_text)."</span>";
+    }
+  
+    return $themed_content;
   }
   
-  return $themed_content;
+  return '';
 }
 
 
