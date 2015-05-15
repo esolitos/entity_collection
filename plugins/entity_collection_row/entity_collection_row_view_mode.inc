@@ -57,9 +57,13 @@ class EntityCollectionRowViewMode extends EntityCollectionRow {
    * @see EntityCollectionRowInterface::build()
    */
   public function build(EntityCollection $collection, EntityCollectionTreeNode $item, $langcode = NULL) {
-    if ($item->type != 'entity_collection') {
-      $style = ($this->useStylePerRow()) ? $item->style : $this->getDefaultStyle($item->type, $item->content);
-      return entity_view($item->type, array($item->entity_id => $item->content), $style['view_mode'], $langcode);
+    $style = ($this->useStylePerRow()) ? $item->style : $this->getDefaultStyle($item->type, $item->content);
+
+    if ($item->type == 'entity_collection') {
+      $build = $item->content->buildContent($style['view_mode'], $langcode);
+    } else {
+      $build = entity_view($item->type, array($item->entity_id => $item->content), $style['view_mode'], $langcode);
     }
+    return $build;
   }
 }

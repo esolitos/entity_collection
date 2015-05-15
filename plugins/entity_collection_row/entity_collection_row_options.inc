@@ -106,27 +106,30 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
    *  The language code to use.
    */
   public function build(EntityCollection$collection, EntityCollectionTreeNode$item, $langcode = NULL) {
-
     $style = $this->getDefaultSettings();
     if (!empty($item->style)) {
       $style = array_merge($style, $item->style);
     }
-
     $classes = $this->getWrapperClasses($style, $item->type);
-    if ($item->type != 'entity_collection') {
+
+    if ($item->type == 'entity_collection') {
+      $build = $item->content->buildContent($item->style['view_mode'], $langcode);
+    }
+    else {
       $item->content->collection_style = $item->style;
       $item->content->collection_grid = $item->grid_settings;
 
       $build = entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode);
-      $build[$item->type][$item->entity_id]['#attributes']['class'] =
-        $this->getWrapperClasses($style, $item->type, FALSE);
-
-      return array(
-        '#prefix' => '<div class="' . $classes . '">',
-        '#markup' => drupal_render($build),
-        '#suffix' => '</div>',
-      );
     }
+    
+    $build[$item->type][$item->entity_id]['#attributes']['class'] =
+      $this->getWrapperClasses($style, $item->type, FALSE);
+
+    return array(
+      '#prefix' => '<div class="' . $classes . '">',
+      '#markup' => drupal_render($build),
+      '#suffix' => '</div>',
+    );
   }
 
   /********************** Protected Functions **********************/
