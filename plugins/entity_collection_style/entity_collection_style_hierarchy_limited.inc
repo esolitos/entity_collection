@@ -18,7 +18,7 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
 
     if ( $this->useBreakpoint() ) {
       $offset = 0;
-      $tree = $tree->splice($offset, $this->getBreakpoint());
+      $tree = $tree->splice($offset, $this->getBreakpoint($entity));
     }
 
     return parent::build($entity, $tree, $langcode);
@@ -67,8 +67,9 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
     );
   }
   
-  public function getBreakpoint() {
-    return empty($this->settings['breakpoint']) ? $this->break_default : $this->settings['breakpoint'];
+  public function getBreakpoint(EntityCollection $collection) {
+    $breakpoint = EntityCollectionStorage::getBundleStorage($collection->bundle)->getBreakpoint($collection, $collection->contexts);
+    return !$breakpoint ? $this->break_default : $breakpoint;
   }
   
   public function setBreakpoint($value=10) {

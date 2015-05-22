@@ -70,12 +70,14 @@ class EntityCollection extends Entity {
   public function buildContent($view_mode = 'default', $langcode = NULL, $settings = array()) {
     $tree = $this->getTree();
     $content = array();
+    
     $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree, $langcode, $settings);
     if (isset($content['entity_collection'])) {
       foreach ($content['entity_collection'] as &$row) {
         $row[]['#entity_collection'] = $this;
       }
     }
+
     $rendered = entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
     $rendered['#entity_collection'] = $this;
     $rendered['#theme'] = 'entity_collection';

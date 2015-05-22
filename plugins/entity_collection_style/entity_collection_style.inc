@@ -35,7 +35,7 @@ interface EntityCollectionStyleInterface {
    * @return int
    *   An integer indicating the number of items to show before the break
    */
-  public function getBreakpoint();
+  public function getBreakpoint(EntityCollection $collection);
 
   /**
    * Build the entity collection content.
@@ -88,7 +88,7 @@ abstract class EntityCollectionStyle implements EntityCollectionStyleInterface {
   /**
    * Return the default empty value
    */
-  public function getBreakpoint() {
+  public function getBreakpoint(EntityCollection $collection) {
     return 0;
   }
   
