@@ -68,7 +68,10 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
   }
   
   public function getBreakpoint(EntityCollection $collection) {
-    $breakpoint = EntityCollectionStorage::getBundleStorage($collection->bundle)->getBreakpoint($collection, $collection->contexts);
+    if($storage = EntityCollectionStorage::getBundleStorage($collection->bundle)) {
+      $breakpoint = $storage->getBreakpoint($collection, $collection->contexts);  
+    }
+    
     return !$breakpoint ? $this->break_default : $breakpoint;
   }
   

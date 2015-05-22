@@ -390,7 +390,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   if ( $style->useBreakpoint() ) {
     $break_at = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->getBreakpoint($entity_collection, $entity_collection->contexts);
     if ( $break_at === FALSE ) {
-      $break_at = $style->getBreakpoint();
+      $break_at = $style->getBreakpoint($entity_collection);
     }
     if ( $break_at > count($items) ) {
       $break_at = count($items);
