@@ -5,17 +5,17 @@
  */
 ?>
 <?php if( empty($parent) ): ?>
-<div class="root">
+<div class="<?php print $classes; ?>">
   <?php print render($children) ?>
 </div>
 
 <?php elseif ( empty($children) ): ?>
-<div class="item leaf">
+<div class="<?php print $classes; ?>">
   <?php print render($parent) ?>
 </div>
 
 <?php else: ?>
-<div class="item group">
+<div class="<?php print $classes; ?>">
     <div class="parent"><?php print render($parent) ?></div>
     <div class="children"><?php print render($children) ?></div>
 </div>

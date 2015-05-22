@@ -63,6 +63,19 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
  * Preprocess function for this plugin.
  */
 function template_preprocess_entity_collection_style_hierarchy(&$variables) {
-  $variables['parent'] = isset($variables['element']['#collection_parent']) ? $variables['element']['#collection_parent'] : 0;
+  $variables['classes_array'][] = 'item';
+  if ( isset($variables['element']['#collection_parent']) ) {
+    $variables['parent'] =  $variables['element']['#collection_parent'];
+    
+    if ( !empty($variables['element']['#collection_children']) ) {
+      $variables['classes_array'][] = 'group';
+    } else {
+      $variables['classes_array'][] = 'leaf';
+    }
+  } else {
+    $variables['parent'] = FALSE;
+    $variables['classes_array'][] = 'root';
+  }
+  
   $variables['children'] = $variables['element']['#collection_children'];
 }
