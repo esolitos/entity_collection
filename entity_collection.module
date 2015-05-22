@@ -651,9 +651,15 @@ function template_preprocess_entity_collection(&$variables) {
   $variables['classes_array'][] = 'entity-collection-name-' . str_replace('_', '-', $variables['element']['#entity_collection']->name);
 
   if($style->useBreakpoint()) {
-    $variables['classes_array'][] = 'has-breakpoint';
+    $current_contexts = '';
+    foreach($variables['element']['#entity_collection']->contexts as $context) {
+      $current_contexts[] = $context->argument;
+    }
+    if($current_contexts) {
+      $variables['classes_array'][] = 'has-breakpoint';
+      $variables['attributes_array'] = array('data-contexts'=>implode(':', $current_contexts));
+    }
   }
-
 
   // Here we take the object that is being themed and define some useful
   // variables that we will print in the template file.

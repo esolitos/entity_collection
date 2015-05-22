@@ -4,7 +4,7 @@
  * Template for an entity collection.
  */
 ?>
-<div class="<?php print $classes; ?>">
+<div class="<?php print $classes; ?>" <?php print drupal_attributes($attributes_array); ?>>
 <?php print render($title_prefix); ?>
   <?php if ($show_title): ?>
     <h2><?php print $title; ?></h2>

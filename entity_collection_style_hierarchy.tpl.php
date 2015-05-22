@@ -3,6 +3,7 @@
  * @file
  * This is the template file for the hierarchy style plugin.
  */
+
 ?>
 <?php if( empty($parent) ): ?>
 <div class="<?php print $classes; ?>">

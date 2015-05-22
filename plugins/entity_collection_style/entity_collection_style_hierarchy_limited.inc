@@ -72,7 +72,7 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
     return !$breakpoint ? $this->break_default : $breakpoint;
   }
   
-  public function setBreakpoint($value=10) {
+  public function setBreakpoint($value=10) {  
     $this->settings['breakpoint'] = $value;
   }
   
