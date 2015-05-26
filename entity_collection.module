@@ -644,6 +644,7 @@ function entity_collection_theme() {
  * Preprocess function for entity collections.
  */
 function template_preprocess_entity_collection(&$variables) {
+  
   // Add the style name, the view-mode and the collection name to the classes array 
   $style = EntityCollectionStyle::getStyle($variables['element']['#entity_collection']);  
   $variables['classes_array'][] = str_replace('_', '-', $style->entity_collection->style);

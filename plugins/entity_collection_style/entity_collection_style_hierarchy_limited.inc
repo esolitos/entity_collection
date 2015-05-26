@@ -14,7 +14,11 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
    * Build the hierarchy.
    * @see EntityCollectionStyle::build().
    */
-  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL) {
+  public function build(EntityCollection $entity, EntityCollectionTreeNode &$tree, $langcode = NULL, $settings = array()) {
+    $this->settings = array_merge($this->settings, $settings);
+
+    // FIXME/TODO: Should be placed someplace more generic.
+    $entity->settings['style_settings'] = $this->settings;
 
     if ( $this->useBreakpoint() ) {
       $offset = 0;
