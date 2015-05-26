@@ -399,7 +399,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   foreach ($items as $key => $child) {
     if ( $break_at !== FALSE && $break_at == $i ) {
       $form['content']['breakpoint'] = array();
-       entity_collection_content_form_get_break($form['content']['breakpoint'], $child->position, $child->style);
+      entity_collection_content_form_get_break($form['content']['breakpoint'], $child->position, $child->style);
     }
     $i++;
 
