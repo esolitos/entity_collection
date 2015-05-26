@@ -54,6 +54,7 @@ class EntityCollection extends Entity {
   public function getTree($reset = FALSE) {
     if (!isset($this->tree) || $reset) {
       $this->tree = EntityCollectionStorage::getBundleStorage($this->bundle)->retrieve($this, $this->contexts);
+      drupal_alter('entity_collection_tree', $this->tree);
     }
     return $this->tree;
   }
