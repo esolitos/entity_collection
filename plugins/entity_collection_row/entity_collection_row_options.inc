@@ -117,7 +117,7 @@ class EntityCollectionRowOptions extends EntityCollectionRow {
     }
     else {
       $item->content->collection_style = $item->style;
-      $item->content->collection_grid = $item->grid_settings;
+      $item->content->collection_grid = isset($item->grid_settings) ? $item->grid_settings : array();
 
       $build = entity_view($item->type, array($item->entity_id => $item->content), $item->style['view_mode'], $langcode);
     }
