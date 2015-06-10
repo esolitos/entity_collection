@@ -42,10 +42,25 @@ class EntityCollection extends Entity {
    */
   public function setContexts($contexts) {
     $this->contexts = $contexts;
+    $reset = FALSE;
+    
     // Reset cache and content if the context are changing
-    $this->cache = NULL;
-    $this->tree = NULL;
+    // FIXME: Check the check here. It checks if the contexts has changed.
+    if($contexts) {
+      foreach ($contexts as $key => $context) {
+        if($context->identifier != $this->contexts[0]->identifier) {
+          $reset = TRUE;
+        } else if ($context->identifier == $this->contexts[0]->identifier AND $context->argument != $this->contexts[0]->argument){
+          $reset = TRUE;
+        }
+      }
+      if($reset) {
+        $this->cache = NULL;
+        $this->tree = NULL;
+      }
+    }
   }
+    
   /**
    * Get the entity collection tree.
    * @return EntityCollectionTreeNode
@@ -68,8 +83,8 @@ class EntityCollection extends Entity {
    * @return array
    *  An array that can be used with Drupals rendering system.
    */
-  public function buildContent($view_mode = 'default', $langcode = NULL, $settings = array()) {
-    $tree = $this->getTree();
+  public function buildContent($view_mode = 'default', $langcode = NULL, $settings = array(), $reset = FALSE) {
+    $tree = $this->getTree($reset);
     $content = array();
     
     $content['entity_collection'] = EntityCollectionStyle::getStyle($this)->build($this, $tree, $langcode, $settings);
