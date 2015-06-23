@@ -598,6 +598,7 @@ function theme_entity_collection_content_form(&$variables) {
   if (isset($form['content'])) {
     // TODO: Render the entity using a custom view mode!
     foreach (element_children($form['content']) as $key) {
+      $this_row = array();
       $current =& $form['content'][$key];
 
       $current['parent']['#attributes']['class'] = array('entity_collection-parent');
