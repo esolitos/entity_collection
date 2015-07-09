@@ -38,7 +38,7 @@ class EntityCollectionStyleHierarchyLimited extends EntityCollectionStyleHierarc
       '#theme' => 'entity_collection_style_hierarchy'
     );
     if (isset($item->content)) {
-      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
+      $data = EntityCollectionRow::getRow($entity)->build($entity, $item, $langcode);
       $element['#collection_parent'] = $data;
     }
     foreach ($item->getChildren() as $key => $child) {

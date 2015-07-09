@@ -42,7 +42,7 @@ class EntityCollectionStyleLimit extends EntityCollectionStyle {
       $list = $tree->getFlat($settings['limitation']['offset'], $settings['limitation']['length']);
       $i = 0;
       foreach ($list as $key => $item) {
-        $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
+        $data = EntityCollectionRow::getRow($entity)->build($entity, $item, $langcode);
         $content[$key] = array(
           'item' => $data,
           '#weight' => $i,

@@ -27,7 +27,7 @@ class EntityCollectionStyleGrid extends EntityCollectionStyle {
     if(!isset($tree->access_check)) { // Pop out elements if the user has not access to view
       foreach ($tree->list as $key => $item) {
         //$item_entity = entity_load_single($item->type, array($item->entity_id));
-        $wrapper = entity_metadata_wrapper($item->type, $item->content);
+        $wrapper = entity_metadata_wrapper($item->type, $item->content, array('langcode'=>$langcode));
         if(!$wrapper->access('view')) {
           unset($tree->list[$key]);
         }
@@ -47,7 +47,7 @@ class EntityCollectionStyleGrid extends EntityCollectionStyle {
     foreach ($list as $key => $item) {
       $extra_classes = array();
       $item->grid_settings = $settings['grid']['options'][$i];
-      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
+      $data = EntityCollectionRow::getRow($entity)->build($entity, $item, $langcode);
 
       if($tree->end_of_row == 0) {
         $tree->end_of_row = 0;

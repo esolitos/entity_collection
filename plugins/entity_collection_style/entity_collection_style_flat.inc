@@ -21,7 +21,7 @@ class EntityCollectionStyleFlat extends EntityCollectionStyle {
     $list = $tree->getFlat();
     $i = 0;
     foreach ($list as $key => $item) {
-      $data = EntityCollectionRow::getRow($entity)->build($entity, $item);
+      $data = EntityCollectionRow::getRow($entity)->build($entity, $item, $langcode);
       $content[$key] = array(
         'item' => $data,
         '#weight' => $i,
