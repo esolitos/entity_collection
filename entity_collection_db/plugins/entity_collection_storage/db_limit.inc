@@ -16,7 +16,7 @@ class EntityCollectionStorageLimitDB extends EntityCollectionStorageDB {
    * Settings for this storage engine.
    */
   function bundleSettingsForm($bundle, &$form, &$form_state) {
-    parent::bundleSettingsForm($bundle, &$form, &$form_state);
+    parent::bundleSettingsForm($bundle, $form, $form_state);
 
     $form['store_limit'] = array(
       '#type' => 'textfield',
@@ -37,7 +37,20 @@ class EntityCollectionStorageLimitDB extends EntityCollectionStorageDB {
     // Then add the new item
     parent::appendItem($collection, $item, $contexts);
   }
-  
+
+  /**
+   * Prepend a new item to the entity_collection on the top.
+   * @param string $name
+   * @param EntityCollectionTreeNode $item
+   */
+  public function prependItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array()) {
+    // First remove the elements in excess
+    self::removeExceedingItems($collection, self::FROM_BOTTOM, TRUE);
+    // Then add the new item
+    parent::prependItem($collection, $item, $contexts);
+    // TODO: Reorder other items?
+  }
+
   /**
    * Removes the elements that are exceeding the limit
    * @param EntityCollection $collection 

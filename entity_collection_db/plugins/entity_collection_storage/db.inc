@@ -148,7 +148,8 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->fields('rs')
       ->condition('name', $collection->name, '=')
       ->orderBy('depth')
-      ->orderBy('position');
+      ->orderBy('position')
+      ->orderBy('rsid', 'DESC'); // So if two items have the same weight the latest one goes on top
     if (!isset($contexts) && isset($collection->contexts)) {
       $contexts = $collection->contexts;
     }
