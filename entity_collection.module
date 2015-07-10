@@ -928,7 +928,7 @@ function _entity_collection_theme_entity_info($vars)
     
     $themed_content =  "<strong class='entity-bundle'>{$bundle_label}</strong>";
 
-    if ( $entity_type == 'node' ) {
+    if ( $entity_type == 'node' || isset($entity->status) ) {
       $status_text = ($entity->status) ? 'Published' : 'Not published';
       $status_class = ($entity->status) ? 'published' : 'not-published';
       $themed_content .= "<br><span class='node-{$status_class}'>".t($status_text)."</span>";

@@ -448,7 +448,7 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
       $row_options = $row->getOptions($child->type);
       foreach ($row_options as $option_key => $option_form_item) {
         $form['content'][$key]['style'][$option_key] = $option_form_item;
-        $form['content'][$key]['style'][$option_key]['#default_value'] = $child->style[$option_key];
+        $form['content'][$key]['style'][$option_key]['#default_value'] = isset($child->style[$option_key]) ? $child->style[$option_key] : -1;
       }
     }
     $form['content'][$key]['operations'] = array(
