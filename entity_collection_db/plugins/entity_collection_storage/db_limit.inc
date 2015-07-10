@@ -9,19 +9,14 @@
  */
 class EntityCollectionStorageLimitDB extends EntityCollectionStorageDB {
 
+  const FROM_TOP = 0;
+  const FROM_BOTTOM = 1;
 
   /**
    * Settings for this storage engine.
    */
   function bundleSettingsForm($bundle, &$form, &$form_state) {
-    $form['store_entity'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Store full entity'),
-      '#default_value' => isset($bundle->settings['store_entity']) ? $bundle->settings['store_entity'] : FALSE,
-      '#description' => t('Store the full entity in the entity collection table.
-       This is performant in some cases, but it also requires you to set up your
-       cache invalidation settings.'),
-    );
+    parent::bundleSettingsForm($bundle, &$form, &$form_state);
 
     $form['store_limit'] = array(
       '#type' => 'textfield',
@@ -37,28 +32,46 @@ class EntityCollectionStorageLimitDB extends EntityCollectionStorageDB {
    * @param EntityCollectionTreeNode $item
    */
   public function appendItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array()) {
-    // Fetch the last position.
-    $query = db_select('entity_collection_storage', 'rs');
-    $query->addField('rs', 'position');
-    $query->orderBy('position', 'DESC');
-    $query->condition('parent', isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0);
-    $position = $query->execute()->fetchField();
-    if ($position > 0) {
-      $position++;
+    // First remove the elements in excess
+    self::removeExceedingItems($collection, self::FROM_TOP, TRUE);
+    // Then add the new item
+    parent::appendItem($collection, $item, $contexts);
+  }
+  
+  /**
+   * Removes the elements that are exceeding the limit
+   * @param EntityCollection $collection 
+   * @param integer $removeFrom 
+   * @param boolean $beforeInsert 
+   * @author Marlon
+   */
+  public function removeExceedingItems(EntityCollection $collection, $removeFrom = EntityCollectionStorageLimitDB::FROM_TOP, $beforeInsert = FALSE) {
+    $settings = $this->getStorageSettings($collection->bundle);
+    $offset = $settings['store_limit'];
+
+    // If we're removing items before inserting a new one make room for it.
+    if ( $beforeInsert && $offset > 0 ) {
+      $offset--;
     }
 
-    $this->save($collection, $item, $contexts, -1);
-    
-    $settings = $this->getStorageSettings($collection->bundle);
+    // FIXME: What happens if we remove an item with some children?
     $last_query = db_select('entity_collection_storage', 'rs');
-    $last_query->fields('rs', array('eid', 'entity_type'));
-    $last_query->orderBy('position', 'ASC');
-    $last_query->range($settings['store_limit'], 10000);
-    $last_query->condition('name', $collection->name);
-    $last_entry_result = $last_query->execute();
+    $last_query->fields('rs', array('eid', 'entity_type'))
+      ->condition('name', $collection->name)
+      ->orderBy('depth', 'ASC')
+      ->range($offset, 10000);
 
-    foreach ($last_entry_result as $record) {
-      $this->delete($collection, $record->entity_type, array($record->eid));
+    if ( $removeFrom == self::FROM_TOP ) {
+      $last_query->orderBy('position', 'DESC');
+    }
+    // else if ( $removeFrom == self::FROM_BOTTOM ) {
+    else {
+      $last_query->orderBy('position', 'ASC');
+    }
+
+    $last_entry_result = $last_query->execute();
+    foreach ($last_entry_result as $entity) {
+      $this->delete($collection, $entity->entity_type, array($entity->eid));
     }
   }
 

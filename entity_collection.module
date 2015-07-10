@@ -255,6 +255,19 @@ function entity_collection_append_item(EntityCollection $entity_collection, Enti
 }
 
 /**
+ * Prepend an item to an entity collection.
+ * @param EntityCollection $entity_collection
+ * @param EntityCollectionTreeNode $item
+ * @param array $contexts
+ */
+function entity_collection_prepend_item(EntityCollection $entity_collection, EntityCollectionTreeNode $item, $contexts = NULL) {
+  entity_collection_content_pre_insert($entity_collection, $item);
+  EntityCollectionStorage::getBundleStorage($entity_collection->bundle)
+    ->prependItem($entity_collection, $item, $contexts);
+  entity_collection_content_insert($entity_collection, $item);
+}
+
+/**
  * Delete content in an Entity collection.
  * @param EntityCollection $entity_collection
  * @param type $entity_type

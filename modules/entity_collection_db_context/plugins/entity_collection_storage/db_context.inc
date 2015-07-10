@@ -15,6 +15,11 @@ class EntityCollectionStorageDBContext extends EntityCollectionStorageDB {
     parent::appendItem($collection, $item, $contexts);
   }
 
+  public function prependItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array()) {
+    $this->saveContexts($contexts);
+    parent::prependItem($collection, $item, $contexts);
+  }
+
   protected function serializeContexts($contexts) {
     if (empty($contexts)) {
       return '';

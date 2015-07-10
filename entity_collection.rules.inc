@@ -84,6 +84,23 @@ function entity_collection_rules_action_info() {
     ),
     'group' => t('Entity collection'),
   );
+  $items['entity_collection_prepend_action'] = array(
+    'label' => t('Push an item to the top of the collection'),
+    'parameter' => array(
+      'entity_collection' => array(
+        'type' => 'entity_collection',
+        'label' => t('Entity collection'),
+        'restriction' => 'selector',
+        'save' => FALSE,
+      ),
+      'item' => array(
+        'type' => 'entity',
+        'label' => t('Item'),
+        'save' => FALSE,
+      ),
+    ),
+    'group' => t('Entity collection'),
+  );
   $items['entity_collection_pop_action'] = array(
     'label' => t('Remove the first item in the collection'),
     'parameter' => array(
@@ -229,6 +246,14 @@ function entity_collection_append_action($entity_collection, $item) {
   $entity_id = entity_id($entity_type, $entity);
   $item = new EntityCollectionTreeNode($entity_type, $entity_id, $entity);
   entity_collection_append_item($entity_collection, $item);
+}
+
+function entity_collection_prepend_action($entity_collection, $item) {
+  $entity = $item->value();
+  $entity_type = $item->type();
+  $entity_id = entity_id($entity_type, $entity);
+  $item = new EntityCollectionTreeNode($entity_type, $entity_id, $entity);
+  entity_collection_prepend_item($entity_collection, $item);
 }
 
 function entity_collection_remove_last_action($entity_collection) {

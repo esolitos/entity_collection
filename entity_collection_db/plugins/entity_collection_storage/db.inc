@@ -58,10 +58,18 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
     $query->orderBy('position', 'DESC');
     $query->condition('parent', isset($item->parent) && isset($item->parent->entity_id) ? $item->parent->entity_id : 0);
     $position = $query->execute()->fetchField();
-    if ($position > 0) {
-      $position++;
-    }
-    $this->save($collection, $item, $contexts, $position);
+
+    $this->save($collection, $item, $contexts, ($position + 1));
+  }
+  
+  /**
+   * Prepend a new item to the entity_collection on the top.
+   * @param string $name
+   * @param EntityCollectionTreeNode $item
+   */
+  public function prependItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array()) {
+    $this->save($collection, $item, $contexts, 0);
+    // TODO: Reorder other items?
   }
 
   /**
@@ -76,10 +84,10 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       }
       $record->entity_type = $item->type;
       $record->eid = $item->entity_id;
-      $record->depth = $depth;
+      $record->depth = isset($item->parent) && isset($item->parent->key) ? $depth : 0;;
       $record->style = $item->style;
       $record->parent = isset($item->parent) && isset($item->parent->key) ? $item->parent->key : 0;
-      $record->position = $item->position;
+      $record->position = $position;
       $record->contexts = $this->serializeContexts($contexts);
       return $record;
     }

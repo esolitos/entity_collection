@@ -29,10 +29,21 @@ interface EntityCollectionStorageInterface {
    *   The collection to which the content belongs.
    * @param EntityCollectionTreeNode $item
    *   The item to append
-   * @param unknown_type $contexts
+   * @param array $contexts
    *   An array of contexts to use when appending the item.
    */
   public function appendItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array());
+
+  /**
+   * Prepend an item to a collection
+   * @param EntityCollection $collection
+   *   The collection to which the content belongs.
+   * @param EntityCollectionTreeNode $item
+   *   The item to append
+   * @param array $contexts
+   *   An array of contexts to use when appending the item.
+   */
+  public function prependItem(EntityCollection $collection, EntityCollectionTreeNode $item, $contexts = array());
 
   /**
    * Retrieve the content of a collectio.
