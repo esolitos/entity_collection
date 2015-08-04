@@ -86,7 +86,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       $record->depth = isset($item->parent) && isset($item->parent->key) ? $depth : 0;
       $record->style = $item->style;
       $record->parent = isset($item->parent) && isset($item->parent->key) ? $item->parent->key : 0;
-      $record->position = ($position => 0) ? $position : 0;
+      $record->position = ($position >= 0) ? $position : 0;
       $record->contexts = $this->serializeContexts($contexts);
       return $record;
     }
