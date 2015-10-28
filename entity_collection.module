@@ -402,7 +402,9 @@ function entity_collection_bundle_load($name) {
   ctools_include('export');
   $result = ctools_export_load_object('entity_collection_bundles', 'names', array($name));
   if (isset($result[$name])) {
-    $result[$name]->settings = isset($result[$name]->settings) && !is_array($result[$name]->settings) ? unserialize($result[$name]->settings) : array();
+    if (isset($result[$name]->settings) && !is_array($result[$name]->settings)) {
+      $result[$name]->settings = unserialize($result[$name]->settings);
+    }
     return $result[$name];
   }
   return FALSE;
