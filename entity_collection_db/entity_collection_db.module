@@ -40,3 +40,11 @@ function entity_collection_db_ctools_plugin_directory($module, $type) {
     return 'plugins/' . $type;
   }
 }
+
+/**
+ * Implements hook_flush_caches().
+ */
+function entity_collection_db_flush_caches() {
+  return array(EntityCollectionStorageDB::CACHE_BIN);
+}
+

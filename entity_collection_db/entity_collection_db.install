@@ -77,14 +77,15 @@ function entity_collection_db_schema() {
       'eid' => array('eid'),
     ),
   );
+  
+  $schema[EntityCollectionStorageDB::CACHE_BIN] = drupal_get_schema_unprocessed('system', 'cache');
   return $schema;
 }
 
 /**
  * Updates the table to store the style as a serialized object.
  */
-function entity_collection_db_update_7200(&$sandbox)
-{
+function entity_collection_db_update_7200(&$sandbox) {
 
   if (!isset($sandbox['progress']))
   {
@@ -136,4 +137,15 @@ function entity_collection_db_update_7200(&$sandbox)
   }
 
   return;
+}
+
+/**
+ * Adds the caching schema
+ */
+function entity_collection_db_update_7201(&$sandbox) {
+  if ( !db_table_exists(EntityCollectionStorageDB::CACHE_BIN) ) {
+    $full_schema = entity_collection_db_schema();
+
+    db_create_table(EntityCollectionStorageDB::CACHE_BIN, $full_schema[EntityCollectionStorageDB::CACHE_BIN]);
+  }
 }

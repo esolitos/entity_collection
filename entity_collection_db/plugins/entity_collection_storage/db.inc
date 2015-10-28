@@ -8,6 +8,8 @@
  * Entity collection storage backend using the database.
  */
 class EntityCollectionStorageDB extends EntityCollectionStorage {
+  
+  const CACHE_BIN = 'cache_entity_collection_storage_db';
 
   /**
    * Save an entity collection
@@ -24,7 +26,9 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
         $primary_keys = $this->getPrimaryKeys();
       }
       drupal_write_record('entity_collection_storage', $record, $primary_keys);
+      EntityCollectionStorageDB::invalidateCache($collection, $contexts);
     }
+
     $pos = 0;
     foreach ($tree->getChildren() as $child_entity) {
       $this->save($collection, $child_entity, $contexts, $pos++, ($depth + 1));
@@ -43,6 +47,14 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
        This is performant in some cases, but it also requires you to set up your
        cache invalidation settings.'),
     );
+
+    $form['enable_caching'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Storage Caching'),
+      '#default_value' => isset($bundle->settings['enable_caching']) ? $bundle->settings['enable_caching'] : FALSE,
+      '#description' => t(''),
+    );
+
   }
 
   /**
@@ -138,10 +150,57 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
   }
 
   /**
-   * Retreive a entity_collection.
+   * Tries to fetch the entity collection from the cache
+   */
+  public function retrieveCached(EntityCollection $collection, $contexts = NULL) {
+    $cache_cid = 'ec_storage_' . $collection->name . '_' . $this->serializeContexts($contexts);
+
+    if ( $cache = cache_get($cache_cid, EntityCollectionStorageDB::CACHE_BIN) ) {
+      if ( is_a($cache->data, 'EntityCollectionTreeNode') ) {
+        watchdog('entity_collection_db', "Loaded collection from cache: @collection", array('@collection'=>$collection->name), WATCHDOG_DEBUG);
+        return $cache->data;
+      } else {
+        watchdog('entity_collection_db', "Corrupted cache for: @collection. Data is not an instance of EntityCollectionTreeNode.", array('@collection'=>$collection->name), WATCHDOG_WARNING);
+      }
+    }
+
+    return NULL;
+  }
+  
+  /**
+   * Stores the given collection with the correct
+   */
+  protected function storeCached(EntityCollection $collection, EntityCollectionTreeNode $tree, $contexts = NULL) {
+    $contexts = EntityCollectionStorage::getBundleStorage($collection->bundle)->serializeContexts($contexts);
+    $cache_cid = 'ec_storage_' . $collection->name . '_' . $contexts;
+    return cache_set($cache_cid, $tree, EntityCollectionStorageDB::CACHE_BIN);
+  }
+  
+  /**
+   * Invalidates the cache for a collection + context
+   */
+  public static function invalidateCache(EntityCollection $collection, $contexts = NULL) {
+    $contexts = EntityCollectionStorage::getBundleStorage($collection->bundle)->serializeContexts($contexts);
+    $cache_cid = 'ec_storage_' . $collection->name . '_' . $contexts;
+    watchdog('entity_collection_db', "Clearing cache for @collection", array('@collection'=>$collection->name), WATCHDOG_INFO);
+    cache_clear_all($cache_cid, EntityCollectionStorageDB::CACHE_BIN);
+  }
+
+  /**
+   * Retrieve a entity_collection.
    * @param string $name
    */
   public function retrieve(EntityCollection $collection, $contexts = NULL) {
+    $bundle = entity_collection_bundle_load($collection->bundle);
+
+    if (empty($contexts) && isset($collection->contexts)) {
+      $contexts = $collection->contexts;
+    }
+
+    if ( !empty($bundle->settings['enable_caching']) && ($tree = $this->retrieveCached($collection, $contexts)) ) {
+      return $tree;
+    }
+
     // Serialize the context arguments into a string.
     $query = db_select('entity_collection_storage', 'rs')
       ->fields('rs')
@@ -149,12 +208,11 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       ->orderBy('depth')
       ->orderBy('position')
       ->orderBy('rsid', 'DESC'); // So if two items have the same weight the latest one goes on top
-    if (!isset($contexts) && isset($collection->contexts)) {
-      $contexts = $collection->contexts;
-    }
+
     if (isset($contexts)) {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
+
     $result = $query->execute();
     $tree = new EntityCollectionTreeNode();
     $bundle = entity_collection_bundle_load($collection->bundle);
@@ -174,6 +232,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       }
       $node->addChild($value->entity_type, $value->eid, $entity, $value->style, $value->rsid, $value->position);
     }
+
     // Load all entities
     // and make sure we only do as few entity_loads as possible.
     if (empty($bundle->settings['store_entity'])) {
@@ -183,11 +242,16 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
         $entities[$node->type][$node->key] = $node->entity_id;
       }
     }
+
     foreach ($entities as $type => $ids) {
       $loaded_entities = entity_load($type, $ids);
       foreach ($ids as $key => $id) {
         $nodes[$tree->getChildKey($type, $id)]->content = $loaded_entities[$id];
       }
+    }
+
+    if ( !empty($bundle->settings['enable_caching']) ) {
+      EntityCollectionStorageDB::storeCached($collection, $tree, $contexts);
     }
     return $tree;
   }
@@ -228,6 +292,7 @@ class EntityCollectionStorageDB extends EntityCollectionStorage {
       $query->condition('contexts', $this->serializeContexts($contexts));
     }
     $query->execute();
+    EntityCollectionStorageDB::invalidateCache($collection, $contexts);
   }
 
   /**
