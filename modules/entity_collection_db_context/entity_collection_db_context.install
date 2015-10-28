@@ -47,4 +47,3 @@ function entity_collection_db_context_install() {
   // Since we store hashed contexts we should have an index.
   db_add_index('entity_collection_storage', 'context', array('contexts'));
 }
-

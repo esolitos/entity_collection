@@ -37,7 +37,7 @@ class EntityCollectionStorageDBContext extends EntityCollectionStorageDB {
   
   protected function saveContexts($contexts) {
     $hash = $this->serializeContexts($contexts);
-    if ( !$this->contextHashExists($hash) ) {
+    if ( !$this->contextHashExists($hash) && is_array($contexts) ) {
       foreach ($contexts as $ctxt) {
         $record = $this->buildContextRecord($hash, $ctxt);
         drupal_write_record('entity_collection_storage_contexts', $record);
