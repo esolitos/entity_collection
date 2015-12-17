@@ -789,15 +789,38 @@ function entity_collection_content_add_form($form, &$form_state, $entity_collect
  */
 function entity_collection_content_add_form_validate($form, &$form_state) {
   $entity_collection = $form_state['entity_collection'];
-  list($type, $value) = explode(':', $form_state['values']['content_select']);
-  $entity = entity_load_single($type, $value);
-  list($entity_id,,$bundle) = entity_extract_ids($type, $entity);
-  if (!in_array($bundle, $entity_collection->settings['allowed_bundles'][$type])) {
-    form_set_error('content_select', t('The selected entitiy is not allowed in this collection'));
-  }
-  $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection);
-  if ($content->getChild($form_state['values']['content_select'])) {
-    form_set_error('content_select', t('This item already exists in the collection'));
+
+  // If the user has asked to add existing content
+  if ($form_state['clicked_button']['#id'] === 'edit-add-content--2') {
+    // First check that he has indeed chosen an existing content to add
+    if (!$form_state['values']['content_select']) {
+      form_set_error('content_select', t('You must select some content to be added.'));
+      return FALSE;
+    }
+    $content_select = $form_state['values']['content_select'];
+    list($type, $value) = explode(':', $content_select);
+    // Check if the entity type is among the allowed
+    if ( empty($entity_collection->settings['allowed_bundles'][$type]) ) {
+      form_set_error('content_select', t('Adding a "!entity_type" is not allowed in this collection', array('!entity_type'=>$type)));
+      return FALSE;
+    }
+    // Check if the entity exists
+    if ( !($entity = entity_load_single($type, $value)) ) {
+      form_set_error('content_select', t('You must select an existing "!entity_type" to add.', array('!entity_type'=>$type)));
+      return FALSE;
+    }
+    // Now check that the selected entity is in one of the allowed bundles.
+    list($entity_id, ,$bundle) = entity_extract_ids($type, $entity);
+    if (!in_array($bundle, $entity_collection->settings['allowed_bundles'][$type])) {
+      form_set_error('content_select', t('!entity_type of type !bundle are not allowed in this collection.', array('!entity_type'=>ucwords($type), '!bundle'=>ucwords($bundle))));
+      return FALSE;
+    }
+    // Now check if the selected has already been added in the collection before.
+    $content = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->retrieve($entity_collection);
+    if ( $content->getChild($content_select) ) {
+      form_set_error('content_select', t('This item already exists in the collection'));
+      return FALSE;
+    }
   }
 }
 
