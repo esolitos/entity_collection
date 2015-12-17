@@ -168,6 +168,21 @@ function entity_collection_form($form = array(), &$form_state = array()) {
   if (!empty($storage) && method_exists($storage, 'entitySettingsForm')) {
     $storage->settingsForm($entity_collection, $form['settings'], $form_state);
   }
+  
+  $form['settings']['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced'),
+    '#description' => t('Other extra settings for this collection'),
+  );
+
+  $form['settings']['advanced']['remove_link_text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('"Remove from Collection" link text'),
+    '#description' => t('This text is used in the Content administration table of this Collection.'),
+    '#default_value' => isset($entity_collection->settings['advanced']['remove_link_text']) ? t($entity_collection->settings['advanced']['remove_link_text']) : '',
+    '#maxlength' => 255,
+  );
+  
 
   // Attach the field form.
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
@@ -240,18 +255,12 @@ function entity_collection_form_submit($form, &$form_state) {
   if (isset($cached_entity_collection)) {
      $entity_collection->requiredcontexts = $cached_entity_collection->requiredcontexts;
   }
-  $entity_collection->settings['row_settings'] = isset($form_state['values']['settings']['row_settings']) ?
-    $form_state['values']['settings']['row_settings'] : array();
-  $entity_collection->settings['style_settings'] = isset($form_state['values']['settings']['style_settings']) ?
-    $form_state['values']['settings']['style_settings'] : array();
-  foreach ($form_state['values']['settings']['allowed_bundles'] as $entity_name => $allowed) {
-    $entity_collection->settings['allowed_bundles'][$entity_name] = array();
-    foreach ($allowed as $bundle => $allowed) {
-      if ($allowed) {
-        $entity_collection->settings['allowed_bundles'][$entity_name][] = $bundle;
-      }
-    }
-  }
+  $entity_collection->settings = $form_state['values']['settings'];
+
+  array_walk($entity_collection->settings['allowed_bundles'], function(&$entity_bundles, $key){
+      $entity_bundles = array_filter($entity_bundles);
+  });
+
   ctools_cache_clear('entity_collection_cache_object', $entity_collection->name);
   field_attach_submit('entity_collection', $entity_collection, $form, $form_state);
   entity_save('entity_collection', $entity_collection);
@@ -380,13 +389,16 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
   $items = $tree->getChildren();
   $query = array('query' => drupal_get_destination());
 
-  $i = 0;
-  $break_at = FALSE;
-  $style = EntityCollectionStyle::getStyle($entity_collection);
-  $row = EntityCollectionRow::getRow($entity_collection);
-  $form['#style'] = $style;
-  $form['#row'] = $row;
+  $i                = 0;
+  $break_at         = FALSE;
+  $settings         = $entity_collection->settings;
+  $style            = EntityCollectionStyle::getStyle($entity_collection);
+  $row              = EntityCollectionRow::getRow($entity_collection);
+  $form['#style']   = $style;
+  $form['#row']     = $row;
 
+  $remove_item_text = !empty($settings['advanced']['remove_link_text']) ? t($settings['advanced']['remove_link_text']) : t('Remove from collection');
+  
   if ( $style->useBreakpoint() ) {
     $break_at = EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->getBreakpoint($entity_collection, $entity_collection->contexts);
     if ( $break_at === FALSE ) {
@@ -408,7 +420,10 @@ function entity_collection_content_form_content(EntityCollection $entity_collect
     if ($edit_path = entity_collection_edit_path($child->type, $child->content)) {
       $links[] = l(t('Edit'), $edit_path, $query);
     }
-    $links[] = l(t('Remove from collection'), 'entity-collection/' . $entity_collection->name . '/content/delete/' . $child->type . '/' . $child->entity_id, $query);
+
+    $remove_link_uri = "entity-collection/{$entity_collection->name}/content/delete/{$child->type}/{$child->entity_id}";
+    $links[] = l($remove_item_text, $remove_link_uri, $query);
+
     $form['content'][$key]['#content'] = $child;
     $form['content'][$key]['key'] = array(
       '#type' => 'hidden',
