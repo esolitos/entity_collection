@@ -182,7 +182,13 @@ function entity_collection_form($form = array(), &$form_state = array()) {
     '#default_value' => isset($entity_collection->settings['advanced']['remove_link_text']) ? t($entity_collection->settings['advanced']['remove_link_text']) : '',
     '#maxlength' => 255,
   );
-  
+
+  $form['settings']['advanced']['remove_confirmation'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Require confirmation before removing item from collection'),
+    '#description' => t('Check this box if you want to have a confirmation warning before removing an item from the collection.'),
+    '#default_value' => $entity_collection->settings['advanced']['remove_confirmation'] ? TRUE : FALSE,
+  );
 
   // Attach the field form.
   field_attach_form('entity_collection', $entity_collection, $form, $form_state);
@@ -705,7 +711,18 @@ function entity_collection_content_delete_form($form, &$form_state, $entity_coll
   $form_state['entity_collection'] = $entity_collection;
   $form_state['entity_type'] = $entity_type;
   $form_state['eid'] = $eid;
-  return confirm_form($form, t('Are you sure you want to delete this content from the entity collection?'), 'admin/structure/entity_collection');
+
+  $entity_collection_settings = $entity_collection->settings;
+  $require_confirmation = $entity_collection_settings['advanced']['remove_confirmation'];
+
+  if (!$require_confirmation) {
+    entity_collection_content_delete($form_state['entity_collection'], $form_state['entity_type'], array($form_state['eid']));
+    $form_state['redirect'] = 'admin/structure/entity_collection';
+    drupal_redirect_form($form_state);
+  }
+  else {
+    return confirm_form($form, t('Are you sure you want to delete this content from the entity collection?'), 'admin/structure/entity_collection');
+  }
 }
 
 /**
