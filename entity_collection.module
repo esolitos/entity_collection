@@ -737,6 +737,7 @@ function entity_collection_block_view($delta) {
  *   The tree to save.
  */
 function entity_collection_save_content(EntityCollection $entity_collection, EntityCollectionTreeNode $tree) {
+  module_invoke_all('entity_collection_content_pre_save_content', $entity_collection, $tree);
   return EntityCollectionStorage::getBundleStorage($entity_collection->bundle)->save($entity_collection, $tree);
 }
 
