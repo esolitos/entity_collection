@@ -3,6 +3,7 @@
  * @file
  * Install-related things for entity collection.
  */
+require_once 'plugins/entity_collection_storage/db.inc';
 
 /**
  * Implements of hook_schema().
