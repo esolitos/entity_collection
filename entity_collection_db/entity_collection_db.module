@@ -45,6 +45,11 @@ function entity_collection_db_ctools_plugin_directory($module, $type) {
  * Implements hook_flush_caches().
  */
 function entity_collection_db_flush_caches() {
-  return array(EntityCollectionStorageDB::CACHE_BIN);
+  // Do not attempt to clear caches if the table does not exist!
+  if ( db_table_exists(EntityCollectionStorageDB::CACHE_BIN) ) {
+    return array(EntityCollectionStorageDB::CACHE_BIN);
+  }
+  
+  return array();
 }
 
