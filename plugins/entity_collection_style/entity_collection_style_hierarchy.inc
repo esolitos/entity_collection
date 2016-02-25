@@ -46,6 +46,7 @@ class EntityCollectionStyleHierarchy extends EntityCollectionStyle {
   }
 
   public function settingsForm(&$form, $settings = array()) {
+    $settings = $settings + $this->settings;
     $depth_options = array();
     for ($i = 1; $i <= 10; $i++) {
       $depth_options[$i] = $i;
