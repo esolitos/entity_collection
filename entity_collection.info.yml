@@ -1,0 +1,5 @@
+name: Entity Collection
+type: module
+description: "Let's you create collections of entities"
+package: Entity Collection
+core: 8.x
