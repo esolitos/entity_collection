@@ -1,0 +1,6 @@
+entity.entity_collection.add_form:
+  route_name: 'entity.entity_collection.add_form'
+  title: 'Add Entity collection'
+  appears_on:
+    - entity.entity_collection.collection
+

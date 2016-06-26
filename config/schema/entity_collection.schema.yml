@@ -1,0 +1,12 @@
+entity_collection.entity_collection.*:
+  type: config_entity
+  label: 'Entity Collection config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
