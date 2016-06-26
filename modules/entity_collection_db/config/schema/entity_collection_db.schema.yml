@@ -1,0 +1,7 @@
+entity_collection.collection.storage.database
+  type: mapping
+  label: 'Database Storage'
+  mapping:
+    connection:
+      type: string
+      label: 'DB Connection to use for storage'

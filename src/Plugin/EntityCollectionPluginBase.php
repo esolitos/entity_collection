@@ -10,9 +10,10 @@ namespace Drupal\entity_collection\Plugin;
 
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\PluginBase;
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
 
-abstract class EntityCollectionPluginBase implements EntityCollectionPluginBaseInterface {
+abstract class EntityCollectionPluginBase extends PluginBase implements EntityCollectionPluginBaseInterface {
 
 
   /**

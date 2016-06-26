@@ -1,8 +1,8 @@
 # Entity collection menu items definition
 entity.entity_collection.collection:
-  title: 'Entity collection'
+  title: 'Entity Collection'
   route_name: entity.entity_collection.collection
-  description: 'List Entity collection (bundles)'
+  description: 'Manage Entity Collection'
   parent: system.admin_structure
   weight: 99
 

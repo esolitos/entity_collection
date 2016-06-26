@@ -10,6 +10,10 @@ use Drupal\Component\Plugin\PluginBase;
 abstract class EntityCollectionRowDisplayBase extends EntityCollectionPluginBase implements EntityCollectionRowDisplayInterface {
 
 
-  // Add common methods and abstract methods for your plugin type here.
-
+  /**
+   * Not allow "style per row" by default.
+   */
+  public function useStylePerRow() {
+    return FALSE;
+  }
 }

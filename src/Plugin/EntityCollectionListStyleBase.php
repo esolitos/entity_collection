@@ -10,6 +10,18 @@ use Drupal\Component\Plugin\PluginBase;
 abstract class EntityCollectionListStyleBase extends EntityCollectionPluginBase implements EntityCollectionListStyleInterface {
 
 
-  // Add common methods and abstract methods for your plugin type here.
+  /**
+   * Use a max depth of 0 (disabled) by default.
+   */
+  public function getMaxDepth() {
+    return 0;
+  }
+
+  /**
+   * Use reordering by default.
+   */
+  public function useReordering() {
+    return TRUE;
+  }
 
 }

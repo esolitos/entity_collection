@@ -1,12 +1,45 @@
-entity_collection.entity_collection.*:
+entity_collection.collection.*:
   type: config_entity
   label: 'Entity Collection config'
   mapping:
+    uuid:
+      type: string
     id:
       type: string
       label: 'ID'
     label:
       type: label
-      label: 'Label'
-    uuid:
+      label: 'Name'
+    storage:
       type: string
+      label: 'Storage plugin'
+    storage_settings:
+      type: entity_collection.collection.storage.[%parent.storage]
+      label: 'List Settings'
+    list_style:
+      type: string
+      label: 'List Style'
+    list_style_settings:
+      type: entity_collection.collection.list_style.[%parent.list_style]
+      label: 'List Settings'
+    row_display:
+      type: string
+      label: 'Row Display'
+    row_display_settings:
+      type: entity_collection.collection.row_display.[%parent.row_display]
+      label: 'Row Settings'
+
+
+entity_collection.collection.list_style.flat_list
+  type: mapping
+  label: 'Flat List style configuration'
+  mapping: {}
+
+
+entity_collection.collection.row_display.view_mode
+  type: mapping
+  label: 'View mode row configuration'
+  mapping:
+    configurable:
+      type: boolean
+      label: 'View mode per each Row'

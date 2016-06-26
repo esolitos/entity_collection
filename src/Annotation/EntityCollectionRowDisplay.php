@@ -31,4 +31,12 @@ class EntityCollectionRowDisplay extends Plugin {
    */
   public $label;
 
+  /**
+   * A short description for the plugin.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $description;
 }

@@ -5,7 +5,7 @@ namespace Drupal\entity_collection\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines a EntityCollection Storage item annotation object.
+ * Defines a Entity Collection: Storage item annotation object.
  *
  * @see \Drupal\entity_collection\Plugin\EntityCollectionStorageManager
  * @see plugin_api
@@ -31,4 +31,12 @@ class EntityCollectionStorage extends Plugin {
    */
   public $label;
 
+  /**
+   * A short description for the plugin.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $description;
 }
