@@ -12,6 +12,11 @@ use Drupal\entity_collection\Plugin\EntityCollectionStorageInterface;
  */
 interface EntityCollectionInterface extends ConfigEntityInterface {
 
+  public function getTree();
+
+  public function setContexts(array $contexts);
+
+  public function getContexts();
   
   public function setStorage(EntityCollectionStorageInterface $storage);
 

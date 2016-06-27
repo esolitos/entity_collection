@@ -3,6 +3,7 @@
 namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\entity_collection\Annotation\EntityCollectionStorage;
 use Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
@@ -52,7 +53,7 @@ use Drupal\entity_collection\Plugin\EntityCollectionStorageInterface;
  *
  * @Note: take a look at EntityWithPluginCollectionInterface
  */
-class EntityCollection extends ConfigEntityBase implements EntityCollectionInterface {
+class EntityCollection extends ConfigEntityBase implements EntityCollectionInterface, EntityWithPluginCollectionInterface {
 
   /**
    * The Entity collection ID.
@@ -68,41 +69,85 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    */
   protected $label;
 
+
   /**
-   * @var EntityCollectionStorageInterface
+   * The storage plugin id.
+   *
+   * @var string
    */
   protected $storage;
 
   /**
-   * @var
+   * The storage plugin settings
+   *
+   * @var array
    */
   protected $storage_settings;
 
   /**
-   * @var EntityCollectionListStyleInterface
+   * Storage lazy plugin collection.
+   *
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   */
+  protected $storage_collection;
+
+
+  /**
+   * The List Style plugin id.
+   *
+   * @var string
    */
   protected $list_style;
 
   /**
-   * @var
+   * The list style plugin settings
+   *
+   * @var array
    */
   protected $list_style_settings;
 
   /**
-   * @var EntityCollectionRowDisplayInterface
+   * List style lazy plugin collection.
+   *
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   */
+  protected $list_style_collection;
+
+  /**
+   * The List Style plugin id.
+   *
+   * @var string
    */
   protected $row_display;
 
   /**
-   * @var
+   * The Row Display plugin settings
+   *
+   * @var array
    */
   protected $row_display_settings;
+
+  /**
+   * List style lazy plugin collection.
+   *
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   */
+  protected $row_display_collection;
+
+
+  /**
+   * Contains the contexts for this collection
+   *
+   * @var array
+   */
+  protected $contexts = [];
+
 
   /**
    * @return mixed
    */
   public function getStorage() {
-    return $this->storage;
+    return $this->storagePluginCollection()->get($this->storage);
   }
 
   /**
@@ -116,7 +161,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    * @return EntityCollectionListStyleInterface
    */
   public function getListStyle() {
-    return $this->list_style;
+    return $this->listStylePluginCollection()->get($this->list_style);
   }
 
   /**
@@ -130,7 +175,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    * @return EntityCollectionRowDisplayInterface
    */
   public function getRowDisplay() {
-    return $this->row_display;
+    return $this->rowDisplayPluginCollection()->get($this->row_display);
   }
 
   /**
@@ -140,7 +185,67 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
     $this->row_display = $row_display;
   }
 
-  
+  /**
+   * {@inheritdoc}
+   */
+  public function getContexts() {
+    return $this->contexts;
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setContexts(array $contexts) {
+    $this->contexts = $contexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTree() {
+    // TODO: Implement getTree() method.
+  }
+
+  /**
+   * Returns Storage plugin collection.
+   *
+   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   *   The storage plugin collection.
+   */
+  private function storagePluginCollection() {
+    if (!$this->storage_collection) {
+      $this->storage_settings['entity_collection_id'] = $this->id();
+      $this->storage_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->storage, $this->storage_settings);
+    }
+    return $this->storage_collection;
+  }
+
+  /**
+   * Returns List Style plugin collection.
+   *
+   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   *   The List Style plugin collection.
+   */
+  private function listStylePluginCollection() {
+    if (!$this->list_style_collection) {
+      $this->list_style_settings['entity_collection_id'] = $this->id();
+      $this->list_style_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->list_style, $this->list_style_settings);
+    }
+    return $this->list_style_collection;
+  }
+
+  /**
+   * Returns Row Display plugin collection.
+   *
+   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   *   The Row Display plugin collection.
+   */
+  private function rowDisplayPluginCollection() {
+    if (!$this->row_display_collection) {
+      $this->row_display_settings['entity_collection_id'] = $this->id();
+      $this->row_display_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->row_display, $this->row_display_settings);
+    }
+    return $this->row_display_collection;
+  }
 
 }
