@@ -16,12 +16,13 @@ use Drupal\entity_collection\Entity\EntityCollectionInterface;
 interface EntityCollectionPluginBaseInterface extends PluginInspectionInterface {
 
   /**
-   * Generates the cinfiguration form for each plugin.
+   * Generates the configuration form for each plugin.
    * 
-   * @param \Drupal\entity_collection\Entity\EntityCollectionInterface $collection
    * @param array $form
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    * @return array A form that will be included in the configuration page
    */
-  public function getConfigForm(EntityCollectionInterface $collection, array $form, FormStateInterface &$form_state);
+  public function getConfigForm(array $form, FormStateInterface &$form_state);
+
+  public function getConfiguration();
 }

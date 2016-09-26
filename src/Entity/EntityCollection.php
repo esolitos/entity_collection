@@ -203,47 +203,4 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
     // TODO: Implement getTree() method.
   }
 
-//
-//  /**
-//   * Returns Storage plugin collection.
-//   *
-//   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
-//   *   The storage plugin collection.
-//   */
-//  private function storagePluginCollection() {
-//    if (!$this->storage_collection) {
-//      $this->storage_settings['entity_collection_id'] = $this->id();
-//      $this->storage_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->storage, $this->storage_settings);
-//    }
-//    return $this->storage_collection;
-//  }
-//
-//  /**
-//   * Returns List Style plugin collection.
-//   *
-//   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
-//   *   The List Style plugin collection.
-//   */
-//  private function listStylePluginCollection() {
-//    if (!$this->list_style_collection) {
-//      $this->list_style_settings['entity_collection_id'] = $this->id();
-//      $this->list_style_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->list_style, $this->list_style_settings);
-//    }
-//    return $this->list_style_collection;
-//  }
-//
-//  /**
-//   * Returns Row Display plugin collection.
-//   *
-//   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
-//   *   The Row Display plugin collection.
-//   */
-//  private function rowDisplayPluginCollection() {
-//    if (!$this->row_display_collection) {
-//      $this->row_display_settings['entity_collection_id'] = $this->id();
-//      $this->row_display_collection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager'), $this->row_display, $this->row_display_settings);
-//    }
-//    return $this->row_display_collection;
-//  }
-
 }
