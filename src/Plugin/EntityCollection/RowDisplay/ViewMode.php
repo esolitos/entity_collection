@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: esolitos
- * Date: 26/06/16
- * Time: 13:38
- */
 
 namespace Drupal\entity_collection\Plugin\EntityCollection\RowDisplay;
-
 
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
 use Drupal\entity_collection\Plugin\RowDisplayBase;
