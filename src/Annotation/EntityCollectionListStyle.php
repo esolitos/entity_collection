@@ -23,7 +23,7 @@ class EntityCollectionListStyle extends Plugin {
   public $id;
 
   /**
-   * The label of the plugin.
+   * The human-readable name of the List Style plugin.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
@@ -32,8 +32,8 @@ class EntityCollectionListStyle extends Plugin {
   public $label;
 
   /**
-   * A short description for the plugin.
-   * 
+   * A brief description of the List Style plugin.
+   *
    * @var \Drupal\Core\Annotation\Translation
    *
    * @ingroup plugin_translatable

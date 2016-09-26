@@ -23,7 +23,7 @@ class EntityCollectionRowDisplay extends Plugin {
   public $id;
 
   /**
-   * The label of the plugin.
+   * The human-readable name of the Row Display plugin.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
@@ -32,7 +32,7 @@ class EntityCollectionRowDisplay extends Plugin {
   public $label;
 
   /**
-   * A short description for the plugin.
+   * A brief description of the Row Display plugin.
    *
    * @var \Drupal\Core\Annotation\Translation
    *

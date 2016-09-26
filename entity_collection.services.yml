@@ -1,11 +1,11 @@
 services:
-  plugin.manager.entity_collection_storage.processor:
+  plugin.manager.entity_collection_storage:
     class: Drupal\entity_collection\Plugin\EntityCollectionStorageManager
     parent: default_plugin_manager
-  plugin.manager.entity_collection_list_style.processor:
+  plugin.manager.entity_collection_list_style:
     class: Drupal\entity_collection\Plugin\EntityCollectionListStyleManager
     parent: default_plugin_manager
-  plugin.manager.entity_collection_row_display.processor:
+  plugin.manager.entity_collection_row_display:
     class: Drupal\entity_collection\Plugin\EntityCollectionRowDisplayManager
     parent: default_plugin_manager
   entity_collection.manager:

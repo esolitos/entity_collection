@@ -1,4 +1,4 @@
-entity_collection.collection.storage.database
+entity_collection.collection.storage.database:
   type: mapping
   label: 'Database Storage'
   mapping:
