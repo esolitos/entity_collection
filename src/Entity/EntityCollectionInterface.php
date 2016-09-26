@@ -5,7 +5,7 @@ namespace Drupal\entity_collection\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionStorageInterface;
+use Drupal\entity_collection\Plugin\StorageInterface;
 
 /**
  * Provides an interface for defining Entity collection entities.
@@ -18,10 +18,10 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
 
   public function getContexts();
   
-  public function setStorage(EntityCollectionStorageInterface $storage);
+  public function setStorage(StorageInterface $storage);
 
   /**
-   * @return \Drupal\entity_collection\Plugin\EntityCollectionStorageInterface
+   * @return \Drupal\entity_collection\Plugin\StorageInterface
    */
   public function getStorage();
 

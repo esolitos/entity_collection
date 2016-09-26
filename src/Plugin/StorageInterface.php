@@ -10,7 +10,7 @@ use Drupal\entity_collection\TreeNodeInterface;
 /**
  * Defines an interface for EntityCollection Storage plugins.
  */
-interface EntityCollectionStorageInterface extends EntityCollectionPluginBaseInterface {
+interface StorageInterface extends EntityCollectionPluginBaseInterface {
 
   /**
    * Stores an entity collection in the backend.

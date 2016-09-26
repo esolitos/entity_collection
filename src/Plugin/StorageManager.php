@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the EntityCollection Storage plugin manager.
  */
-class EntityCollectionStorageManager extends DefaultPluginManager {
+class StorageManager extends DefaultPluginManager {
 
 
   /**
@@ -24,7 +24,7 @@ class EntityCollectionStorageManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EntityCollectionStorage', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\EntityCollectionStorageInterface', 'Drupal\entity_collection\Annotation\EntityCollectionStorage');
+    parent::__construct('Plugin/EntityCollection/Storage', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\StorageInterface', 'Drupal\entity_collection\Annotation\EntityCollectionStorage');
 
     $this->alterInfo('entity_collection_entity_collection_storage_info');
     $this->setCacheBackend($cache_backend, 'entity_collection_entity_collection_storage_plugins');

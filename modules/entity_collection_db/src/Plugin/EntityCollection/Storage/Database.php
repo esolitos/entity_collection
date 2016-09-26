@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: esolitos
- * Date: 26/06/16
- * Time: 16:05
- */
 
-namespace Drupal\entity_collection_db\Plugin\EntityCollectionStorage;
-
+namespace Drupal\entity_collection_db\Plugin\EntityCollection\Storage;
 
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionStorageBase;
+use Drupal\entity_collection\Plugin\StorageBase;
 use Drupal\entity_collection\TreeNodeInterface;
 
 /**
@@ -22,7 +15,7 @@ use Drupal\entity_collection\TreeNodeInterface;
  *   description = @Translation("Stores the Entity Collection content in a system database")
  * )
  */
-class Database extends EntityCollectionStorageBase {
+class Database extends StorageBase {
 
   /**
    * {@inheritdoc}

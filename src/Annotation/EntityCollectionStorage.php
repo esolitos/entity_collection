@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Entity Collection: Storage item annotation object.
  *
- * @see \Drupal\entity_collection\Plugin\EntityCollectionStorageManager
+ * @see \Drupal\entity_collection\Plugin\StorageManager
  * @see plugin_api
  *
  * @Annotation

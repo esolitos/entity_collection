@@ -7,7 +7,7 @@ use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\entity_collection\Annotation\EntityCollectionStorage;
 use Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionStorageInterface;
+use Drupal\entity_collection\Plugin\StorageInterface;
 
 /**
  * Defines the Entity collection entity.
@@ -144,9 +144,9 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @param EntityCollectionStorageInterface $storage
+   * @param StorageInterface $storage
    */
-  public function setStorage(EntityCollectionStorageInterface $storage) {
+  public function setStorage(StorageInterface $storage) {
     $this->storage = $storage->getPluginId();
     $this->storage_settings = $storage->getConfiguration();
   }

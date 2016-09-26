@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\PluginBase;
 /**
  * Base class for EntityCollection Storage plugins.
  */
-abstract class EntityCollectionStorageBase extends EntityCollectionPluginBase implements EntityCollectionStorageInterface {
+abstract class StorageBase extends EntityCollectionPluginBase implements StorageInterface {
 
 
   // Add common methods and abstract methods for your plugin type here.
