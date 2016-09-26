@@ -1,12 +1,11 @@
 entity_collection.collection.*:
   type: config_entity
-  label: 'Entity Collection config'
+  label: 'Entity Collection'
   mapping:
     uuid:
       type: string
     id:
       type: string
-      label: 'ID'
     label:
       type: label
       label: 'Name'
@@ -15,28 +14,28 @@ entity_collection.collection.*:
       label: 'Storage plugin'
     storage_settings:
       type: entity_collection.collection.storage.[%parent.storage]
-      label: 'List Settings'
+      label: 'Storage Settings'
     list_style:
       type: string
       label: 'List Style'
     list_style_settings:
       type: entity_collection.collection.list_style.[%parent.list_style]
-      label: 'List Settings'
+      label: 'List plugin settings'
     row_display:
       type: string
       label: 'Row Display'
     row_display_settings:
       type: entity_collection.collection.row_display.[%parent.row_display]
-      label: 'Row Settings'
+      label: 'Row plugin settings'
 
 
-entity_collection.collection.list_style.flat_list
+entity_collection.collection.list_style.flat_list:
   type: mapping
   label: 'Flat List style configuration'
   mapping: {}
 
 
-entity_collection.collection.row_display.view_mode
+entity_collection.collection.row_display.view_mode:
   type: mapping
   label: 'View mode row configuration'
   mapping:
