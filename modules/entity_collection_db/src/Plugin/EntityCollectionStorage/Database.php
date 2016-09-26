@@ -45,5 +45,4 @@ class Database extends EntityCollectionStorageBase {
     // TODO: Implement truncate() method.
   }
 
-
 }

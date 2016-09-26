@@ -83,7 +83,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    *
    * @var array
    */
-  protected $storage_settings;
+  protected $storage_settings = [];
 
 
   /**
@@ -98,7 +98,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    *
    * @var array
    */
-  protected $list_style_settings;
+  protected $list_style_settings = [];
 
 
   /**
@@ -113,7 +113,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    *
    * @var array
    */
-  protected $row_display_settings;
+  protected $row_display_settings = [];
 
 
 
@@ -123,6 +123,13 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    * @var array
    */
   protected $contexts = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isStorageConfigured() {
+    return !empty($this->storage);
+  }
 
 
   /**
@@ -145,6 +152,13 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function isListStyleConfigured() {
+    return !empty($this->list_style);
+  }
+
+  /**
    * @return EntityCollectionListStyleInterface
    */
   public function getListStyle() {
@@ -161,6 +175,13 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   public function setListStyle(EntityCollectionListStyleInterface $list_style) {
     $this->list_style = $list_style->getPluginId();
     $this->list_style_settings = $list_style->getConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isRowDisplayConfigured() {
+    return !empty($this->row_display);
   }
 
   /**
