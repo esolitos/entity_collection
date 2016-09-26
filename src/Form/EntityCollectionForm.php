@@ -4,6 +4,7 @@ namespace Drupal\entity_collection\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\entity_collection\Plugin\AdminUIManager;
 use Drupal\entity_collection\Plugin\ListStyleManager;
 use Drupal\entity_collection\Plugin\RowDisplayManager;
 use Drupal\entity_collection\Plugin\StorageManager;
@@ -24,6 +25,11 @@ class EntityCollectionForm extends EntityForm {
   protected $entity;
 
   /**
+   * @var \Drupal\entity_collection\Plugin\AdminUIManager
+   */
+  protected $adminUIManager;
+
+  /**
    * @var \Drupal\entity_collection\Plugin\ListStyleManager
    */
   protected $listStyleManager;
@@ -40,11 +46,14 @@ class EntityCollectionForm extends EntityForm {
 
   /**
    * EntityCollectionForm constructor.
+   *
+   * @param \Drupal\entity_collection\Plugin\AdminUIManager $admin_ui_manager
    * @param \Drupal\entity_collection\Plugin\StorageManager $storage_manager
    * @param \Drupal\entity_collection\Plugin\ListStyleManager $list_style_manager
    * @param \Drupal\entity_collection\Plugin\RowDisplayManager $row_display_manager
    */
-  function __construct(StorageManager $storage_manager, ListStyleManager $list_style_manager, RowDisplayManager $row_display_manager) {
+  function __construct(AdminUIManager $admin_ui_manager, StorageManager $storage_manager, ListStyleManager $list_style_manager, RowDisplayManager $row_display_manager) {
+    $this->adminUIManager = $admin_ui_manager;
     $this->storageManager = $storage_manager;
     $this->listStyleManager = $list_style_manager;
     $this->rowDisplayManager = $row_display_manager;
@@ -55,6 +64,7 @@ class EntityCollectionForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('plugin.manager.entity_collection_admin_ui'),
       $container->get('plugin.manager.entity_collection_storage'),
       $container->get('plugin.manager.entity_collection_list_style'),
       $container->get('plugin.manager.entity_collection_row_display')
@@ -86,6 +96,24 @@ class EntityCollectionForm extends EntityForm {
       '#disabled' => !$entity_collection->isNew(),
     );
 
+    /**
+     * Admin UI selection and configuration
+     */
+    $admin_ui_options = array();
+    foreach ($this->adminUIManager->getDefinitions() as $id => $definition) {
+      $admin_ui_options[$id] = $definition['label'];
+    }
+    $default_admin_ui = $entity_collection->get('admin_ui') ?: 'table_form';
+    $form['admin_ui'] = array(
+      '#type' => 'select',
+      '#title' => $this->t("Admin UI"),
+      '#options' => $admin_ui_options,
+      '#default_value' => $default_admin_ui,
+    );
+
+    /**
+     * Backend Storage selection and configuration
+     */
     $storage_options = array();
     foreach ($this->storageManager->getDefinitions() as $id => $definition) {
       $storage_options[$id] = $definition['label'];
@@ -116,6 +144,9 @@ class EntityCollectionForm extends EntityForm {
       );
     }
 
+    /**
+     * List Style selection and configuration
+     */
     $list_style_options = array();
     foreach ($this->listStyleManager->getDefinitions() as $id => $definition) {
       $list_style_options[$id] = $definition['label'];
@@ -129,6 +160,9 @@ class EntityCollectionForm extends EntityForm {
       '#empty_value' => '',
     );
 
+    /**
+     * Row Display selection and configuration
+     */
     $row_display_options = array();
     foreach ($this->rowDisplayManager->getDefinitions() as $id => $definition) {
       $row_display_options[$id] = $definition['label'];

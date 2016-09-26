@@ -3,6 +3,7 @@
 namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\entity_collection\Plugin\AdminUIInterface;
 use Drupal\entity_collection\Plugin\ListStyleInterface;
 use Drupal\entity_collection\Plugin\RowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
@@ -17,7 +18,20 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
   public function setContexts(array $contexts);
 
   public function getContexts();
-  
+
+
+  /**
+   * @return \Drupal\entity_collection\Plugin\AdminUIInterface
+   */
+  public function getAdminUI();
+
+  /**
+   * @return bool
+   */
+  public function isAdminUIConfigured();
+
+  public function setAdminUI(AdminUIInterface $admin_ui);
+
   public function setStorage(StorageInterface $storage);
 
   /**
@@ -25,6 +39,9 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
    */
   public function getStorage();
 
+  /**
+   * @return bool
+   */
   public function isStorageConfigured();
 
   public function setListStyle(ListStyleInterface $list_style);
@@ -34,6 +51,9 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
    */
   public function getListStyle();
 
+  /**
+   * @return bool
+   */
   public function isListStyleConfigured();
 
   public function setRowDisplay(RowDisplayInterface $row_display);
@@ -43,5 +63,8 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
    */
   public function getRowDisplay();
 
+  /**
+   * @return bool
+   */
   public function isRowDisplayConfigured();
 }

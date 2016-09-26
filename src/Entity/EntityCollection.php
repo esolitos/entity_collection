@@ -3,8 +3,7 @@
 namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
-use Drupal\entity_collection\Annotation\EntityCollectionStorage;
+use Drupal\entity_collection\Plugin\AdminUIInterface;
 use Drupal\entity_collection\Plugin\ListStyleInterface;
 use Drupal\entity_collection\Plugin\RowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
@@ -43,6 +42,8 @@ use Drupal\entity_collection\Plugin\StorageInterface;
  *   config_export = {
  *     "id",
  *     "label",
+ *     "admin_ui",
+ *     "admin_ui_settings",
  *     "storage",
  *     "storage_settings",
  *     "list_style",
@@ -70,6 +71,19 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    */
   protected $label;
 
+  /**
+   * The Admin UI plugin id
+   *
+   * @var string
+   */
+  protected $admin_ui;
+
+  /**
+   * The Admin UI plugin settings (if any).
+   *
+   * @var array
+   */
+  protected $admin_ui_settings = [];
 
   /**
    * The storage plugin id.
@@ -84,7 +98,6 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    * @var array
    */
   protected $storage_settings = [];
-
 
   /**
    * The List Style plugin id.
@@ -116,13 +129,39 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   protected $row_display_settings = [];
 
 
-
   /**
    * Contains the contexts for this collection
    *
    * @var array
    */
   protected $contexts = [];
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAdminUIConfigured() {
+    return !empty($this->admin_ui);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdminUI() {
+    if ( $this->admin_ui ) {
+      return \Drupal::service('plugin.manager.entity_collection_admin_ui')->createInstance($this->admin_ui, $this->admin_ui_settings);
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAdminUI(AdminUIInterface $admin_ui) {
+    $this->admin_ui = $admin_ui->getPluginId();
+    $this->admin_ui_settings = $admin_ui->getConfiguration();
+  }
 
   /**
    * {@inheritdoc}
@@ -131,9 +170,8 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
     return !empty($this->storage);
   }
 
-
   /**
-   * @return mixed
+   * {@inheritdoc}
    */
   public function getStorage() {
     if ( $this->storage ) {
@@ -144,7 +182,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @param StorageInterface $storage
+   * {@inheritdoc}
    */
   public function setStorage(StorageInterface $storage) {
     $this->storage = $storage->getPluginId();
@@ -159,7 +197,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @return ListStyleInterface
+   * {@inheritdoc}
    */
   public function getListStyle() {
     if ( $this->list_style ) {
@@ -170,7 +208,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @param ListStyleInterface $list_style
+   * {@inheritdoc}
    */
   public function setListStyle(ListStyleInterface $list_style) {
     $this->list_style = $list_style->getPluginId();
@@ -185,7 +223,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @return RowDisplayInterface
+   * {@inheritdoc}
    */
   public function getRowDisplay() {
     if ( $this->row_display ) {

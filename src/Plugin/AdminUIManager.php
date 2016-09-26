@@ -7,13 +7,13 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
- * Provides the Entity Collection: List Style plugin manager.
+ * Provides the E.C. Admin UI plugin manager.
  */
-class ListStyleManager extends DefaultPluginManager {
+class AdminUIManager extends DefaultPluginManager {
 
 
   /**
-   * Constructor for EntityCollectionListStyleManager objects.
+   * Constructor for EntityCollectionAdminUIManager objects.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
@@ -24,10 +24,10 @@ class ListStyleManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EntityCollection/ListStyle', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\ListStyleInterface', 'Drupal\entity_collection\Annotation\EntityCollectionListStyle');
+    parent::__construct('Plugin/EntityCollection/AdminUI', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\AdminUIInterface', 'Drupal\entity_collection\Annotation\EntityCollectionAdminUI');
 
-    $this->alterInfo('entity_collection_list_style_info');
-    $this->setCacheBackend($cache_backend, 'entity_collection_list_style_plugins');
+    $this->alterInfo('entity_collection_admin_ui_info');
+    $this->setCacheBackend($cache_backend, 'entity_collection_admin_ui_plugins');
   }
 
 }

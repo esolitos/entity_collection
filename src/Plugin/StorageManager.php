@@ -26,8 +26,8 @@ class StorageManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/EntityCollection/Storage', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\StorageInterface', 'Drupal\entity_collection\Annotation\EntityCollectionStorage');
 
-    $this->alterInfo('entity_collection_entity_collection_storage_info');
-    $this->setCacheBackend($cache_backend, 'entity_collection_entity_collection_storage_plugins');
+    $this->alterInfo('entity_collection_storage_info');
+    $this->setCacheBackend($cache_backend, 'entity_collection_storage_plugins');
   }
 
 }

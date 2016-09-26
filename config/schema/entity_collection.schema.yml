@@ -9,6 +9,12 @@ entity_collection.collection.*:
     label:
       type: label
       label: 'Name'
+    admin_ui:
+      type: string
+      label: 'Admin UI'
+    admin_ui_settings:
+      type: entity_collection.collection.admin_ui.[%parent.admin_ui]
+      label: 'Admin UI Settings'
     storage:
       type: string
       label: 'Storage plugin'
@@ -28,6 +34,10 @@ entity_collection.collection.*:
       type: entity_collection.collection.row_display.[%parent.row_display]
       label: 'Row plugin settings'
 
+entity_collection.collection.admin_ui.table_form:
+  type: mapping
+  label: 'Table Form configuration'
+  mapping: {}
 
 entity_collection.collection.list_style.flat_list:
   type: mapping

@@ -26,8 +26,8 @@ class RowDisplayManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/EntityCollection/RowDisplay', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\RowDisplayInterface', 'Drupal\entity_collection\Annotation\EntityCollectionRowDisplay');
 
-    $this->alterInfo('entity_collection_entity_collection_row_display_info');
-    $this->setCacheBackend($cache_backend, 'entity_collection_entity_collection_row_display_plugins');
+    $this->alterInfo('entity_collection_row_display_info');
+    $this->setCacheBackend($cache_backend, 'entity_collection_row_display_plugins');
   }
 
 }
