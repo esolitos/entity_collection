@@ -19,7 +19,12 @@ abstract class EntityCollectionPluginBase extends PluginBase implements EntityCo
   /**
    * {@inheritdoc}
    */
-  public function getConfigForm(EntityCollectionInterface $collection, array $form, FormStateInterface &$form_state) {
+  public function getConfigForm(array $form, FormStateInterface &$form_state) {
+    // Empty form by default.
+    return [];
+  }
+
+  public function getConfiguration() {
     // Empty form by default.
     return [];
   }
