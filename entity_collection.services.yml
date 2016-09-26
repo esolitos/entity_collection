@@ -6,7 +6,7 @@ services:
     class: Drupal\entity_collection\Plugin\ListStyleManager
     parent: default_plugin_manager
   plugin.manager.entity_collection_row_display:
-    class: Drupal\entity_collection\Plugin\EntityCollectionRowDisplayManager
+    class: Drupal\entity_collection\Plugin\RowDisplayManager
     parent: default_plugin_manager
   entity_collection.manager:
     class: Drupal\entity_collection\EntityCollectionManager

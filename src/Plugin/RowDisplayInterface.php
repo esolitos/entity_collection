@@ -8,7 +8,7 @@ use Drupal\entity_collection\TreeNodeInterface;
 /**
  * Defines an interface for Entity Collection: Row Display plugins.
  */
-interface EntityCollectionRowDisplayInterface extends EntityCollectionPluginBaseInterface {
+interface RowDisplayInterface extends EntityCollectionPluginBaseInterface {
 
 
   /**

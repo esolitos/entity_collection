@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the Entity Collection: Row Display plugin manager.
  */
-class EntityCollectionRowDisplayManager extends DefaultPluginManager {
+class RowDisplayManager extends DefaultPluginManager {
 
 
   /**
@@ -24,7 +24,7 @@ class EntityCollectionRowDisplayManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EntityCollectionRowDisplay', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface', 'Drupal\entity_collection\Annotation\EntityCollectionRowDisplay');
+    parent::__construct('Plugin/EntityCollection/RowDisplay', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\RowDisplayInterface', 'Drupal\entity_collection\Annotation\EntityCollectionRowDisplay');
 
     $this->alterInfo('entity_collection_entity_collection_row_display_info');
     $this->setCacheBackend($cache_backend, 'entity_collection_entity_collection_row_display_plugins');

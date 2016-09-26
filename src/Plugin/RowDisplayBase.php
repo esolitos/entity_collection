@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\PluginBase;
 /**
  * Base class for Entity Collection: Row Display plugins.
  */
-abstract class EntityCollectionRowDisplayBase extends EntityCollectionPluginBase implements EntityCollectionRowDisplayInterface {
+abstract class RowDisplayBase extends EntityCollectionPluginBase implements RowDisplayInterface {
 
 
   /**

@@ -4,7 +4,7 @@ namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\entity_collection\Plugin\ListStyleInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
+use Drupal\entity_collection\Plugin\RowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
 
 /**
@@ -36,10 +36,10 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
 
   public function isListStyleConfigured();
 
-  public function setRowDisplay(EntityCollectionRowDisplayInterface $row_display);
+  public function setRowDisplay(RowDisplayInterface $row_display);
 
   /**
-   * @return \Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface
+   * @return \Drupal\entity_collection\Plugin\RowDisplayInterface
    */
   public function getRowDisplay();
 

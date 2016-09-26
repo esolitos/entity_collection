@@ -6,7 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\entity_collection\Annotation\EntityCollectionStorage;
 use Drupal\entity_collection\Plugin\ListStyleInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
+use Drupal\entity_collection\Plugin\RowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
 
 /**
@@ -185,7 +185,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @return EntityCollectionRowDisplayInterface
+   * @return RowDisplayInterface
    */
   public function getRowDisplay() {
     if ( $this->row_display ) {
@@ -196,9 +196,9 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @param EntityCollectionRowDisplayInterface $row_display
+   * @param RowDisplayInterface $row_display
    */
-  public function setRowDisplay(EntityCollectionRowDisplayInterface $row_display) {
+  public function setRowDisplay(RowDisplayInterface $row_display) {
     $this->row_display = $row_display->getPluginId();
     $this->row_display_settings = $row_display->getConfiguration();
   }
