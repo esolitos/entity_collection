@@ -76,7 +76,6 @@ class EntityCollectionForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-
     $entity_collection = $this->entity;
 
     $form['label'] = array(
@@ -127,21 +126,19 @@ class EntityCollectionForm extends EntityForm {
       '#empty_value' => '',
     );
 
-    if ( $entity_collection->isStorageConfigured() ) {
-      $form['storage_config'] = $entity_collection->getStorage()->getConfigForm($form, $form_state);
-    }
-    else {
-      $form['storage_config'] = array(
-        '#type' => 'details',
-        '#title' => $this->t("Storage Settings"),
-        '#prefix' => '<div class="storage-settings-wrapper">',
-        '#suffix' => '</div>',
-        '#states' => array(
-          'invisible' => array(
-            ':input[name="storage"]' => array('value' => ''),
-          ),
+    $form['storage_settings'] = array(
+      '#type' => 'details',
+      '#title' => $this->t("Storage Settings"),
+      '#prefix' => '<div class="storage-settings-wrapper">',
+      '#suffix' => '</div>',
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="storage"]' => array('value' => ''),
         ),
-      );
+      ),
+    );
+    if ( $entity_collection->isStorageConfigured() ) {
+      $form['storage_settings'] = $form['storage_settings'] + $entity_collection->getStorage()->getConfigForm($form, $form_state);
     }
 
     /**

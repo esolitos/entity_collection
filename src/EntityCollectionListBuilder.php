@@ -14,8 +14,11 @@ class EntityCollectionListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Entity collection');
-    $header['id'] = $this->t('Machine name');
+    $header['label'] = $this->t('Collection Name');
+    $header['id'] = $this->t('Machine Name');
+    $header['admin_ui'] = $this->t('Admin UI');
+    $header['list_style'] = $this->t('List Style');
+    $header['row_display'] = $this->t('Row Display');
     return $header + parent::buildHeader();
   }
 
@@ -24,8 +27,12 @@ class EntityCollectionListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
+    // $row['label'] = $entity->toLink();
     $row['id'] = $entity->id();
-    // You probably want a few more properties here...
+    $row['admin_ui'] = $entity->get('admin_ui');
+    $row['list_style'] = $entity->get('list_style');
+    $row['row_display'] = $entity->get('row_display');
+
     return $row + parent::buildRow($entity);
   }
 
