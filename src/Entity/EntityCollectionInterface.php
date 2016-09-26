@@ -3,7 +3,7 @@
 namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface;
+use Drupal\entity_collection\Plugin\ListStyleInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
 
@@ -27,10 +27,10 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
 
   public function isStorageConfigured();
 
-  public function setListStyle(EntityCollectionListStyleInterface $list_style);
+  public function setListStyle(ListStyleInterface $list_style);
 
   /**
-   * @return \Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface
+   * @return \Drupal\entity_collection\Plugin\ListStyleInterface
    */
   public function getListStyle();
 

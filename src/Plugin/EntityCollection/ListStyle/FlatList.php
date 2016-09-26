@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: esolitos
- * Date: 26/06/16
- * Time: 13:25
- */
 
-namespace Drupal\entity_collection\Plugin\EntityCollectionListStyle;
-
+namespace Drupal\entity_collection\Plugin\EntityCollection\ListStyle;
 
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionListStyleBase;
+use Drupal\entity_collection\Plugin\ListStyleBase;
 use Drupal\entity_collection\TreeNodeInterface;
 
 /**
@@ -22,7 +15,7 @@ use Drupal\entity_collection\TreeNodeInterface;
  *   description = @Translation("Defines a very simple plugin to handle a linear list without depth.")
  * )
  */
-class FlatList extends EntityCollectionListStyleBase {
+class FlatList extends ListStyleBase {
 
   /**
    * {@inheritdoc}

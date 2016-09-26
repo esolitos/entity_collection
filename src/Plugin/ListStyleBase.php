@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\PluginBase;
 /**
  * Base class for Entity Collection: List Style plugins.
  */
-abstract class EntityCollectionListStyleBase extends EntityCollectionPluginBase implements EntityCollectionListStyleInterface {
+abstract class ListStyleBase extends EntityCollectionPluginBase implements ListStyleInterface {
 
 
   /**

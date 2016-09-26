@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the Entity Collection: List Style plugin manager.
  */
-class EntityCollectionListStyleManager extends DefaultPluginManager {
+class ListStyleManager extends DefaultPluginManager {
 
 
   /**
@@ -24,7 +24,7 @@ class EntityCollectionListStyleManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/EntityCollectionListStyle', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface', 'Drupal\entity_collection\Annotation\EntityCollectionListStyle');
+    parent::__construct('Plugin/EntityCollection/ListStyle', $namespaces, $module_handler, 'Drupal\entity_collection\Plugin\ListStyleInterface', 'Drupal\entity_collection\Annotation\EntityCollectionListStyle');
 
     $this->alterInfo('entity_collection_entity_collection_list_style_info');
     $this->setCacheBackend($cache_backend, 'entity_collection_entity_collection_list_style_plugins');

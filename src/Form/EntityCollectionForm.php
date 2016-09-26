@@ -4,7 +4,7 @@ namespace Drupal\entity_collection\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\entity_collection\Plugin\EntityCollectionListStyleManager;
+use Drupal\entity_collection\Plugin\ListStyleManager;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayManager;
 use Drupal\entity_collection\Plugin\StorageManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,7 +24,7 @@ class EntityCollectionForm extends EntityForm {
   protected $entity;
 
   /**
-   * @var \Drupal\entity_collection\Plugin\EntityCollectionListStyleManager
+   * @var \Drupal\entity_collection\Plugin\ListStyleManager
    */
   protected $listStyleManager;
 
@@ -41,10 +41,10 @@ class EntityCollectionForm extends EntityForm {
   /**
    * EntityCollectionForm constructor.
    * @param \Drupal\entity_collection\Plugin\StorageManager $storage_manager
-   * @param \Drupal\entity_collection\Plugin\EntityCollectionListStyleManager $list_style_manager
+   * @param \Drupal\entity_collection\Plugin\ListStyleManager $list_style_manager
    * @param \Drupal\entity_collection\Plugin\EntityCollectionRowDisplayManager $row_display_manager
    */
-  function __construct(StorageManager $storage_manager, EntityCollectionListStyleManager $list_style_manager, EntityCollectionRowDisplayManager $row_display_manager) {
+  function __construct(StorageManager $storage_manager, ListStyleManager $list_style_manager, EntityCollectionRowDisplayManager $row_display_manager) {
     $this->storageManager = $storage_manager;
     $this->listStyleManager = $list_style_manager;
     $this->rowDisplayManager = $row_display_manager;

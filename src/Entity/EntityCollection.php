@@ -5,7 +5,7 @@ namespace Drupal\entity_collection\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\entity_collection\Annotation\EntityCollectionStorage;
-use Drupal\entity_collection\Plugin\EntityCollectionListStyleInterface;
+use Drupal\entity_collection\Plugin\ListStyleInterface;
 use Drupal\entity_collection\Plugin\EntityCollectionRowDisplayInterface;
 use Drupal\entity_collection\Plugin\StorageInterface;
 
@@ -159,7 +159,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @return EntityCollectionListStyleInterface
+   * @return ListStyleInterface
    */
   public function getListStyle() {
     if ( $this->list_style ) {
@@ -170,9 +170,9 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   }
 
   /**
-   * @param EntityCollectionListStyleInterface $list_style
+   * @param ListStyleInterface $list_style
    */
-  public function setListStyle(EntityCollectionListStyleInterface $list_style) {
+  public function setListStyle(ListStyleInterface $list_style) {
     $this->list_style = $list_style->getPluginId();
     $this->list_style_settings = $list_style->getConfiguration();
   }

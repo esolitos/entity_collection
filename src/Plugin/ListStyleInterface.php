@@ -7,7 +7,7 @@ use Drupal\entity_collection\TreeNodeInterface;
 /**
  * Defines an interface for Entity Collection: List Style plugins.
  */
-interface EntityCollectionListStyleInterface extends EntityCollectionPluginBaseInterface {
+interface ListStyleInterface extends EntityCollectionPluginBaseInterface {
 
   /**
    * Get the max depth that this style allows.

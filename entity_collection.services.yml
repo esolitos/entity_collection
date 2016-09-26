@@ -3,7 +3,7 @@ services:
     class: Drupal\entity_collection\Plugin\StorageManager
     parent: default_plugin_manager
   plugin.manager.entity_collection_list_style:
-    class: Drupal\entity_collection\Plugin\EntityCollectionListStyleManager
+    class: Drupal\entity_collection\Plugin\ListStyleManager
     parent: default_plugin_manager
   plugin.manager.entity_collection_row_display:
     class: Drupal\entity_collection\Plugin\EntityCollectionRowDisplayManager
