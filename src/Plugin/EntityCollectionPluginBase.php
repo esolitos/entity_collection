@@ -17,9 +17,27 @@ abstract class EntityCollectionPluginBase extends PluginBase implements EntityCo
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getConfiguration() {
-    // Empty form by default.
+    // Empty config by default.
     return [];
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    // Empty config by default.
+    return [];
+  }
+
+  public function calculateDependencies() {
+    // No dependencies by default.
+    return [];
+  }
+
+
 
 }
