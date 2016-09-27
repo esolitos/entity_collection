@@ -21,11 +21,6 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
 
 
   /**
-   * @return \Drupal\entity_collection\Plugin\AdminUIInterface
-   */
-  public function getAdminUI();
-
-  /**
    * @return bool
    */
   public function isAdminUIConfigured();
@@ -35,11 +30,6 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
   public function setStorage(StorageInterface $storage);
 
   /**
-   * @return \Drupal\entity_collection\Plugin\StorageInterface
-   */
-  public function getStorage();
-
-  /**
    * @return bool
    */
   public function isStorageConfigured();
@@ -47,21 +37,11 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
   public function setListStyle(ListStyleInterface $list_style);
 
   /**
-   * @return \Drupal\entity_collection\Plugin\ListStyleInterface
-   */
-  public function getListStyle();
-
-  /**
    * @return bool
    */
   public function isListStyleConfigured();
 
   public function setRowDisplay(RowDisplayInterface $row_display);
-
-  /**
-   * @return \Drupal\entity_collection\Plugin\RowDisplayInterface
-   */
-  public function getRowDisplay();
 
   /**
    * @return bool

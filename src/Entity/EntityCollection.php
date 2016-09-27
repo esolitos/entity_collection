@@ -147,17 +147,6 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function getAdminUI() {
-    if ( $this->admin_ui ) {
-      return \Drupal::service('plugin.manager.entity_collection_admin_ui')->createInstance($this->admin_ui, $this->admin_ui_settings);
-    }
-
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setAdminUI(AdminUIInterface $admin_ui) {
     $this->admin_ui = $admin_ui->getPluginId();
     $this->admin_ui_settings = $admin_ui->getConfiguration();
@@ -168,17 +157,6 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    */
   public function isStorageConfigured() {
     return !empty($this->storage);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getStorage() {
-    if ( $this->storage ) {
-      return \Drupal::service('plugin.manager.entity_collection_storage')->createInstance($this->storage, $this->storage_settings);
-    }
-
-    return NULL;
   }
 
   /**
@@ -199,17 +177,6 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function getListStyle() {
-    if ( $this->list_style ) {
-      return \Drupal::service('plugin.manager.entity_collection_list_style')->createInstance($this->list_style, $this->list_style_settings);
-    }
-
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setListStyle(ListStyleInterface $list_style) {
     $this->list_style = $list_style->getPluginId();
     $this->list_style_settings = $list_style->getConfiguration();
@@ -220,17 +187,6 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    */
   public function isRowDisplayConfigured() {
     return !empty($this->row_display);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRowDisplay() {
-    if ( $this->row_display ) {
-      return \Drupal::service('plugin.manager.entity_collection_row_display')->createInstance($this->row_display, $this->row_display_settings);
-    }
-
-    return NULL;
   }
 
   /**
