@@ -14,4 +14,9 @@ services:
 
   entity_collection.manager:
     class: Drupal\entity_collection\EntityCollectionManager
-    arguments: ["@config.factory"]
+    arguments:
+      - "@plugin.manager.entity_collection_admin_ui"
+      - "@plugin.manager.entity_collection_storage"
+      - "@plugin.manager.entity_collection_list_style"
+      - "@plugin.manager.entity_collection_row_display"
+
