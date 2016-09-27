@@ -27,7 +27,7 @@ class EntityCollectionListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
-    // $row['label'] = $entity->toLink();
+    $row['label'] = $entity->toLink();
     $row['id'] = $entity->id();
     $row['admin_ui'] = $entity->get('admin_ui');
     $row['list_style'] = $entity->get('list_style');

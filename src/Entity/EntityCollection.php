@@ -28,11 +28,11 @@ use Drupal\entity_collection\Plugin\StorageInterface;
  *   config_prefix = "entity_collection",
  *   admin_permission = "administer site configuration",
  *   links = {
- *     "canonical" = "/admin/structure/entity_collection/{entity_collection}",
+ *     "canonical" = "/admin/structure/entity_collection/{entity_collection}/content",
  *     "add-form" = "/admin/structure/entity_collection/add",
  *     "edit-form" = "/admin/structure/entity_collection/{entity_collection}/edit",
  *     "delete-form" = "/admin/structure/entity_collection/{entity_collection}/delete",
- *     "collection" = "/admin/structure/entity_collection"
+ *     "collection" = "/admin/structure/entity_collection/collections"
  *   },
  *   entity_keys = {
  *     "id" = "id",

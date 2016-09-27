@@ -22,6 +22,10 @@ class EntityCollectionHtmlRouteProvider extends AdminHtmlRouteProvider {
 
     $entity_type_id = $entity_type->id();
 
+    if ($canonical_route = $this->getCanonicalRoute($entity_type)) {
+      $collection->add("entity.{$entity_type_id}.canonical", $canonical_route);
+    }
+
     if ($collection_route = $this->getCollectionRoute($entity_type)) {
       $collection->add("entity.{$entity_type_id}.collection", $collection_route);
     }
@@ -55,5 +59,35 @@ class EntityCollectionHtmlRouteProvider extends AdminHtmlRouteProvider {
       return $route;
     }
   }
+
+
+  /**
+   * Gets the canonical route.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   *
+   * @return \Symfony\Component\Routing\Route|null
+   *   The generated route, if available.
+   */
+  protected function getCanonicalRoute(EntityTypeInterface $entity_type) {
+    if ($entity_type->hasLinkTemplate('canonical') && $entity_type->hasListBuilderClass()) {
+      $entity_type_id = $entity_type->id();
+      $route = new Route($entity_type->getLinkTemplate('canonical'));
+      $route
+        ->setDefaults([
+          '_controller' => '\Drupal\entity_collection\Controller\EntityCollectionContentAdmin::adminUI',
+          '_title' => (string) $entity_type->getLabel(),
+        ])
+        ->setRequirement('_permission', $entity_type->getAdminPermission())
+        ->setOption('_admin_route', TRUE)
+        ->setOption('parameters', [
+          $entity_type_id => ['type' => 'entity:' . $entity_type_id],
+        ]);
+
+      return $route;
+    }
+  }
+
 
 }

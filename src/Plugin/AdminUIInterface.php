@@ -9,6 +9,6 @@ namespace Drupal\entity_collection\Plugin;
 interface AdminUIInterface extends EntityCollectionPluginBaseInterface {
 
 
-  // Add get/set methods for your plugin type here.
+  public function build();
 
 }
