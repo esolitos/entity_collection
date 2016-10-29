@@ -1,0 +1,20 @@
+# Entity collection general permissions.
+create entity collections:
+  title: 'Create entity collections'
+  description: 'Create new entity collections.'
+  restrict access: FALSE
+
+delete entity collections:
+  title: 'Delete entity collections'
+  description: 'Delete entity collections.'
+  restrict access: FALSE
+
+edit entity collections:
+  title: 'Edit entity collections'
+  description: 'Edit entity collections.'
+  restrict access: FALSE
+
+# Permissions per entity collection.
+#permission_callbacks:
+# DELETEME this is just an example:
+#  - Drupal\filter\FilterPermissions::permissions
