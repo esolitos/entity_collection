@@ -3,6 +3,7 @@
 namespace Drupal\entity_collection\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\entity_collection\Plugin\AdminUIInterface;
 use Drupal\entity_collection\Plugin\ListStyleInterface;
 use Drupal\entity_collection\Plugin\RowDisplayInterface;
@@ -216,6 +217,10 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
    */
   public function getTree() {
     // TODO: Implement getTree() method.
+  }
+
+  public function getStorage() {
+    return $this->storage_settings;
   }
 
 }

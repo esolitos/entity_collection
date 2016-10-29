@@ -138,7 +138,7 @@ class EntityCollectionForm extends EntityForm {
       ),
     );
     if ( $entity_collection->isStorageConfigured() ) {
-      $form['storage_settings'] = $form['storage_settings'] + $entity_collection->getStorage()->getConfigForm($form, $form_state);
+      $form['storage_settings'] = $form['storage_settings'] + $entity_collection->getStorage()/*->getConfigForm($form, $form_state)*/;
     }
 
     /**
