@@ -13,8 +13,3 @@ edit entity collections:
   title: 'Edit entity collections'
   description: 'Edit entity collections.'
   restrict access: FALSE
-
-# Permissions per entity collection.
-#permission_callbacks:
-# DELETEME this is just an example:
-#  - Drupal\filter\FilterPermissions::permissions
