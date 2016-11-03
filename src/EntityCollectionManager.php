@@ -82,21 +82,21 @@ class EntityCollectionManager implements EntityCollectionManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListStyle(EntityCollection $collection) {
+  public function getListStyle(EntityCollectionInterface $collection) {
     return $this->createPluginInstance($collection, 'list_style');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRowDisplay(EntityCollection $collection) {
+  public function getRowDisplay(EntityCollectionInterface $collection) {
     return $this->createPluginInstance($collection, 'row_display');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getStorage(EntityCollection $collection) {
+  public function getStorage(EntityCollectionInterface $collection) {
     return $this->createPluginInstance($collection, 'storage');
   }
 

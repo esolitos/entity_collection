@@ -16,12 +16,13 @@ use Drupal\entity_collection\Plugin\AdminUIBase;
 class TableForm extends AdminUIBase {
 
   public function build() {
-    dsm($this);
     return [
       '#type' => 'markup',
       '#markup' => $this->t('TableForm built.'),
     ];
   }
-
+  public function setConfiguration(array $configuration) {
+    // TODO: Implement setConfiguration() method.
+  }
 
 }
