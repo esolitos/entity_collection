@@ -16,6 +16,7 @@ use Drupal\entity_collection\Plugin\StorageInterface;
  *   label = @Translation("Entity Collection"),
  *   handlers = {
  *     "list_builder" = "Drupal\entity_collection\EntityCollectionListBuilder",
+ *     "access" = "Drupal\entity_collection\EntityCollectionAccessController",
  *     "form" = {
  *       "add" = "Drupal\entity_collection\Form\EntityCollectionForm",
  *       "edit" = "Drupal\entity_collection\Form\EntityCollectionForm",
