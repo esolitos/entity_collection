@@ -122,7 +122,7 @@ class EntityCollectionForm extends EntityForm {
       '#title' => $this->t("Storage"),
       '#options' => $storage_options,
       '#default_value' => $entity_collection->get('storage'),
-      '#empty_option' => $this->t("Select the storage backend."),
+      '#empty_option' => $this->t("Select the storage backend"),
       '#empty_value' => '',
     );
 
@@ -153,7 +153,7 @@ class EntityCollectionForm extends EntityForm {
       '#title' => $this->t("List Style"),
       '#options' => $list_style_options,
       '#default_value' => $entity_collection->get('list_style'),
-      '#empty_option' => $this->t("Select the List Style."),
+      '#empty_option' => $this->t("Select the List Style"),
       '#empty_value' => '',
     );
 
@@ -169,7 +169,7 @@ class EntityCollectionForm extends EntityForm {
       '#title' => $this->t("Row Display"),
       '#options' => $row_display_options,
       '#default_value' => $entity_collection->get('row_display'),
-      '#empty_option' => $this->t("Select a Row Display."),
+      '#empty_option' => $this->t("Select a Row Display"),
       '#empty_value' => '',
     );
 

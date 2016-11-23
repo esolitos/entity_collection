@@ -16,7 +16,7 @@ use Drupal\entity_collection\Plugin\AdminUIBase;
 class TableForm extends AdminUIBase {
 
   public function build() {
-    dsm($this);
+//    dsm($this);
     return [
       '#type' => 'markup',
       '#markup' => $this->t('TableForm built.'),
@@ -24,4 +24,13 @@ class TableForm extends AdminUIBase {
   }
 
 
+  /**
+   * Sets the configuration for this plugin instance.
+   *
+   * @param array $configuration
+   *   An associative array containing the plugin's configuration.
+   */
+  public function setConfiguration(array $configuration) {
+    // TODO: Implement setConfiguration() method.
+  }
 }
