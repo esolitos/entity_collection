@@ -53,7 +53,7 @@ class EntityCollectionHtmlRouteProvider extends AdminHtmlRouteProvider {
           // TitleResolver translates this string again.
           '_title' => (string) $entity_type->getLabel(),
         ])
-        ->setRequirement('_permission', $entity_type->getAdminPermission())
+        ->setRequirement('_permission', 'list entity collections')
         ->setOption('_admin_route', TRUE);
 
       return $route;
