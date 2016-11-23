@@ -25,4 +25,13 @@ class FlatList extends ListStyleBase {
   }
 
 
+  /**
+   * Sets the configuration for this plugin instance.
+   *
+   * @param array $configuration
+   *   An associative array containing the plugin's configuration.
+   */
+  public function setConfiguration(array $configuration) {
+    // TODO: Implement setConfiguration() method.
+  }
 }

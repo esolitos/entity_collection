@@ -21,4 +21,13 @@ class ViewMode extends RowDisplayBase {
     // TODO: Implement build() method.
   }
 
+  /**
+   * Sets the configuration for this plugin instance.
+   *
+   * @param array $configuration
+   *   An associative array containing the plugin's configuration.
+   */
+  public function setConfiguration(array $configuration) {
+    // TODO: Implement setConfiguration() method.
+  }
 }
