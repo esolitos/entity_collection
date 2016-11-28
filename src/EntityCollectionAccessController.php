@@ -39,7 +39,7 @@ class EntityCollectionAccessController extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  public function checkCreateAccess(AccountInterface $account, array $context) {
+  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     if ($admin_permission = $this->entityType->getAdminPermission()) {
       return AccessResult::allowedIfHasPermission($account, $admin_permission);
     }
