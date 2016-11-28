@@ -55,7 +55,7 @@ class EntityCollectionTest extends WebTestBase {
    * 3) An authenticated user with the "Access entity collections list" ('list
    * entity collections') has access to the entity collections list page.
    */
-  public function testEntityCollectionPermissionAccessEntityCollectionsList() {
+  public function testPermissionAccessEntityCollectionsList() {
     // 1) The anonymous user cannot access the entity collections list page.
     $path = '/admin/structure/entity_collection/collections';
     $this->drupalGet($path);
