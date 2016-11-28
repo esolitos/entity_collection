@@ -20,19 +20,33 @@ class EntityCollectionAccessController extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    // Example code:
-    if ($operation == 'view') {
-      return TRUE;
+
+    switch ($operation) {
+
+      case 'view':
+      case 'view label':
+        // At the moment, viewing the entity collection is open to everyone.
+        // @TODO upgrade this logic
+        return TRUE;
+        break;
+
+      case 'update':
+        return AccessResult::allowedIfHasPermission($account, 'edit entity collections');
+        break;
+
+      case 'delete':
+        return AccessResult::allowedIfHasPermission($account, 'delete entity collections');
+        break;
+      default:
+        // @TODO Not sure if this is needed
+        return AccessResult::neutral();
+        break;
     }
+
+    // @TODO what is this? Is this needed?
+    // It's not called right now, as the above switch statement covers all cases.
     if ($operation == 'delete' && $entity->isNew()) {
       return AccessResult::forbidden()->addCacheableDependency($entity);
-    }
-    if ($admin_permission = $this->entityType->getAdminPermission()) {
-      return AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission());
-    }
-    else {
-      // No opinion.
-      return AccessResult::neutral();
     }
   }
 
@@ -40,13 +54,7 @@ class EntityCollectionAccessController extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    if ($admin_permission = $this->entityType->getAdminPermission()) {
-      return AccessResult::allowedIfHasPermission($account, $admin_permission);
-    }
-    else {
-      // No opinion.
-      return AccessResult::neutral();
-    }
+    return AccessResult::allowedIfHasPermission($account, 'create entity collections');
   }
 
 }
