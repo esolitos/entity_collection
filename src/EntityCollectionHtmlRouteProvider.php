@@ -79,7 +79,7 @@ class EntityCollectionHtmlRouteProvider extends AdminHtmlRouteProvider {
           '_controller' => '\Drupal\entity_collection\Controller\EntityCollectionContentAdmin::adminUI',
           '_title' => (string) $entity_type->getLabel(),
         ])
-        ->setRequirement('_permission', $entity_type->getAdminPermission())
+        ->setRequirement('_permission', 'list entity collections')
         ->setOption('_admin_route', TRUE)
         ->setOption('parameters', [
           $entity_type_id => ['type' => 'entity:' . $entity_type_id],
