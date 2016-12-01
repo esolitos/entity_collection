@@ -197,25 +197,4 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
     $this->row_display_settings = $row_display->getConfiguration();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getContexts() {
-    return $this->contexts;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setContexts(array $contexts) {
-    $this->contexts = $contexts;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTree() {
-    // TODO: Implement getTree() method.
-  }
-
 }
