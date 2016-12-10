@@ -4,58 +4,49 @@ namespace Drupal\entity_collection;
 
 use Drupal\Core\Entity\EntityInterface;
 
-class TreeNode extends \RecursiveIteratorIterator implements TreeNodeInterface {
+class TreeNode extends \ArrayIterator implements TreeNodeInterface {
 
   /**
-   * @var array
+   * @var TreeNodeInterface[]
    */
   private $children = [];
 
   /**
-   * Construct a RecursiveIteratorIterator
+   * @inheritDoc
+   */ static function create(EntityInterface $entity) {
+    return new static([$entity]);
+  }
+
+  /**
+   * Append an element
+   * @param TreeNodeInterface $value
    */
-  public function __construct(\RecursiveArrayIterator $element = NULL) {
-    if (empty($element)) {
-      $element = new \RecursiveArrayIterator([]);
+  public function append($value) {
+    if (!is_a($value, TreeNodeInterface::class)) {
+      throw new \UnexpectedValueException("TreeNode can only contain other TreeNodes as children.");
     }
 
-    parent::__construct($element, \RecursiveIteratorIterator::SELF_FIRST);
+    parent::append($value);
   }
 
   /**
-   * Given an entity it statically Creates a TreeNode
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity The Drupal entity to wrap
-   *
-   * @return \Drupal\entity_collection\TreeNodeInterface
+   * @inheritDoc
    */
-  public static function create(EntityInterface $entity) {
-    $iterator = new \RecursiveArrayIterator([$entity]);
-
-    return new static($iterator);
+  public function getChildren() {
+    return new TreeNode($this->children);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function hasChildren() {
+    return !empty($this->children);
+  }
 
   /**
-   * Appends a TreeNode as children
-   *
-   * @param \Drupal\entity_collection\TreeNodeInterface $child
-   *
-   * @return mixed
+   * @inheritDoc
    */
   public function addChild(TreeNodeInterface $child) {
-    // TODO: Implement removeChild() method.
+    $this->children[] = $child;
   }
-
-  /**
-   * Detaches a TreeNode from the tree and returns it.
-   *
-   * @param \Drupal\entity_collection\TreeNodeInterface $child
-   * @return TreeNodeInterface
-   */
-  public function removeChild(TreeNodeInterface $child) {
-    // TODO: Implement removeChild() method.
-  }
-
-
 }

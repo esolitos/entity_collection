@@ -47,7 +47,7 @@ class TreeNodeTest extends UnitTestCase {
   public function testCreateEmpty() {
     $treeNode = new TreeNode();
 
-    $this->assertNotEmpty($treeNode, 'The TreeNode is created.');
+    $this->assertNotNull($treeNode, 'The TreeNode is created.');
 
     $count = 0;
     foreach ($treeNode as $item) {

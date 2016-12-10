@@ -4,7 +4,7 @@ namespace Drupal\entity_collection;
 
 use Drupal\Core\Entity\EntityInterface;
 
-interface TreeNodeInterface extends \OuterIterator {
+interface TreeNodeInterface extends \RecursiveIterator {
 
   /**
    * Given an entity it statically Creates a TreeNode
@@ -22,12 +22,4 @@ interface TreeNodeInterface extends \OuterIterator {
    * @return mixed
    */
   public function addChild(TreeNodeInterface $child);
-
-  /**
-   * Detaches a TreeNode from the tree and returns it.
-   *
-   * @param \Drupal\entity_collection\TreeNodeInterface $child
-   * @return TreeNodeInterface
-   */
-  public function removeChild(TreeNodeInterface $child);
 }
