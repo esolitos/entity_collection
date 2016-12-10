@@ -2,55 +2,32 @@
 
 namespace Drupal\entity_collection;
 
-
 use Drupal\Core\Entity\EntityInterface;
 
-interface TreeNodeInterface extends \Countable {
-
-//  public function addChild($type, $entity_id, $content, $style = NULL, $key = NULL, $position = NULL, $locked = FALSE);
+interface TreeNodeInterface extends \OuterIterator {
 
   /**
-   * @param string $key
-   * @param bool $deep_search
-   * @return TreeNodeInterface
+   * Given an entity it statically Creates a TreeNode
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity The Drupal entity to wrap
+   *
+   * @return \Drupal\entity_collection\TreeNodeInterface
    */
-  public function getChild($key, $deep_search = TRUE);
+   public static function create(EntityInterface $entity);
 
-  public function getChildren();
-
+  /**
+   * Appends a TreeNode as children
+   *
+   * @param \Drupal\entity_collection\TreeNodeInterface $child
+   * @return mixed
+   */
   public function addChild(TreeNodeInterface $child);
 
+  /**
+   * Detaches a TreeNode from the tree and returns it.
+   *
+   * @param \Drupal\entity_collection\TreeNodeInterface $child
+   * @return TreeNodeInterface
+   */
   public function removeChild(TreeNodeInterface $child);
-
-  public static function keyForNode(TreeNodeInterface $node);
-
-  
-  public static function keyForEntity(EntityInterface $entity);
-
-
-  public function setPosition($position);
-
-  public function getPosition();
-
-//  public function lockPosition($lock = TRUE)
-//  public function isPositionLocked();
-
-
-//  public function getFlat($offset = 0, $length = NULL);
-
-//  public function splice($offset = 0, $length = NULL);
-
-//  public function getFirstChild();
-//  public function getLastChild();
-
-
-//  public function getChildKey($entity_type, $entity_id)
-
-
-//  public function getLastChildKey();
-
-//  public function truncate()
-
-//  public function setParent(TreeNodeInterface $parent)
-
 }
