@@ -1,12 +1,9 @@
 <?php
 
-namespace Drupal\entity_collection\Tests;
+namespace Drupal\Tests\entity_collection\Unit;
 
-
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\entity_collection\TreeNodeInterface;
-use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
 use Drupal\entity_collection\TreeNode;
 
@@ -44,7 +41,7 @@ class TreeNodeTest extends UnitTestCase {
    *
    * @covers ::__construct
    */
-  public function testCreateEmpty() {
+  public function test create an empty TreeNode() {
     $treeNode = new TreeNode();
 
     $this->assertNotNull($treeNode, 'The TreeNode is created.');
@@ -55,8 +52,6 @@ class TreeNodeTest extends UnitTestCase {
     }
 
     $this->assertEquals(0, $count, 'New TreeNode should contain zero items.');
-
-    return $treeNode;
   }
 
   /**
@@ -64,7 +59,7 @@ class TreeNodeTest extends UnitTestCase {
    *
    * @covers ::create
    */
-  public function testCreateTree() {
+  public function test create a TreeNode with an Entity() {
     $treeNode = TreeNode::create($this->entity);
 
     $this->assertInstanceOf(TreeNodeInterface::class, $treeNode, 'Creates a TreeNode from an Entity');
