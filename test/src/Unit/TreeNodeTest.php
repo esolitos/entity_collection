@@ -38,6 +38,9 @@ class TreeNodeTest extends UnitTestCase {
     $this->assertNotNull($treeNode, 'The tree is created.');
     $this->assertEquals(0, count($treeNode), 'New tree is countable and contain zero items.');
 
+    $this->assertTrue($treeNode->isRoot(), 'A new TreeNode should always be root');
+    $this->assertSame($treeNode, $treeNode->getRoot(), 'TreeNode::getRoot() on the root element should return itself');
+
     return $treeNode;
   }
 

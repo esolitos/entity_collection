@@ -53,4 +53,20 @@ interface TreeNodeInterface extends \Countable, \IteratorAggregate {
    */
   public function getProperty($name);
 
+  /**
+   * Checks if the current node is the tree root.
+   *
+   * @return bool
+   */
+  public function isRoot();
+
+  /**
+   * Gets the root node of the tree.
+   *
+   * This could also be the same object, if called on the root node itself.
+   * A bit like running `cd ..` while on the root of a filesystem.
+   *
+   * @return \Drupal\entity_collection\CollectionTree\TreeNodeInterface
+   */
+  public function getRoot();
 }

@@ -36,13 +36,18 @@ class TreeNode implements TreeNodeInterface {
   protected $propertiesDefinition;
 
   /**
+   * Points to the node root, or null if this is the root node
+   * @var \Drupal\entity_collection\CollectionTree\TreeNodeInterface
+   */
+  protected $rootNode;
+
+  /**
    * @inheritDoc
    */
-  public function __construct(EntityInterface $entity = NULL, array $properties = []) {
+  public function __construct() {
     $this->innerQueue = new \SplMinHeap();
-    $this->entity = $entity;
-
-    $this->setProperties($properties);
+    $this->entity = NULL;
+    $this->rootNode = $this;
   }
 
   /**
@@ -114,6 +119,19 @@ class TreeNode implements TreeNodeInterface {
     return isset($this->properties[$name]) ? $this->properties[$name] : NULL;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function isRoot() {
+    return $this === $this->rootNode;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getRoot() {
+    return $this->rootNode;
+  }
 
   /**
    * Checks if the set of property name and value is valid for the current tree node.
