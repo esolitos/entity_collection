@@ -1,0 +1,56 @@
+<?php
+
+namespace Drupal\entity_collection\CollectionTree;
+
+interface TreeNodeInterface extends \Countable, \IteratorAggregate {
+
+  /**
+   * @param TreeNodePropertyDef[] $propertyDef
+   *   Array containing multiple TreeNodeProperty.
+   */
+  public function defineProperties(array $propertyDef);
+
+  /**
+   * Sets the definition of a single property.
+   *
+   * @param \Drupal\entity_collection\CollectionTree\TreeNodePropertyDef $propertyDef
+   */
+  public function defineProperty(TreeNodePropertyDef $propertyDef);
+
+  /**
+   * Sets a
+   * @param array $properties
+   * @throws \Drupal\entity_collection\CollectionTree\Exception\InvalidTreeNodePropertyException
+   */
+  public function setProperties(array $properties);
+
+  /**
+   * Sets a property value for the current TreeNode.
+   *
+   * @param string $name Name of a priory defined property.
+   * @param mixed $value Value of the property, myst comply with prior definition.
+   *
+   * @throws \Drupal\entity_collection\CollectionTree\Exception\InvalidTreeNodePropertyException
+   *
+   * @see \Drupal\entity_collection\CollectionTree\TreeNodePropertyDef
+   * @see \Drupal\entity_collection\CollectionTree\TreeNodeInterface::defineProperty()
+   * @see \Drupal\entity_collection\CollectionTree\TreeNodeInterface::getProperty()
+   */
+  public function setProperty($name, $value);
+
+  /**
+   * Gets the value of a property. This
+   *
+   * @param $name
+   *
+   * @return null|mixed
+   *  **Important Note** a NULL value means that the property has not been set,
+   *  or the value is actually NULL (only if type TreeNodePropertyDef::PROP_TYPE_ANY
+   *  However if a property (name) is not yet defined an exception will be thrown!
+   *
+   * @throws \Drupal\entity_collection\CollectionTree\Exception\InvalidTreeNodePropertyException
+   *   When trying to access an undefined property
+   */
+  public function getProperty($name);
+
+}
