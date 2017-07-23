@@ -49,13 +49,14 @@ class TreeNodeTest extends UnitTestCase {
    * @depends      test create an empty TreeNode
    * @dataProvider treeNodeSimplePropertiesProvider
    *
-   * @covers ::defineProperties
    * @covers ::defineProperty
+   * @covers ::getProperty
+   * @covers ::setProperty
    *
    * @param \Drupal\entity_collection\CollectionTree\TreeNodePropertyDef $property
-   * @param $testData
-   * @param $isValidData
-   * @param \Drupal\entity_collection\CollectionTree\TreeNode $tree
+   * @param mixed $testData Data to be tested for a property
+   * @param bool $isValidData Tells if the passed data is valid or not (hence: expect exceptions or not)
+   * @param \Drupal\entity_collection\CollectionTree\TreeNode $tree Just a test tree
    */
   public function test define new simple tree property(Property $property, $testData, $isValidData, TreeNode $tree) {
     $test_tree = clone $tree;
