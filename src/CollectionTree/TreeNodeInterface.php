@@ -2,7 +2,11 @@
 
 namespace Drupal\entity_collection\CollectionTree;
 
+use Drupal\Core\Entity\EntityInterface;
+
 interface TreeNodeInterface extends \Countable, \IteratorAggregate {
+
+  public static function createChild(TreeNodeInterface $parent, EntityInterface $entity);
 
   /**
    * @param TreeNodePropertyDef[] $propertyDef
@@ -69,4 +73,13 @@ interface TreeNodeInterface extends \Countable, \IteratorAggregate {
    * @return \Drupal\entity_collection\CollectionTree\TreeNodeInterface
    */
   public function getRoot();
+
+
+  /**
+   * Appends an item to the children's queue.
+   *
+   * @param \Drupal\entity_collection\CollectionTree\TreeNodeInterface $node
+   * @param array $properties The child's properties for the given entity
+   */
+  public function appendChild(TreeNodeInterface $node, array $properties = []);
 }

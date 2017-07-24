@@ -13,7 +13,7 @@ class TreeNode implements TreeNodeInterface {
   /**
    * Children queue
    *
-   * @var \SplMinHeap
+   * @var \Drupal\entity_collection\CollectionTree\TreeChildren
    */
   protected $innerQueue;
 
@@ -45,13 +45,24 @@ class TreeNode implements TreeNodeInterface {
    * @inheritDoc
    */
   public function __construct() {
-    $this->innerQueue = new \SplMinHeap();
+    $this->innerQueue = new TreeChildren();
     $this->entity = NULL;
     $this->rootNode = $this;
   }
 
+  public static function createChild(TreeNodeInterface $parent, EntityInterface $entity) {
+    $child = new static();
+    $child->rootNode = $parent->getRoot();
+    $child->entity = $entity;
+
+    return $child;
+  }
+
+
   /**
    * @inheritDoc
+   * @implements \Countable::count()
+   * @see \Countable
    */
   public function count() {
     return count($this->innerQueue);
@@ -59,6 +70,8 @@ class TreeNode implements TreeNodeInterface {
 
   /**
    * @inheritDoc
+   * @implements \IteratorAggregate::getIterator()
+   * @see \IteratorAggregate
    */
   public function getIterator() {
     return clone $this->innerQueue;
@@ -132,6 +145,14 @@ class TreeNode implements TreeNodeInterface {
   public function getRoot() {
     return $this->rootNode;
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function appendChild(TreeNodeInterface $node, array $properties = []) {
+    $this->innerQueue->insert($node);
+  }
+
 
   /**
    * Checks if the set of property name and value is valid for the current tree node.

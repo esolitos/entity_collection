@@ -16,6 +16,7 @@ use Drupal\entity_collection\CollectionTree\TreeNode;
  */
 class TreeNodeTest extends UnitTestCase {
 
+  /** @var \PHPUnit_Framework_MockObject_MockBuilder */
   private $entityMockBuilder;
   /**
    * {@inheritdoc}
@@ -77,6 +78,23 @@ class TreeNodeTest extends UnitTestCase {
     $actual = $test_tree->getProperty($prop_name);
     $expected = ($isValidData) ? $testData : NULL;
     $this->assertEquals($actual, $expected, "Property $prop_name expected to be of type " . gettype($testData) . ", but received: " . gettype($expected));
+  }
+
+
+  /**
+   * @covers ::createChild
+   * @covers ::appendChild
+   */
+  public function test basic children creation and queueing() {
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $this->entityMockBuilder->getMock();
+    $treeRoot = new TreeNode();
+
+    $actual_node = TreeNode::createChild($treeRoot, $entity);
+    $treeRoot->appendChild($actual_node);
+
+    $returned_node = $treeRoot->getIterator()->top();
+    $this->assertSame($actual_node, $returned_node);
   }
 
   /* ----------------------------------------------
