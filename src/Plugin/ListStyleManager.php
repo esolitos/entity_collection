@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the Entity Collection: List Style plugin manager.
  */
-class ListStyleManager extends DefaultPluginManager {
+class ListStyleManager extends DefaultPluginManager implements PluginManager {
 
 
   /**

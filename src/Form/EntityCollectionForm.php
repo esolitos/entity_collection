@@ -4,6 +4,7 @@ namespace Drupal\entity_collection\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\entity_collection\EntityCollectionManagerInterface;
 use Drupal\entity_collection\Plugin\AdminUIManager;
 use Drupal\entity_collection\Plugin\ListStyleManager;
 use Drupal\entity_collection\Plugin\RowDisplayManager;
@@ -45,29 +46,44 @@ class EntityCollectionForm extends EntityForm {
   protected $rowDisplayManager;
 
   /**
+   * @var EntityCollectionManagerInterface $entityCollectionManager
+   */
+  protected $entityCollectionManager;
+
+  /**
    * EntityCollectionForm constructor.
    *
    * @param \Drupal\entity_collection\Plugin\AdminUIManager $admin_ui_manager
    * @param \Drupal\entity_collection\Plugin\StorageManager $storage_manager
    * @param \Drupal\entity_collection\Plugin\ListStyleManager $list_style_manager
    * @param \Drupal\entity_collection\Plugin\RowDisplayManager $row_display_manager
+   * @param \Drupal\entity_collection\EntityCollectionManagerInterface $collection_manager
    */
-  function __construct(AdminUIManager $admin_ui_manager, StorageManager $storage_manager, ListStyleManager $list_style_manager, RowDisplayManager $row_display_manager) {
+  function __construct(
+    AdminUIManager $admin_ui_manager,
+    StorageManager $storage_manager,
+    ListStyleManager $list_style_manager,
+    RowDisplayManager $row_display_manager,
+    EntityCollectionManagerInterface $collection_manager
+  ) {
     $this->adminUIManager = $admin_ui_manager;
     $this->storageManager = $storage_manager;
     $this->listStyleManager = $list_style_manager;
     $this->rowDisplayManager = $row_display_manager;
+    $this->entityCollectionManager = $collection_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
+    /** @noinspection PhpParamsInspection */
     return new static(
       $container->get('plugin.manager.entity_collection_admin_ui'),
       $container->get('plugin.manager.entity_collection_storage'),
       $container->get('plugin.manager.entity_collection_list_style'),
-      $container->get('plugin.manager.entity_collection_row_display')
+      $container->get('plugin.manager.entity_collection_row_display'),
+      $container->get('entity_collection.manager')
     );
   }
 
@@ -139,8 +155,9 @@ class EntityCollectionForm extends EntityForm {
         ),
       ),
     );
-    if ( $entity_collection->isStorageConfigured() ) {
-//      $form['storage_settings'] = $form['storage_settings'] + $entity_collection->getStorage()->getConfigForm($form, $form_state);
+    if ($entity_collection->isStorageConfigured()) {
+      $storage = $this->entityCollectionManager->getStorage($entity_collection);
+      $form['storage_settings'] = $form['storage_settings'] + $storage->getConfigForm($form, $form_state);
     }
 
     /**

@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the EntityCollection Storage plugin manager.
  */
-class StorageManager extends DefaultPluginManager {
+class StorageManager extends DefaultPluginManager implements PluginManager {
 
 
   /**

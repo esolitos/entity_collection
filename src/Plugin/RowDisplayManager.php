@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the Entity Collection: Row Display plugin manager.
  */
-class RowDisplayManager extends DefaultPluginManager {
+class RowDisplayManager extends DefaultPluginManager implements PluginManager {
 
 
   /**

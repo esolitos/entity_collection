@@ -9,7 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Provides the E.C. Admin UI plugin manager.
  */
-class AdminUIManager extends DefaultPluginManager {
+class AdminUIManager extends DefaultPluginManager implements PluginManager {
 
 
   /**

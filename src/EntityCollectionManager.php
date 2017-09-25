@@ -7,6 +7,8 @@ use Drupal\entity_collection\Entity\EntityCollection;
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
 use Drupal\entity_collection\Plugin\AdminUIManager;
 use Drupal\entity_collection\Plugin\ListStyleManager;
+use Drupal\entity_collection\Plugin\PluginManager;
+use Drupal\entity_collection\Plugin\PluginManagerBase;
 use Drupal\entity_collection\Plugin\RowDisplayManager;
 use Drupal\entity_collection\Plugin\StorageManager;
 
@@ -76,28 +78,28 @@ class EntityCollectionManager implements EntityCollectionManagerInterface {
    * {@inheritdoc}
    */
   public function getAdminUI(EntityCollectionInterface $collection) {
-    return $this->createPluginInstance($collection, 'admin_ui');
+    return $this->createPluginInstance($collection, 'admin_ui', $this->adminUIManager);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getListStyle(EntityCollectionInterface $collection) {
-    return $this->createPluginInstance($collection, 'list_style');
+    return $this->createPluginInstance($collection, 'list_style', $this->listStyleManager);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getRowDisplay(EntityCollectionInterface $collection) {
-    return $this->createPluginInstance($collection, 'row_display');
+    return $this->createPluginInstance($collection, 'row_display', $this->rowDisplayManager);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getStorage(EntityCollectionInterface $collection) {
-    return $this->createPluginInstance($collection, 'storage');
+    return $this->createPluginInstance($collection, 'storage', $this->storageManager);
   }
 
   /**
@@ -106,16 +108,18 @@ class EntityCollectionManager implements EntityCollectionManagerInterface {
    * @param \Drupal\entity_collection\Entity\EntityCollectionInterface $collection
    * @param string $plugin_type
    *
+   * @param \Drupal\entity_collection\Plugin\PluginManager $pluginManager
+   *
    * @return \Drupal\entity_collection\Plugin\EntityCollectionPluginBaseInterface|null
    */
-  private function createPluginInstance(EntityCollectionInterface $collection, $plugin_type) {
+  private function createPluginInstance(EntityCollectionInterface $collection, string $plugin_type, PluginManager $pluginManager) {
     $plugin = NULL;
 
     $plugin_id = $collection->get($plugin_type);
-    $plugin_settings = $collection->get($plugin_type . '_settings');
+    $plugin_settings = $collection->getPluginSettings($plugin_type);
 
     if ( $plugin_id ){
-      $plugin = $this->adminUIManager->createInstance($plugin_id, $plugin_settings);
+      $plugin = $pluginManager->createInstance($plugin_id, $plugin_settings);
     }
 
     return $plugin;
