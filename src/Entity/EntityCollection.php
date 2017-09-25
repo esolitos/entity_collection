@@ -197,4 +197,20 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
     $this->row_display_settings = $row_display->getConfiguration();
   }
 
+  public function setPluginSettings(string $plugin_type, array $settings) {
+    $plugin_type = strtolower($plugin_type);
+    $allowed_plugins = [
+      'admin_ui', 'storage', 'list_style', 'row_display'
+    ];
+    if (!in_array($plugin_type, $allowed_plugins)) {
+      throw new \RuntimeException($this->t("Invalid plugin type: @type", ['@type' => $plugin_type]));
+    }
+    $this->set($plugin_type . '_settings', $settings);
+  }
+
+  public function getPluginSettings(string $plugin_type): array {
+    return $this->get($plugin_type . '_settings');
+  }
+
+
 }

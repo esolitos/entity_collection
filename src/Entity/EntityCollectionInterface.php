@@ -62,4 +62,17 @@ interface EntityCollectionInterface extends ConfigEntityInterface {
    */
   public function isRowDisplayConfigured(): bool;
 
+
+  /**
+   * @param string $plugin_type
+   * @param array $settings
+   */
+  public function setPluginSettings(string $plugin_type, array $settings);
+
+  /**
+   * @param string $plugin_type
+   *
+   * @return array
+   */
+  public function getPluginSettings(string $plugin_type): array;
 }
