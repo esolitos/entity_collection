@@ -140,7 +140,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function isAdminUIConfigured() {
+  public function isAdminUIConfigured(): bool {
     return !empty($this->admin_ui);
   }
 
@@ -155,7 +155,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function isStorageConfigured() {
+  public function isStorageConfigured(): bool {
     return !empty($this->storage);
   }
 
@@ -170,7 +170,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function isListStyleConfigured() {
+  public function isListStyleConfigured(): bool {
     return !empty($this->list_style);
   }
 
@@ -185,7 +185,7 @@ class EntityCollection extends ConfigEntityBase implements EntityCollectionInter
   /**
    * {@inheritdoc}
    */
-  public function isRowDisplayConfigured() {
+  public function isRowDisplayConfigured(): bool {
     return !empty($this->row_display);
   }
 
