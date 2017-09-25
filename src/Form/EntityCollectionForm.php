@@ -149,6 +149,8 @@ class EntityCollectionForm extends EntityForm {
       '#title' => $this->t("Storage Settings"),
       '#prefix' => '<div class="storage-settings-wrapper">',
       '#suffix' => '</div>',
+      '#open' => TRUE,
+      '#tree' => TRUE,
       '#states' => array(
         'invisible' => array(
           ':input[name="storage"]' => array('value' => ''),
@@ -158,6 +160,8 @@ class EntityCollectionForm extends EntityForm {
     if ($entity_collection->isStorageConfigured()) {
       $storage = $this->entityCollectionManager->getStorage($entity_collection);
       $form['storage_settings'] = $form['storage_settings'] + $storage->getConfigForm($form, $form_state);
+    } else {
+      $form['storage_settings']['empty']['#markup'] = 'You will be able to configure this plugin after saving the Entity Collection.';
     }
 
     /**
@@ -203,6 +207,10 @@ class EntityCollectionForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $entity_collection = $this->entity;
     $status = $entity_collection->save();
+
+    /*
+     * TODO: Cleanup plugin settings if they are changed.
+     */
 
     switch ($status) {
       case SAVED_NEW:
