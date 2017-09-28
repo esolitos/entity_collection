@@ -119,7 +119,7 @@ class EntityCollectionManager implements EntityCollectionManagerInterface {
     $plugin_settings = $collection->getPluginSettings($plugin_type);
 
     if ( $plugin_id ){
-      $plugin = $pluginManager->createInstance($plugin_id, $plugin_settings);
+      $plugin = $pluginManager->createInstance($plugin_id, $plugin_settings, $collection);
     }
 
     return $plugin;

@@ -5,11 +5,12 @@ namespace Drupal\entity_collection\Plugin;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\entity_collection\Entity\EntityCollectionInterface;
 
 /**
  * Provides the E.C. Admin UI plugin manager.
  */
-class AdminUIManager extends DefaultPluginManager implements PluginManager {
+class AdminUIManager extends PluginManagerBase {
 
 
   /**
