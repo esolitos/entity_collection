@@ -2,6 +2,7 @@
 
 namespace Drupal\entity_collection\Plugin\EntityCollection\AdminUI;
 
+use Drupal\entity_collection\Form\AddEntityToCollectionForm;
 use Drupal\entity_collection\Plugin\AdminUIBase;
 
 /**
@@ -15,12 +16,22 @@ use Drupal\entity_collection\Plugin\AdminUIBase;
  */
 class TableForm extends AdminUIBase {
 
+  /** @var  \Drupal\entity_collection\Entity\EntityCollectionInterface $collection */
+  protected $collection;
+
   public function build() {
-//    dsm($this);
-    return [
+    $build = [];
+
+    $this->collection = $this->configuration['collection'];
+
+    $build['add_form'] = \Drupal::formBuilder()->getForm(AddEntityToCollectionForm::class);
+
+    $build['text'] = [
       '#type' => 'markup',
       '#markup' => $this->t('TableForm built.'),
     ];
+
+    return $build;
   }
 
 
