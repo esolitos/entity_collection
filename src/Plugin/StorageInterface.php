@@ -3,9 +3,8 @@
 namespace Drupal\entity_collection\Plugin;
 
 
-use Drupal\entity_collection\Entity\EntityCollection;
+use Drupal\entity_collection\CollectionTree\TreeNodeInterface;
 use Drupal\entity_collection\Entity\EntityCollectionInterface;
-use Drupal\entity_collection\TreeNodeInterface;
 
 /**
  * Defines an interface for EntityCollection Storage plugins.
