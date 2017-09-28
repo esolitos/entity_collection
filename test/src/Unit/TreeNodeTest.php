@@ -33,11 +33,11 @@ class TreeNodeTest extends UnitTestCase {
    *
    * @covers ::__construct
    */
-  public function test create an empty TreeNode() {
+  public function test can create an empty TreeNode() {
     $treeNode = new TreeNode();
 
-    $this->assertNotNull($treeNode, 'The tree is created.');
-    $this->assertEquals(0, count($treeNode), 'New tree is countable and contain zero items.');
+    $this->assertNotNull($treeNode, 'Can instantiate a TreeNode object.');
+    $this->assertEquals(0, count($treeNode), 'A new tree is countable and contain zero items.');
 
     $this->assertTrue($treeNode->isRoot(), 'A new TreeNode should always be root');
     $this->assertSame($treeNode, $treeNode->getRoot(), 'TreeNode::getRoot() on the root element should return itself');
@@ -47,7 +47,7 @@ class TreeNodeTest extends UnitTestCase {
 
   /**
    *
-   * @depends      test create an empty TreeNode
+   * @depends      test can create an empty TreeNode
    * @dataProvider treeNodeSimplePropertiesProvider
    *
    * @covers ::defineProperty
@@ -59,7 +59,7 @@ class TreeNodeTest extends UnitTestCase {
    * @param bool $isValidData Tells if the passed data is valid or not (hence: expect exceptions or not)
    * @param \Drupal\entity_collection\CollectionTree\TreeNode $tree Just a test tree
    */
-  public function test define new simple tree property(Property $property, $testData, $isValidData, TreeNode $tree) {
+  public function test can define new simple tree property(Property $property, $testData, $isValidData, TreeNode $tree) {
     $test_tree = clone $tree;
     $prop_name = $property->getName();
 
@@ -85,7 +85,7 @@ class TreeNodeTest extends UnitTestCase {
    * @covers ::createChild
    * @covers ::appendChild
    */
-  public function test basic children creation and queueing() {
+  public function test can create and queue children() {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $this->entityMockBuilder->getMock();
     $treeRoot = new TreeNode();

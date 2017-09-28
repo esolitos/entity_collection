@@ -30,7 +30,7 @@ class EntityCollectionEntityTest extends UnitTestCase {
     parent::setUp();
   }
 
-  public function testNewCollection() {
+  public function test can create new clean entity collection() {
     $ec = new EntityCollection([], 'entity_collection');
 
     $this->assertFalse($ec->isAdminUIConfigured(), 'Admin UI is not configured.');

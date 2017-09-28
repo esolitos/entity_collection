@@ -13,8 +13,5 @@ use Drupal\Tests\UnitTestCase;
  */
 class DatabaseStorageTest extends UnitTestCase {
 
-  public function test true() {
-
-    $this->assertTrue(FALSE, "working");
-  }
+  // TODO
 }
