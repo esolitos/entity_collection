@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_collection_db\Plugin\EntityCollection\Storage;
+namespace Drupal\entity_collection\Plugin\EntityCollection\Storage;
 
 use \Drupal\Core\Database\Database as DrupalDatabase;
 use Drupal\Core\Form\FormStateInterface;

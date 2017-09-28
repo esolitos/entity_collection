@@ -1,7 +1,0 @@
-name: Entity Collection Database
-type: module
-description: Database Storage for Entity Collection
-core: 8.x
-package: Entity Collection
-dependencies:
-  - entity_collection
