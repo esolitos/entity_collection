@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * Implements hook_schema()
+ */
+function entity_collection_schema() {
+  $schema = [];
+
+  /**
+   * The main storage table
+   */
+  $schema['entity_collection_storage'] = [
+    'description' => "Stores the tree nodes for the entity collections",
+  ];
+  $schema['entity_collection_storage']['fields'] = [
+    'id' => [
+      'description' => "Tree Node identifier",
+      'type' => 'serial',
+      'not null' => TRUE,
+    ],
+    'collection' => [
+      'description' => "Machine name of the entity collection this item refers to.",
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => TRUE,
+    ],
+    'entity_type' => [
+      'description' => "Entity type ID of the entity referenced",
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => TRUE,
+    ],
+    'entity_id' => [
+      'description' => "Entity ID of the entity referenced.",
+      // Using string to allow config entity storage.
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => TRUE,
+    ],
+    'depth' => [
+      'description' => "Depth of the Node in the Tree",
+      'type' => 'int',
+      'size' => 'tiny',
+      'unsigned' => TRUE,
+    ],
+    'parent' => [
+      'description' => "Tree Node parent identifier",
+      'type' => 'int',
+      'unsigned' => TRUE,
+    ],
+    'weight' => [
+      'description' => "Tree Node weight",
+      'type' => 'int',
+      'size' => 'small',
+      'default' => 0,
+    ],
+  ];
+
+  $schema['entity_collection_storage']['primary key'] = ['id'];
+  $schema['entity_collection_storage']['indexes'] = [
+    'collection_name' => ['collection'],
+    'collection_depth' => ['collection', 'depth'],
+    'collection_parent' => ['collection', 'parent'],
+    'collection_depth_parent' => ['collection', 'depth', 'parent'],
+    'collection_entity' => ['collection', 'entity_type', 'entity_id'],
+  ];
+
+  /**
+   * Separate "Properties" table to allow better exposure in views.
+   */
+  $schema['entity_collection_storage_properties'] = [
+    'description' => "Stores the properties of each ",
+  ];
+  $schema['entity_collection_storage_properties']['fields'] = [
+    'tree_node_id' => [
+      'description' => "Tree Node identifier, from entity_collection_storage.id",
+      'type' => 'serial',
+      'not null' => TRUE,
+    ],
+    'name' => [
+      'description' => "Property name.",
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => TRUE,
+    ],
+    'value' => [
+      'description' => "Serialized value fot the given property.",
+      'type' => 'blob',
+      'serialize' => TRUE,
+
+    ],
+  ];
+  $schema['entity_collection_storage_properties']['primary key'] = [
+    'tree_node_id', 'name'
+  ];
+  $schema['entity_collection_storage_properties']['indexes'] = [
+    'collection_name' => ['tree_node_id'],
+  ];
+
+  return $schema;
+}
