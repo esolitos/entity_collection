@@ -43,9 +43,9 @@ class EntityCollectionHtmlRouteProvider extends AdminHtmlRouteProvider {
    *   The generated route, if available.
    */
   protected function getCollectionRoute(EntityTypeInterface $entity_type) {
-    if ($entity_type->hasLinkTemplate('collection') && $entity_type->hasListBuilderClass()) {
+    if ($entity_type->hasLinkTemplate('entity_collection') && $entity_type->hasListBuilderClass()) {
       $entity_type_id = $entity_type->id();
-      $route = new Route($entity_type->getLinkTemplate('collection'));
+      $route = new Route($entity_type->getLinkTemplate('entity_collection'));
       $route
         ->setDefaults([
           '_entity_list' => $entity_type_id,

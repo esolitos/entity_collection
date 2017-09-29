@@ -2,8 +2,6 @@
 
 namespace Drupal\entity_collection\Plugin;
 
-use Drupal\Component\Plugin\PluginBase;
-
 /**
  * Base class for EntityCollection Storage plugins.
  */

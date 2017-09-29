@@ -22,7 +22,7 @@ class TableForm extends AdminUIBase {
   public function build() {
     $build = [];
 
-    $this->collection = $this->configuration['collection'];
+    $this->collection = $this->configuration['entity_collection'];
 
     $build['add_form'] = \Drupal::formBuilder()->getForm(AddEntityToCollectionForm::class);
 
