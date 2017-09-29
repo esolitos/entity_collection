@@ -153,6 +153,10 @@ class TreeNode implements TreeNodeInterface {
     $this->innerQueue->insert($node);
   }
 
+  public function entity() {
+    return $this->entity;
+  }
+
 
   /**
    * Checks if the set of property name and value is valid for the current tree node.

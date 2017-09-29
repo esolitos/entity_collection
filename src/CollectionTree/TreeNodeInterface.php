@@ -74,7 +74,6 @@ interface TreeNodeInterface extends \Countable, \IteratorAggregate {
    */
   public function getRoot();
 
-
   /**
    * Appends an item to the children's queue.
    *
@@ -82,4 +81,9 @@ interface TreeNodeInterface extends \Countable, \IteratorAggregate {
    * @param array $properties The child's properties for the given entity
    */
   public function appendChild(TreeNodeInterface $node, array $properties = []);
+
+  /**
+   * @return EntityInterface
+   */
+  public function entity();
 }
