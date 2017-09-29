@@ -19,7 +19,7 @@ interface StorageInterface extends EntityCollectionPluginBaseInterface {
    * @param TreeNodeInterface $tree
    *   The Tree to be saved
    */
-  public function store(EntityCollectionInterface $collection, TreeNodeInterface $tree);
+  public function store(TreeNodeInterface $tree);
 
   /**
    * Retrieve the content of a collection.
@@ -27,12 +27,12 @@ interface StorageInterface extends EntityCollectionPluginBaseInterface {
    * @param EntityCollectionInterface $collection
    *   The collection to which the content belongs.
    */
-  public function load(EntityCollectionInterface $collection);
+  public function load();
   
   /**
    * Remove all content in the entity collection.
    *
    * @param EntityCollectionInterface $collection
    */
-  public function truncate(EntityCollectionInterface $collection);
+  public function truncate();
 }
