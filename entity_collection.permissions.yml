@@ -1,0 +1,17 @@
+# Entity collection general permissions.
+
+list entity collections:
+  title: 'Access entity collections list'
+  restrict access: FALSE
+
+create entity collections:
+  title: 'Create new entity collections'
+  restrict access: FALSE
+
+edit entity collections:
+  title: 'Edit existing entity collections'
+  restrict access: FALSE
+
+delete entity collections:
+  title: 'Delete entity collections'
+  restrict access: FALSE
