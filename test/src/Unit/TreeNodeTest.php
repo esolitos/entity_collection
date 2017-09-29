@@ -85,7 +85,7 @@ class TreeNodeTest extends UnitTestCase {
    * @covers ::createChild
    * @covers ::appendChild
    */
-  public function test can create and queue children() {
+  public function test can create and queue a single child() {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $this->entityMockBuilder->getMock();
     $treeRoot = new TreeNode();
@@ -95,6 +95,40 @@ class TreeNodeTest extends UnitTestCase {
 
     $returned_node = $treeRoot->getIterator()->top();
     $this->assertSame($actual_node, $returned_node);
+  }
+
+  /**
+   * @covers ::createChild
+   * @covers ::appendChild
+   */
+  public function test can create and queue multiple children() {
+    $treeRoot = new TreeNode();
+
+    /** @var \Drupal\Core\Entity\EntityInterface $entity_1 */
+    $entity_1 = $this->entityMockBuilder->getMock();
+    $actual_node_1 = TreeNode::createChild($treeRoot, $entity_1);
+    $treeRoot->appendChild($actual_node_1);
+
+    /** @var \Drupal\Core\Entity\EntityInterface $entity_2 */
+    $entity_2 = $this->entityMockBuilder->getMock();
+    $actual_node_2 = TreeNode::createChild($treeRoot, $entity_2);
+    $treeRoot->appendChild($actual_node_2);
+
+    $iterator = $treeRoot->getIterator();
+
+    // Assert that 2 items exist.
+    $count_items = $iterator->count();
+    $this->assertEquals(2, $count_items);
+
+    // Get the top item, assert that it is actually the first one added.
+    $returned_node_1 = $iterator->top();
+    $this->assertSame($actual_node_1, $returned_node_1);
+
+    // Go to next item, assert that it is actually the last one added (so
+    // append works as it should).
+    $iterator->next();
+    $returned_node_2 = $iterator->current();
+    $this->assertSame($actual_node_2, $returned_node_2);
   }
 
   /* ----------------------------------------------
