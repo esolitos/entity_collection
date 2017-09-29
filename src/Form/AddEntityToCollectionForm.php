@@ -3,9 +3,13 @@
 namespace Drupal\entity_collection\Form;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\entity_collection\EntityCollectionManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\entity_collection\EntityCollectionManager;
@@ -45,10 +49,10 @@ class AddEntityToCollectionForm extends FormBase {
    * Constructs a new AddEntityToCollectionForm object.
    */
   public function __construct(
-    EntityTypeManager $entity_type_manager,
-    EntityTypeRepository $entity_type_repository,
-    EntityTypeBundleInfo $entity_type_bundle_info,
-    EntityCollectionManager $entity_collection_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityTypeRepositoryInterface $entity_type_repository,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    EntityCollectionManagerInterface $entity_collection_manager
   ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityCollectionManager = $entity_collection_manager;
