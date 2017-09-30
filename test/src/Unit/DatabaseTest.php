@@ -2,11 +2,10 @@
 
 namespace Drupal\Tests\entity_collection\Unit;
 
-use Drupal\entity_collection\Annotation\EntityCollectionStorage;
 use Drupal\entity_collection\CollectionTree\TreeNode;
 use Drupal\entity_collection\Entity\EntityCollection;
+use Drupal\entity_collection\Plugin\EntityCollection\Storage\Database;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\node\Entity\Node;
 
 /**
@@ -20,9 +19,6 @@ class DatabaseTest extends KernelTestBase {
 
   public static $modules = [
     'entity_collection',
-    'system',
-    'node',
-    'user'
   ];
 
   /**
@@ -41,8 +37,12 @@ class DatabaseTest extends KernelTestBase {
     $this->storagePluginManager = \Drupal::service('plugin.manager.entity_collection_storage');
   }
 
+  /**
+   *
+   */
   public function test can save single entry() {
     $collection = EntityCollection::create([
+      'id' => $this->randomMachineName(),
       'storage' => 'database',
     ]);
 
@@ -51,17 +51,18 @@ class DatabaseTest extends KernelTestBase {
     /** @var \Drupal\entity_collection\Plugin\EntityCollection\Storage\Database $storage */
     $storage = $this->storagePluginManager->createInstance($plugin_id, $plugin_settings, $collection);
 
-    $nid = rand();
-//    $node_entity = $this->createRandomNode($nid);
-
     $tree = new TreeNode();
-    $tree->appendChild(TreeNode::createChild($tree, $this->createRandomNode($nid)));
 
-    $storage->store($collection, $tree);
+    $id = rand();
+    $child = TreeNode::createChild($tree, $this->createEntity($id));
+    $tree->appendChild($child);
 
-    $query = \Drupal::database()->select('entity_collection_storage');
-    $query->condition('entity_type', 'node')
-      ->condition('entity_id', $nid);
+    $storage->store($tree);
+
+    $query = \Drupal::database()
+      ->select(Database::STORAGE_COLLECTION_TABLE, 'f');
+    $query->fields('f')
+      ->condition('entity_id', $id);
 
     $query_count = clone $query;
     $row_count = $query_count->countQuery()
@@ -70,18 +71,31 @@ class DatabaseTest extends KernelTestBase {
 
     $this->assertEquals(1, $row_count, 'One record is added to the table.');
 
+
     $row = $query->execute()->fetch();
-    $this->assertEquals($nid, $row->entity_id);
+    $this->assertEquals($id, $row->entity_id);
 
   }
 
 
-  private function createRandomNode(int $nid): Node {
-    return Node::create([
-      'type' => 'article',
-      'id' => $nid,
-      'title' => $this->randomString(),
-    ]);
+  private function createEntity(int $entity_id = 0, $class = Node::class, $type = 'node', $bundle = 'article', $methods = []) {
+    if ($entity_id === 0) {
+      $entity_id = rand();
+    }
+
+    $node = $this->getMockBuilder($class)
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $node->method('id')->willReturn($entity_id);
+    $node->method('getEntityTypeId')->willReturn($type);
+    $node->method('bundle')->willReturn($bundle);
+
+    foreach ($methods as $name => $return) {
+      $node->method($name)->willReturn($return);
+    }
+
+    return $node;
   }
 
 }
